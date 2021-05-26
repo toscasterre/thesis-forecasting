@@ -1,0 +1,11 @@
+# do not add folders with this prefix
+thesis_*
+
+# python scripts caches 
+__pycache__
+
+# r code in general
+code_r
+
+# data not yet ready to be included
+data
