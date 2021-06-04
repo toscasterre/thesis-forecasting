@@ -1,0 +1,14 @@
+#! /usr/bin/env bash
+
+# takes as input a csv file and returns a csv whose column names are in snake-case. 
+
+# arguments are the input file and output file. 
+INPUT_FILE=$1
+OUTPUT_FILE=$2
+
+# takes the header of the csv file and changes it to snake-case
+NEW_HEADER=$(head -1 $INPUT_FILE | tr "[:upper:]" "[:lower:]" | tr " " "_") 
+
+# substitutes to the first row of the csv the newly formatted one; then outputs the file.
+sed "1s/.*/$NEW_HEADER/" $INPUT_FILE > $OUTPUT_FILE
+

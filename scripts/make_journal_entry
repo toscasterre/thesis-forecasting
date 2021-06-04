@@ -1,0 +1,15 @@
+#! /usr/bin/env bash
+
+# creates a new entry into the research journal of my thesis.
+
+FILE=~/tesi/research_journal/$(date +'%Y_%m_%d').md
+
+if [ ! -f $FILE ]
+then
+    # echo "Today's entry does not exist."
+    touch $FILE
+    echo "# $(date +'%Y-%m-%d')" >> $FILE
+    n $FILE
+else
+    echo "Today's entry already exists."
+fi

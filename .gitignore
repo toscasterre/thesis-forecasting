@@ -1,6 +1,9 @@
 # do not add folders with this prefix
 thesis_*
 
+# avoid work in progress dirs
+wip
+
 # python scripts caches 
 __pycache__
 
@@ -9,3 +12,4 @@ code_r
 
 # data not yet ready to be included
 data
+.Rproj.user
