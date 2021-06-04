@@ -6,27 +6,19 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 
 ```bash
 .
-├── data
-│   ├── arpa
-│   └── test_and_backup_data
-├── references
-│   ├── reference_articles
-│   ├── reference_books
-│   └── reference_tesi
+├── README.md
+├── code_python
 ├── research_journal
-├── tesi_python
-└── tesi_r
-    ├── 01_eda_cache
-    ├── 01_eda_files
-    ├── 02_groupby_cache
-    └── renv
+└── scripts
 ```
 
-* `data` contains some of the data I am still gathering. `test_and_backup_data` contains a tarball with the `.csv` bike-sharing files. `arpa` is cumbersome, data about bike stations needs to be added.
-* `refereces` has three types of reference files: `books` about time series, deep learning and other; `tesi` about other dissertations to model my thesis after and `articles` for the proper bibliography.
-* `research_journal` has my research log.
-* the other two folders have code in `python` and `R` respectively.
+* `code_python` contains the notebooks with the analysis.
+* `research_journal` has some of my considerations I wrote down. Actually, most of my errands are stored in a local knowledge tree with [logseq](https://github.com/logseq/logseq).
+* `scripts` contains the custom shell scripts I have written to process the data.
+
 
 # To Do List
 
-* define research question and structure of the paper.
+Still a great deal of stuff...
+
+* terminate the scripts to extract the data from the zip archives.
