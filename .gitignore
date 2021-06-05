@@ -1,5 +1,5 @@
 # do not add folders with this prefix
-thesis_*
+thesis
 
 # avoid work in progress dirs
 wip
