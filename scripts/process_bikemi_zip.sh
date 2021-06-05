@@ -30,8 +30,11 @@ for ZIP in $@; do
         echo -e "\n${BOLD}${GREEN}==> ${WHITE}Converting ${GREEN}${FILE} ${WHITE}to ${GREEN}${FILE/.xlsx/.csv}${RESET}"
         in2csv "$FILE" > "${FILE/.xlsx/.csv}"
 
+        # remove the original file
+        rm "$FILE"
+
         # clean the headers of the csv
-        echo "${BOLD}${GREEN}==> ${WHITE}Cleaning ${GREEN}${FILE} ${WHITE}headers${RESET}"
+        echo "${BOLD}${GREEN}==> ${WHITE}Cleaning ${GREEN}${FILE/.xlsx/.csv} ${WHITE}headers${RESET}"
         clean_headers "${FILE/.xlsx/.csv}"
     done
 

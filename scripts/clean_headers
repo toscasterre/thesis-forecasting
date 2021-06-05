@@ -8,7 +8,7 @@ for FILE in $@; do
     NEW_HEADER=$(head -1 $FILE | tr "[:upper:]" "[:lower:]" | tr " " "_") 
 
     # substitutes to the first row of the csv the newly formatted one; then outputs the file.
-    sed -i .backup "1s/.*/$NEW_HEADER/" $FILE
+    sed -i "1s/.*/$NEW_HEADER/" $FILE
 
     #echo "${FILE} columns have been cleaned up."
 
