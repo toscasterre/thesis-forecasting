@@ -36,6 +36,9 @@ for DIR in $@; do
 
     done
 
+    # zip all files and remove them
+    zip -r "${DIR}_csv.zip" *.csv && rm *.csv
+    
     cd ..
 
 done
