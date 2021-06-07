@@ -8,7 +8,7 @@ source $ZDOTDIR/.zsh-colors
 
 for ZIP in $@; do
     
-    TMP_DIR="${ZIP/.zip/}_tmp" # ${ZIP/<pattern_to_replace>/<pattern_to_substitute>/}
+    TMP_DIR="${ZIP/.zip/}" # ${ZIP/<pattern_to_replace>/<pattern_to_substitute>/}
     echo "${BOLD}Creating the temporary dir ${TMP_DIR}${RESET}"
     mkdir "$TMP_DIR"
     cd "$TMP_DIR" # cd into the tmp dir to execute the script
