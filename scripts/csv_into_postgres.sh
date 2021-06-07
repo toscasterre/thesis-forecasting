@@ -2,7 +2,7 @@
 
 # csv_into_postgres.sh dir1 dir2...
 
-source $ZDOTDIR/.zsh-colors
+source "$ZDOTDIR/.zsh-colors"
 
 # see if the server is running (custom script)
 pg_server_status
@@ -18,23 +18,18 @@ for DIR in $@; do
             bici INT,
             tipo_bici VARCHAR(20),
             cliente_anonimizzato INT,
-            data_riferimento_prelievo DATE,
             data_prelievo TIMESTAMP,
             numero_stazione_prelievo INT,
             nome_stazione_prelievo TEXT,
-            slot_prelievo SMALLINT,
-            data_riferimento_restituzione DATE,
             data_restituzione TIMESTAMP,
             numero_stazione_restituzione INT,
             nome_stazione_restituzione TEXT,
-            slot_restituzione SMALLINT,
-            durata VARCHAR(10),
             distanza_totale REAL
         );" bikemi 
 
     for CSV in *.csv; do
 
-        COLS=$( head -1 ${CSV} | xsv select 1-15 )
+        COLS="$( head -1 ${CSV} )"
         
         echo "${BOLD}${CYAN}==>${WHITE} Copying data from ${CYAN}${CSV}${RESET}"
         psql -c "SET datestyle TO iso, dmy; COPY ${DIR}(${COLS}) FROM '$(pwd)/${CSV}' DELIMITER ',' CSV HEADER;" bikemi

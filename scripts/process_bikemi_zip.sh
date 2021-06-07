@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source $ZDOTDIR/.zsh-colors
+source "$ZDOTDIR/.zsh-colors"
 
 # dove sono: anywhere
 # che cosa faccio
@@ -8,16 +8,16 @@ source $ZDOTDIR/.zsh-colors
 
 for ZIP in $@; do
     
-    TMP_DIR="${ZIP/.zip/}" # ${ZIP/<pattern_to_replace>/<pattern_to_substitute>/}
-    echo "${BOLD}Creating the temporary dir ${TMP_DIR}${RESET}"
-    mkdir "$TMP_DIR"
-    cd "$TMP_DIR" # cd into the tmp dir to execute the script
+    EXTRACTION_DIR="${ZIP/.zip/}" # ${ZIP/<pattern_to_replace>/<pattern_to_substitute>/}
+    echo "${BOLD}${BLUE}> ${WHITE}Creating the extraction directory ${BLUE}${EXTRACTION_DIR}${RESET}"
+    mkdir "$EXTRACTION_DIR" && cd "$EXTRACTION_DIR"
 
     # unzip the file
-    echo -e "${BOLD}${BLUE}=> ${WHITE}Unzipping ${BLUE}${ZIP}${RESET}"
+    echo -e "${BOLD}${BLUE}=> ${WHITE}Unzipping ${BLUE}${ZIP}${RESET}\n"
     unzip "../${ZIP}"
     
     echo ""
+    # rename the files
     for FILE in *.xlsx; do
         # removes all sequences of whitespaces and replaces them with "_" 
         # see: http://plasmasturm.org/code/rename/
@@ -25,20 +25,24 @@ for ZIP in $@; do
         rename --nows "$FILE"
     done
 
+    echo ""
+    # convert from xlsx to csv
     for FILE in *.xlsx; do
         # convert from xlsx to csv
-        echo -e "\n${BOLD}${GREEN}==> ${WHITE}Converting ${GREEN}${FILE} ${WHITE}to ${GREEN}${FILE/.xlsx/.csv}${RESET}"
-        in2csv "$FILE" > "${FILE/.xlsx/.csv}"
+        echo "${BOLD}${GREEN}==> ${WHITE}Converting ${GREEN}${FILE} ${WHITE}to ${GREEN}${FILE/.xlsx/_temp.csv}${RESET}"
+        in2csv "$FILE" > "${FILE/.xlsx/_temp.csv}" && rm "$FILE"
+    done
+    
+    echo ""
+    # clean the headers of the csv
+    for FILE in *.csv; do     
+        echo "${BOLD}${GREEN}==> ${WHITE}Cleaning ${GREEN}${FILE} ${WHITE}headers${RESET}"
+        clean_headers "${FILE}"
 
-        # remove the original file
-        rm "$FILE"
-
-        # clean the headers of the csv
-        echo "${BOLD}${GREEN}==> ${WHITE}Cleaning ${GREEN}${FILE/.xlsx/.csv} ${WHITE}headers${RESET}"
-        clean_headers "${FILE/.xlsx/.csv}"
+        echo "${BOLD}${GREEN}==> ${WHITE}Removing unnecessary columns from ${GREEN}${FILE}${RESET}"
+        xsv select 1-3,5-7,10-12,15 "${FILE}" > "${FILE/_temp/}" && rm "${FILE}"
     done
 
     cd ..
 
 done
-
