@@ -4,9 +4,6 @@
 
 source "$ZDOTDIR/.zsh-colors"
 
-# see if the server is running (custom script)
-pg_server_status
-
 for DIR in $@; do
 
     cd $DIR
@@ -26,19 +23,21 @@ for DIR in $@; do
             nome_stazione_restituzione TEXT,
             distanza_totale REAL
         );" bikemi 
+    echo ""
 
     for CSV in *.csv; do
 
         COLS="$( head -1 ${CSV} )"
         
-        echo "${BOLD}${CYAN}==>${WHITE} Copying data from ${CYAN}${CSV}${RESET}"
+        echo "${BOLD}${CYAN}==>${WHITE} Copying data from ${CYAN}${CSV} ${WHITE}to ${BLUE}${DIR} ${WHITE}PostgreSQL database${RESET}"
         psql -c "SET datestyle TO iso, dmy; COPY ${DIR}(${COLS}) FROM '$(pwd)/${CSV}' DELIMITER ',' CSV HEADER;" bikemi
 
     done
 
-    # zip all files and remove them
-    zip -r "${DIR}_csv.zip" *.csv && rm *.csv
-    
     cd ..
+
+    # zip all files and remove them
+    echo -e "\n${BOLD}${BLUE}=>${WHITE} Backing up ${BLUE}${DIR}${RESET}"
+    zip -r "${DIR}_csv.zip" ${DIR} && rm -rf ${DIR}
 
 done
