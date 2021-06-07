@@ -11,7 +11,7 @@ for DIR in $@; do
 
     cd $DIR
 
-    echo "${BOLD}${BLUE}==>${WHITE} Checking if table ${BLUE}${DIR}${WHITE} exists${RESET}"
+    echo -e "\n${BOLD}${BLUE}=>${WHITE} Checking if table ${BLUE}${DIR}${WHITE} exists${RESET}"
     psql -c "SET datestyle TO iso, dmy;
 
         CREATE TABLE IF NOT EXISTS ${DIR} (
