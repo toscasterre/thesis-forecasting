@@ -27,8 +27,8 @@ def get_dict_items(dictio):
 
 
 def retrieve_bike_flow(
+    table,
     db_conn_detail={"dbname": "bikemi", "user": "luca"},
-    table="_2019_q3",
     # e.g. station_column = {"nome_stazione_prelievo" : "stazione_partenza"}
     station_column=None,
     # alternatively, {"data_restituzione" : "giorno_restituzione"}
@@ -68,7 +68,7 @@ def retrieve_bike_flow(
             GROUP BY {time_val}, {station_val};
             '''
 
-    return pd.read_sql(query, con=db_conn, index_col=f"{time_val}")
+    return pd.read_sql(query, con=db_conn, index_col=f"{time_val}").sort_index()
 
 
 def pivot_bike_flow(bike_flow, cols, vals="count"):
@@ -141,19 +141,35 @@ def subunits_boxplot(ts, y, time_subunit, boxplot_props=default_boxplot_props())
             **boxplot_props)
 
 
-def plot_rolling_statistics(ts, lags=7):
+def rolling_statistics(ts: pd.Series, lags: int, statistics: list = ["mean"]):
     """Plots the rolling statistics of a time series."""
-    # rolling statistics
-    roll_mean = ts.rolling(lags).mean()
-    roll_std = ts.rolling(lags).std()
 
-    # plot rolling statistics
     fig, ax = plt.subplots()
+
     # colors via tableau palette (tab:<colname>)
-    ax.plot(ts, color="tab:blue", label="Observed Values")
-    ax.plot(roll_mean, color="tab:red", label="Rolling Mean")
-    ax.plot(roll_std, color="tab:gray", label="Rolling Standard Deviation")
-    ax.set_title("Rolling Mean and Standard Deviation")
+    ax.plot(ts, color="tab:blue", label="Observed Values")  # actual series
+
+    if "mean" in statistics:  # if specified, plot rolling mean
+        ax.plot(ts.rolling(lags).mean(),
+                color="tab:red",
+                label="Rolling Mean")
+
+    if "std" in statistics:  # if specified, plot rolling standard deviation
+        ax.plot(ts.rolling(lags).std(),
+                color="tab:gray",
+                label="Rolling Standard Deviation")
+
+    if "mean" in statistics:
+        if "std" in statistics:
+            title = "Rolling Mean and Standard Deviation"
+        else:
+            title = "Rolling Mean"
+    else:
+        title = "Rolling Standard Deviation"
+
+    title += f"\nWindow size: {lags}"
+
+    ax.set_title(title)
     ax.legend(loc="best")
     plt.show()
 

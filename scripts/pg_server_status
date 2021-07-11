@@ -15,5 +15,5 @@ fi
 # lists where postgres binary and server location are
 PG_STATUS=$(pg_ctl status -D /usr/local/var/postgres | sed "s/\"//g" |  awk "NR==2")
 
-echo -e "\n${BOLD}PostgreSQL binary:${BLUE}$(echo $PG_STATUS | awk 'BEGIN { FS = " " } ; {print $1}')${RESET}
-${BOLD}Server directory:${BLUE}$(echo $PG_STATUS | awk 'BEGIN { FS = " " } ; {print $3}')${RESET}"
+echo -e "\n${BOLD}${WHITE}PostgreSQL binary:${BLUE}$(echo $PG_STATUS | awk 'BEGIN { FS = " " } ; {print $1}')${RESET}
+${BOLD}${WHITE}Server directory:${BLUE}$(echo $PG_STATUS | awk 'BEGIN { FS = " " } ; {print $3}')${RESET}"
