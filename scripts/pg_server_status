@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
 # import variables for making colored output easier
-source $ZDOTDIR/.zsh-colors
+source "$ZDOTDIR/colors.zsh"
 
 #checks if the server is running
 if [[ "$(pg_ctl status)" == "pg_ctl: no server running" ]]; then

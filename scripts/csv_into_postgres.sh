@@ -2,7 +2,7 @@
 
 # csv_into_postgres.sh dir1 dir2...
 
-source "$ZDOTDIR/.zsh-colors"
+source "$ZDOTDIR/colors.zsh"
 
 for DIR in $@; do
 

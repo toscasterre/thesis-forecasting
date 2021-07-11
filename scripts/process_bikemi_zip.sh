@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$ZDOTDIR/.zsh-colors"
+source "$ZDOTDIR/colors.zsh"
 
 # dove sono: anywhere
 # che cosa faccio

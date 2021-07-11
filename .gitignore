@@ -1,15 +1,11 @@
 # do not add folders with this prefix
-thesis
+thesis_*
 
-# avoid work in progress dirs
-wip
-
-# python scripts caches 
-__pycache__
-
-# r code in general
+# exclude R code
 code_r
 
-# data not yet ready to be included
+# exclude data
 data
-.Rproj.user
+
+# exclude work in progress folders
+wip
