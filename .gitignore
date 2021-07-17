@@ -5,7 +5,7 @@ thesis_*
 code_r
 
 # exclude data
-data
+data/*
 !data/bikemi_csv
 
 # exclude work in progress folders
