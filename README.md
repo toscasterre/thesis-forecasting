@@ -29,8 +29,8 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 ## Part 0: Data Ingestion
 
 - [x] Scripts to automate data import into the SQL database
-- [ ] Clean multivariate data:
-  - [ ] `NaN`
+- [x] Clean multivariate data:
+  - [x] `NaN` to `0`.
 
 ## Part 1: Univariate Time Series
 
