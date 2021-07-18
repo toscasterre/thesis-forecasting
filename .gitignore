@@ -1,10 +1,7 @@
 # do not add folders with this prefix
 thesis_*
 
-# exclude R code
-code_r
-
-# exclude data
+# exclude data, but not the `.csv`s
 data/*
 !data/bikemi_csv
 

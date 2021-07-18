@@ -28,25 +28,25 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 
 ## Part 0: Data Ingestion
 
-- [ ] Scripts to automate data import into the SQL database
-- [ ] Clean multivariate data
+- [x] Scripts to automate data import into the SQL database
+- [ ] Clean multivariate data:
+  - [ ] `NaN`
 
 ## Part 1: Univariate Time Series
 
-Two analyses:
+Two analyses, then compare the results
 
 * Aggregate data for Milan
 * Aggregate data for each station
 
-And compare the results.
-
 - [ ] Time Series Decomposition?
 - [ ] ARIMA model
   - [ ] Choose the metrics
+  - [ ] Transformations: log? box-cox?
   - [ ] First Differences
   - [ ] Seasonal Differences
-- [ ] SARIMA?
-- [ ] SARIMAX?
+- [ ] SARIMA
 - [ ] Prophet
+- [ ] SARIMAX if weather data
 
 ## Part 2: Multivariate Time Series with Deep Neural Networks
