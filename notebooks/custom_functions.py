@@ -1,3 +1,4 @@
+from typing import Optional
 import psycopg2
 import pandas as pd
 import statsmodels.tsa.api as tsa
@@ -20,26 +21,29 @@ class color:
     END = '\033[0m'
 
 
-def get_dict_items(dictio):
-    """Auxiliary function to extract a tuple of key-value pairs from each dictionary item"""
+def get_dict_items(dictio: dict) -> tuple:
+    """Extract a tuple of key-value pairs from each dictionary item"""
     for key, value in dictio.items():
         return key, value
 
 
 def retrieve_bike_flow(
-    table,
-    db_conn_detail={"dbname": "bikemi", "user": "luca"},
+    table: str,
+    db_conn_detail: dict = {"dbname": "bikemi", "user": "luca"},
     # e.g. station_column = {"nome_stazione_prelievo" : "stazione_partenza"}
-    station_column=None,
+    # `None` as a type hint is replaced by `type(None)`
+    station_column: None = None,
     # alternatively, {"data_restituzione" : "giorno_restituzione"}
-    time_column={"data_prelievo": "giorno_partenza"},
-    trunc="day"
-):
+    time_column: dict = {"data_prelievo": "giorno_partenza"},
+        trunc: str = "day") -> pd.DataFrame:
     """
-    From the PostgreSQL database, extract a Pandas DataFrame containing the trips data grouped at a certain time interval.
-    The time interval is any argument that can enter SQL `DATE_TRUNC()` syntax: it can be 'day', 'hour'...
-    If `time_column` is `data_prelievo` then the function will return the outflow; if it is `data_restituzione` it will be the inflow.
-    If `station_column` is specified, the data will be for each individual station.
+    From the PostgreSQL database, extract a DataFrame of the rental data,
+    grouped at a certain time interval.
+    The time interval is any argument accepted by SQL `DATE_TRUNC()`:
+    it can be 'day', 'hour'...
+    If `time_column` is `data_prelievo`, the function will return the outflow;
+    if it is `data_restituzione` it will be the inflow.
+    If `station_column` is specified, it returns a Series for each strall.
     Data is already indexed at the `time_column`.
     """
     db_conn = psycopg2.connect(
@@ -68,29 +72,36 @@ def retrieve_bike_flow(
             GROUP BY {time_val}, {station_val};
             '''
 
-    return pd.read_sql(query, con=db_conn, index_col=f"{time_val}").sort_index()
+    return pd.read_sql(query, con=db_conn, index_col=f"{time_val}") \
+        .sort_index()
 
 
-def pivot_bike_flow(bike_flow, cols, vals="count"):
-    """Transform the flow into a panel dataframe - i.e., the data in wide format - with a series for each station"""
+def pivot_bike_flow(
+        bike_flow: pd.Series,
+        cols: list,
+        vals: str = "count") -> pd.DataFrame:
+    """Transform the flow into a panel dataframe (wide format)"""
     return bike_flow.pivot(columns=cols, values=vals)
 
 
-def make_ts_plot(df, y="count"):
+def make_ts_plot(df: pd.DataFrame, y: str = "count") -> None:
     df.plot(y=y, title=f"Daily {y.capitalize()} of Trips in Milan",
             xlabel="Time", ylabel=None)
 
 
-def get_time_format(time_unit):
+def get_time_format(time_unit: str) -> Optional[str]:
     """
-    Takes a string such as "month" and returns the corresponding format for functions like `strftime`
+    Takes a string such as "month" and returns
+    the corresponding format for functions like `strftime`.
 
     Args:
-        time_unit (string): a string with a time unit.
-        Values accepted are: ["year","month","weekday","hour","minute","second"]
+    time_unit (string): a string with a time unit.
+    Values accepted:
+    ["year","month","weekday","hour","minute","second"]
 
     Returns:
-        [string]: one of the following: ["%Y","%B","%A","%H","%M","%S"]
+    [string]: one of the following:
+    ["%Y","%B","%A","%H","%M","%S"]
     """
 
     units_and_formats = {
@@ -105,7 +116,11 @@ def get_time_format(time_unit):
     return units_and_formats.get(time_unit.lower())
 
 
-def default_boxplot_props(line_width=1.5, median_linewidth=2.5, whiskers_linewidth=1, median_color="tomato"):
+def default_boxplot_props(
+        line_width: float = 1.5,
+        median_linewidth: float = 2.5,
+        whiskers_linewidth: int = 1,
+        median_color: str = "tomato") -> dict:
     # colors: https://matplotlib.org/stable/gallery/color/named_colors.html
     return dict(
         boxprops=dict(lw=line_width),
@@ -115,7 +130,11 @@ def default_boxplot_props(line_width=1.5, median_linewidth=2.5, whiskers_linewid
     )
 
 
-def subunits_boxplot(ts, y, time_subunit, boxplot_props=default_boxplot_props()):
+def subunits_boxplot(
+        ts: pd.Series,
+        y: str,
+        time_subunit: str,
+        boxplot_props: dict = default_boxplot_props()) -> None:
     """
     Plots a time-series y againsts a subunit of its time column/index.
     Accepted time-subunits are: year, month, weekday, hour, minute, second.
@@ -123,7 +142,8 @@ def subunits_boxplot(ts, y, time_subunit, boxplot_props=default_boxplot_props())
     # duplicate the inputted time series to prevent overwriting
     ts_ = ts.copy()
 
-    # obtain the time format, e.g. "%B", from the subunit indicated, e.g. "month"
+    # obtain the time format from the input subunit
+    # e.g. "%B" and "month"
     time_format = get_time_format(time_subunit)
 
     # create the new subunit column for pivoting
@@ -136,12 +156,17 @@ def subunits_boxplot(ts, y, time_subunit, boxplot_props=default_boxplot_props())
     df = ts_.pivot(columns=time_subunit, values=y).reindex(columns=sorting_key)
 
     fig, ax = plt.subplots()
-    df.plot(kind="box", ax=ax,
-            title=f"Daily Outflow of Bikes, {time_subunit.capitalize()} Boxplots",
-            **boxplot_props)
+    df.plot(
+        kind="box", ax=ax,
+        title=f"Daily Outflow of Bikes, {time_subunit.capitalize()} Boxplots",
+        **boxplot_props
+    )
 
 
-def rolling_statistics(ts: pd.Series, lags: int, statistics: list = ["mean"]):
+def rolling_statistics(
+        ts: pd.Series,
+        lags: int,
+        statistics: list = ["mean"]) -> None:
     """Plots the rolling statistics of a time series."""
 
     fig, ax = plt.subplots()
@@ -174,20 +199,24 @@ def rolling_statistics(ts: pd.Series, lags: int, statistics: list = ["mean"]):
     plt.show()
 
 
-def plot_acf_and_pacf(ts):
-    """Takes a Pandas time series and outputs the autocorrelation and partial-autocorrelation function plots."""
+def plot_acf_and_pacf(ts: pd.Series) -> None:
+    """Plots pd.Series autocorrelation (ACF)
+    and partial-autocorrelation function (PACF)."""
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
     plot_acf(ts, title="Autocorrelation (95% CI)", ax=ax1)
     plot_pacf(ts, title="Partial Autocorrelation (95% CI)", ax=ax2)
     plt.show()
 
 
-def perform_adfuller(ts, regression="ct"):
+def perform_adfuller(ts: pd.Series, regression: str = "ct") -> None:
     """
-    Plots the rollign statistics of a time series and then performs the Advanced Dickey-Fuller test for stationarity.
+    Plots the rollign statistics of a time series,
+    then performs the Advanced Dickey-Fuller test for stationarity.
 
-    ADF Null Hypothesis is that there is a unit root, i.e. the series is non-stationary.
-    To reject the null hypothesis (i.e., the series is stationary), the test statistics must be smaller than the critical value
+    ADF Null Hypothesis is that there is a unit root,
+    i.e. the series is non-stationary.
+    To reject the null hypothesis (i.e., the series is stationary),
+    the test statistics must be smaller than the critical value.
 
     Default test is with constant and trend.
     """
@@ -204,7 +233,9 @@ def perform_adfuller(ts, regression="ct"):
         Critical Value (5%): {adf_results[4].get("5%")}
         Critical Value (10%): {adf_results[4].get("10%")}\n
         AIC: {adf_results[5]}\n
-        {color.BOLD}The series is {f'{color.RED}non-' if adf_results[1] > 0.05 else ''}stationary {color.END}
+        {color.BOLD}The series is
+        {f'{color.RED}non-' if adf_results[1] > 0.05 else ''}
+        stationary {color.END}
         """
     print(results_string)
 
@@ -220,7 +251,3 @@ def perform_adfuller(ts, regression="ct"):
     #         We reject the null hypothesis at the {key} level.
     #         The series appears to be stationary.
     #         """)
-
-
-if __name__ == "main":
-    pass
