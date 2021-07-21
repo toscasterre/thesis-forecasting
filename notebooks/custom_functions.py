@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 # from plotnine import *  # plots à la ggplot
 
 
+# use this to print out colored output with `print()`
 class color:
     # define custom class to render formatted output
     PURPLE = '\033[95m'
@@ -84,9 +85,77 @@ def pivot_bike_flow(
     return bike_flow.pivot(columns=cols, values=vals)
 
 
-def make_ts_plot(df: pd.DataFrame, y: str = "count") -> None:
-    df.plot(y=y, title=f"Daily {y.capitalize()} of Trips in Milan",
-            xlabel="Time", ylabel=None)
+def create_ts_features(
+    dataframe: pd.DataFrame,
+    features: list = ["day", "month"],
+    weekends: bool = False,
+) -> pd.DataFrame:
+    """
+        Generates time-series features out of a dataframe.
+        The index MUST be a DateTimeIndex.
+
+        Args:
+        dataframe ([type]):
+            DateTimeIndex-ed Pandas DataFrame.
+
+        features (list, optional):
+            The number of features to extract.
+            Defaults to ["day", "month", "year"].
+            Possible values:
+            ["hour", "day", "month", "week", "year", "day_name", "month_name"]
+
+            One note: week numbers depend on the year.
+            Sometimes the last days of one year may actually be part
+            of the following years' first week, as it is the case with 2019.
+            (this can help to spot the overlapping days:
+            `daily_outflow.index.isocalendar().week.reset_index().groupby("week").size()`)
+
+        weekends (bool, optional):
+            creates another column with True if the day is in the weekend.
+            Defaults to False.
+
+        Returns the same dataframe, but with new columns
+    """
+
+    if "hour" in features:
+        dataframe["hour"] = dataframe.index.hour
+
+    if weekends and (("day" not in features) or ("day_names" not in features)):
+        raise Exception(
+            """`weekends` must be chosen with either `day`
+            or `day_names` in `features`, or both"""
+        )
+
+    if "day" in features:
+        dataframe["day"] = dataframe.index.day
+
+        if weekends:
+            dataframe["is_weekend"] = dataframe["day"] \
+                .apply(lambda x: "True" if x > 5 else "False") \
+                .astype("bool")
+
+    if "day_names" in features:
+        dataframe["day_name"] = dataframe.index.day_name()
+
+        if weekends:
+            weekend_days = ["Saturday", "Sunday"]
+            dataframe["is_weekend"] = dataframe["day"] \
+                .apply(lambda x: "True" if x in weekend_days else "False") \
+                .astype("bool")
+
+    if "week" in features:
+        dataframe["week"] = dataframe.index.isocalendar().week
+
+    if "month" in features:
+        dataframe["month"] = dataframe.index.month
+
+    if "month_name" in features:
+        dataframe["month_name"] = dataframe.index.month_name()
+
+    if "year" in features:
+        dataframe["year"] = dataframe.index.year
+
+    return dataframe
 
 
 def get_time_format(time_unit: str) -> Optional[str]:
