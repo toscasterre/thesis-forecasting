@@ -1,9 +1,20 @@
-from typing import Optional
+# for connections
 import psycopg2
+
+# for type stubs
+from typing import Optional
+
+# dataframes
 import pandas as pd
+# holidays
+import holidays
+
+# plotting
+import matplotlib.pyplot as plt
+
+# time series
 import statsmodels.tsa.api as tsa
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-import matplotlib.pyplot as plt
 # from plotnine import *  # plots à la ggplot
 
 
@@ -87,8 +98,7 @@ def pivot_bike_flow(
 
 def create_ts_features(
     dataframe: pd.DataFrame,
-    features: list = ["day", "month"],
-    weekends: bool = False,
+    features: list = ["day", "month"]
 ) -> pd.DataFrame:
     """
         Generates time-series features out of a dataframe.
@@ -102,17 +112,14 @@ def create_ts_features(
             The number of features to extract.
             Defaults to ["day", "month", "year"].
             Possible values:
-            ["hour", "day", "month", "week", "year", "day_name", "month_name"]
+            ["hour", "day", "month", "is_weekend", "week",
+            "year", "day_name", "month_name", "holidays"]
 
             One note: week numbers depend on the year.
             Sometimes the last days of one year may actually be part
             of the following years' first week, as it is the case with 2019.
             (this can help to spot the overlapping days:
-            `daily_outflow.index.isocalendar().week.reset_index().groupby("week").size()`)
-
-        weekends (bool, optional):
-            creates another column with True if the day is in the weekend.
-            Defaults to False.
+            `dataframe.index.isocalendar().week.reset_index().groupby("week").size()`)
 
         Returns the same dataframe, but with new columns
     """
@@ -120,28 +127,15 @@ def create_ts_features(
     if "hour" in features:
         dataframe["hour"] = dataframe.index.hour
 
-    if weekends and (("day" not in features) or ("day_names" not in features)):
-        raise Exception(
-            """`weekends` must be chosen with either `day`
-            or `day_names` in `features`, or both"""
-        )
-
     if "day" in features:
         dataframe["day"] = dataframe.index.day
-
-        if weekends:
-            dataframe["is_weekend"] = dataframe["day"] \
-                .apply(lambda x: "True" if x > 5 else "False") \
-                .astype("bool")
 
     if "day_names" in features:
         dataframe["day_name"] = dataframe.index.day_name()
 
-        if weekends:
-            weekend_days = ["Saturday", "Sunday"]
-            dataframe["is_weekend"] = dataframe["day"] \
-                .apply(lambda x: "True" if x in weekend_days else "False") \
-                .astype("bool")
+    if "weekends" in features:
+        dataframe["is_weekend"] = dataframe.index.isocalendar().day \
+            .apply(lambda x: 1 if x in [2, 3] else 0)
 
     if "week" in features:
         dataframe["week"] = dataframe.index.isocalendar().week
@@ -154,6 +148,19 @@ def create_ts_features(
 
     if "year" in features:
         dataframe["year"] = dataframe.index.year
+
+    if "holidays" in features:
+
+        ita_holidays = holidays.CountryHoliday(
+            "IT",
+            prov="MI",
+            years=[year for year in list(dataframe.index.year.unique())]
+        )
+
+        # workaround to create the "holiday" column
+        dataframe["dates"] = dataframe.index
+        dataframe["holiday"] = dataframe["dates"] \
+            .apply(lambda x: ita_holidays.get(str(x)))
 
     return dataframe
 

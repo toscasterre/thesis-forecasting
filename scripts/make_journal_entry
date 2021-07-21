@@ -4,12 +4,27 @@
 
 FILE=~/tesi/research_journal/$(date +'%Y_%m_%d').md
 
-if [ ! -f $FILE ]
-then
+if [ ! -f $FILE ] ; then
     # echo "Today's entry does not exist."
     touch $FILE
     echo "# $(date +'%Y-%m-%d')" >> $FILE
-    n $FILE
+    $EDITOR $FILE
 else
-    echo "Today's entry already exists."
+    echo -e "Today's entry already exists.\n"
+    
+    # reference: https://alvinalexander.com/linux-unix/shell-script-how-prompt-read-user-input-bash/
+    while true ; do
+        # (1) prompt user, and read command line argument
+        read -p "Open in in $(basename "$EDITOR")? [y/n] " ANSWER
+
+        # (2) handle the input we were given
+        case $ANSWER in
+            [yY]* ) $EDITOR $FILE
+                    break;;
+
+            [nN]* ) exit;;
+
+                * ) echo "Enter y or n, please.";;
+        esac
+    done
 fi
