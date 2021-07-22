@@ -90,18 +90,18 @@ def pivot_bike_flow(
     return bike_flow.pivot(columns=cols, values=vals)
 
 
-def extract_italian_holidays(ts: pd.DataFrame) -> pd.Series:
-
+def milan_holidays(ts: pd.DataFrame) -> pd.Series:
+    """Requires a DataFrame with a DateTimeIndex"""
     ita_holidays = holidays.CountryHoliday(
         "IT",
         prov="MI",
         years=[year for year in list(ts.index.year.unique())]
     )
 
-    # workaround to create the "holiday" column
-    ts["dates"] = ts.index
-    return ts["dates"] \
-        .apply(lambda x: ita_holidays.get(str(x)))
+    # you cannot use `.apply()` on Indexes, but you
+    # can cast an Index as a Series!
+    return pd.DataFrame(ts.index, index=ts.index).iloc[:, 0] \
+        .apply(lambda x: ita_holidays.get(str(x))).astype("category")
 
 
 def create_ts_features(
@@ -143,10 +143,10 @@ def create_ts_features(
 
     if "weekends" in features:
         dataframe["is_weekend"] = dataframe.index.isocalendar().day \
-            .apply(lambda x: 1 if x in [2, 3] else 0)
+            .apply(lambda x: 1 if x in [2, 3] else 0).astype("category")
 
     if "week" in features:
-        dataframe["week"] = dataframe.index.isocalendar().week
+        dataframe["week"] = dataframe.index.isocalendar().week.astype("int64")
 
     if "month" in features:
         dataframe["month"] = dataframe.index.month
@@ -158,17 +158,7 @@ def create_ts_features(
         dataframe["year"] = dataframe.index.year
 
     if "holidays" in features:
-
-        ita_holidays = holidays.CountryHoliday(
-            "IT",
-            prov="MI",
-            years=[year for year in list(dataframe.index.year.unique())]
-        )
-
-        # workaround to create the "holiday" column
-        dataframe["dates"] = dataframe.index
-        dataframe["holiday"] = dataframe["dates"] \
-            .apply(lambda x: ita_holidays.get(str(x)))
+        dataframe["holiday"] = milan_holidays(dataframe)
 
     return dataframe
 
