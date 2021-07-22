@@ -33,12 +33,6 @@ class color:
     END = '\033[0m'
 
 
-def get_dict_items(dictio: dict) -> tuple:
-    """Extract a tuple of key-value pairs from each dictionary item"""
-    for key, value in dictio.items():
-        return key, value
-
-
 def retrieve_bike_flow(
     table: str,
     db_conn_detail: dict = {"dbname": "bikemi", "user": "luca"},
@@ -61,7 +55,7 @@ def retrieve_bike_flow(
     db_conn = psycopg2.connect(
         "dbname = {dbname} user = {user}".format(**db_conn_detail))
 
-    time_key, time_val = get_dict_items(time_column)
+    time_key, time_val = time_column.items()
 
     if station_column is None:
 
@@ -73,7 +67,7 @@ def retrieve_bike_flow(
             GROUP BY {time_val};
             '''
     else:
-        station_key, station_val = get_dict_items(station_column)
+        station_key, station_val = station_column.items()
 
         query = f'''
             SELECT
@@ -94,6 +88,20 @@ def pivot_bike_flow(
         vals: str = "count") -> pd.DataFrame:
     """Transform the flow into a panel dataframe (wide format)"""
     return bike_flow.pivot(columns=cols, values=vals)
+
+
+def extract_italian_holidays(ts: pd.DataFrame) -> pd.Series:
+
+    ita_holidays = holidays.CountryHoliday(
+        "IT",
+        prov="MI",
+        years=[year for year in list(ts.index.year.unique())]
+    )
+
+    # workaround to create the "holiday" column
+    ts["dates"] = ts.index
+    return ts["dates"] \
+        .apply(lambda x: ita_holidays.get(str(x)))
 
 
 def create_ts_features(
