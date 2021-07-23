@@ -1,7 +1,7 @@
 # do not add folders with this prefix
 thesis_*
 
-# exclude data, but not the `.csv`s
+# exclude original data 
 data/bikemi
 
 # exclude work in progress folders
