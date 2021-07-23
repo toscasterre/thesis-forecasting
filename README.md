@@ -9,6 +9,7 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 ```bash
 .
 ├── README.md
+├── .vscode
 ├── data
 │   ├── arpa
 │   ├── bikemi_csv
@@ -24,20 +25,19 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 ```
 
 * `README.md` is this file
-* `data` contains:
-  * `arpa` actually not needed
+* [`.vscode`](https://github.com/baggiponte/thesis-forecasting/tree/main/.vscode) settings and VS Code extensions.
+* [`data`](https://github.com/baggiponte/thesis-forecasting/tree/main/data) contains:
+  * [`arpa`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/arpa) actually not needed
     * Could be exploited with time series for weather data from each measuring station.
-  * `bikemi_csv`: data for time series analysis.
-  * `bikemi_metadata`: stalls locations.
-  * `milan`: districts (Municipi) and neighborhoods (NIL) coordinates.
-* `environment.yml` can be used to re-create the `conda` environment I am using via `conda create env --file environment.yml`
-* `jupyter/kernels/bikemi/`: take `bikemi` and copy it to your `$JUPYTER_CONFIG_DIR` to get a kernel specification file. This creates the option to select the environment as a kernel for your Notebooks.
-* `notebooks` contains the notebooks with the analysis.
-* `research_journal` has some of my considerations I wrote down. Actually, most of my errands are stored in a local knowledge tree with [logseq](https://github.com/logseq/logseq).
-* `scripts` contains the custom shell scripts I have written to process the data.
-* `tesi.code-workspace` the file to launch the project in Visual Studio Code
-* `thesis_body` the written text
-  * [ ] Will likely redo everythin in `.Rmarkdown`
+  * [`bikemi_csv`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/bikemi_csv): data for time series analysis.
+  * [`bikemi_metadata`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/bikemi_metadata): stalls locations.
+  * [`milan`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/milan): districts (Municipi) and neighborhoods (NIL) coordinates.
+* [`environment.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment.yml) can be used to re-create the `conda` environment I am using via `conda create env --file environment.yml`
+* [`jupyter/kernels/bikemi/`](https://github.com/baggiponte/thesis-forecasting/tree/main/jupyter/kernels/bikemi): take the `bikemi` folder and copy it to your `$JUPYTER_CONFIG_DIR` to get a kernel specification file. This creates the option to select the environment as a kernel for your Notebooks.
+* [`notebooks`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment.yml) contains the notebooks with the analysis.
+* [`research_journal`](https://github.com/baggiponte/thesis-forecasting/tree/main/research_journal) has some of my considerations I wrote down. Actually, most of my errands are stored in a local knowledge tree with [logseq](https://github.com/logseq/logseq).
+* [`scripts`](https://github.com/baggiponte/thesis-forecasting/tree/main/scripts) contains the custom shell scripts I have written to process the data.
+* [`tesi.code-workspace`](https://github.com/baggiponte/thesis-forecasting/tree/main/tesi.code-workspace) the file to launch the project in Visual Studio Code
 
 # Plan
 

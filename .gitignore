@@ -2,8 +2,7 @@
 thesis_*
 
 # exclude data, but not the `.csv`s
-data/*
-!data/bikemi_csv
+data/bikemi
 
 # exclude work in progress folders
 wip
