@@ -1,0 +1,8 @@
+#! /usr/bin/env bash
+
+# you need to use this with the environment active!
+
+[ -z "$CONDA_PREFIX" ] && $CONDA_PREFIX/python -m ipykernel install --user --name bikemi --display-name "Forecasting Bikemi"
+
+# the output on macOS will be:
+# Installed kernelspec bikemi in ${HOME}/Library/Jupyter/kernels/bikemi
