@@ -7,3 +7,5 @@ data/bikemi
 # exclude work in progress folders
 wip
 
+# exclude .vscode settings as it is user- and os- specific.
+.vscode
