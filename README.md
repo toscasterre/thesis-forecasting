@@ -9,7 +9,6 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 ```bash
 .
 ├── README.md
-├── .vscode
 ├── data
 │   ├── arpa
 │   ├── bikemi_csv
@@ -25,8 +24,7 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 └── thesis_body
 ```
 
-* `README.md` is this file
-* [`.vscode`](https://github.com/baggiponte/thesis-forecasting/tree/main/.vscode) settings and VS Code extensions.
+* `README.md`: this file.
 * [`data`](https://github.com/baggiponte/thesis-forecasting/tree/main/data) contains:
   * [`arpa`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/arpa) actually not needed
     * Could be exploited with time series for weather data from each measuring station.
