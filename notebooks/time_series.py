@@ -29,6 +29,7 @@ class color:
     UNDERLINE = '\033[4m'
     END = '\033[0m'
 
+
 def milan_holidays(ts: pd.DataFrame) -> pd.Series:
     """Requires a DataFrame with a DateTimeIndex"""
     ita_holidays = holidays.CountryHoliday(
@@ -70,34 +71,39 @@ def create_ts_features(
 
         Returns the same dataframe, but with new columns
     """
+    # this can also work:
+    # df['month'] = [d.strftime('%b') for d in df.Fu]
 
     if "hour" in features:
-        dataframe["hour"] = dataframe.index.hour
+        dataframe["hour"] = dataframe.index.hour.astype("category")
 
     if "day" in features:
-        dataframe["day"] = dataframe.index.day
+        dataframe["day"] = (dataframe.index.day.astype("int") + 1) \
+            .astype("category")
 
     if "day_names" in features:
-        dataframe["day_name"] = dataframe.index.day_name()
+        dataframe["day_name"] = dataframe.index.day_name().astype("category")
 
     if "weekends" in features:
         dataframe["is_weekend"] = dataframe.index.isocalendar().day \
-            .apply(lambda x: 1 if x in [2, 3] else 0).astype("category")
+            .apply(lambda x: 1 if x in [6, 7] else 0).astype("category")
 
     if "week" in features:
-        dataframe["week"] = dataframe.index.isocalendar().week.astype("int64")
+        dataframe["week"] = dataframe.index.isocalendar() \
+            .week.astype("category")
 
     if "month" in features:
-        dataframe["month"] = dataframe.index.month
+        dataframe["month"] = dataframe.index.month.astype("category")
 
     if "month_name" in features:
-        dataframe["month_name"] = dataframe.index.month_name()
+        dataframe["month_name"] = dataframe.index.month_name() \
+            .astype("category")
 
     if "year" in features:
-        dataframe["year"] = dataframe.index.year
+        dataframe["year"] = dataframe.index.year.astype("category")
 
     if "holidays" in features:
-        dataframe["holiday"] = milan_holidays(dataframe)
+        dataframe["holiday"] = milan_holidays(dataframe).astype("category")
 
     return dataframe
 
@@ -247,8 +253,8 @@ def perform_adfuller(ts: pd.Series, regression: str = "ct") -> None:
         Critical Value (10%): {adf_results[4].get("10%")}\n
         AIC: {adf_results[5]}\n
         {color.BOLD}The series is
-        {f'{color.RED}non-' if adf_results[1] > 0.05 else ''}
-        stationary {color.END}
+        {f'{color.RED}non-' if adf_results[1] > 0.05 else ''} stationary
+        {color.END}
         """
     print(results_string)
 
