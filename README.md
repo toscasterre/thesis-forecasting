@@ -16,7 +16,7 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 │   ├── bikemi_metadata
 │   └── milan
 ├── environment_macos.yml
-├── environment_no_builds.yml
+├── environment_win.yml
 ├── jupyter/kernels/bikemi
 ├── notebooks
 ├── research_journal
@@ -33,8 +33,8 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
   * [`bikemi_csv`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/bikemi_csv): data for time series analysis.
   * [`bikemi_metadata`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/bikemi_metadata): stalls locations.
   * [`milan`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/milan): districts (Municipi) and neighborhoods (NIL) coordinates.
-* [`environment_macos.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment_macos.yml) can be used to re-create the `conda` environment I am using via `conda create env --file environment_macos.yml`
-* [`environment_no_builds.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment_no_builds.yml) is needed if you want to replicate the analysis on operative systems other than macOS (and maybe Unix).
+* [`environment_macos.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment_macos.yml) can be used to re-create the `conda` environment I am using via `conda create env --file environment_macos.yml`. Should work on Linux too.
+* [`environment_win.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment_win.yml) is needed if you want to replicate the analysis on Windows OS.
 * [`jupyter/kernels/bikemi/`](https://github.com/baggiponte/thesis-forecasting/tree/main/jupyter/kernels/bikemi): take the `bikemi` folder and copy it to your `$JUPYTER_CONFIG_DIR` to get a kernel specification file. This creates the option to select the environment as a kernel for your Notebooks.
 * [`notebooks`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment.yml) contains the notebooks with the analysis.
 * [`research_journal`](https://github.com/baggiponte/thesis-forecasting/tree/main/research_journal) has some of my considerations I wrote down. Actually, most of my errands are stored in a local knowledge tree with [logseq](https://github.com/logseq/logseq).
