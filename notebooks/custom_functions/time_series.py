@@ -2,20 +2,20 @@
 from typing import Optional
 
 import pandas as pd
-
-# holidays
 import holidays
 
 # plotting
 import matplotlib.pyplot as plt
+import plotly.express as px
+import custom_functions.plot_styles as ps
 
 # time series
 import statsmodels.tsa.api as tsa
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-# from plotnine import *  # plots à la ggplot
-
 
 # use this to print out colored output with `print()`
+
+
 class color:
     # define custom class to render formatted output
     PURPLE = '\033[95m'
@@ -41,7 +41,8 @@ def milan_holidays(ts: pd.DataFrame) -> pd.Series:
     # you cannot use `.apply()` on Indexes, but you
     # can cast an Index as a Series!
     return pd.DataFrame(ts.index, index=ts.index).iloc[:, 0] \
-        .apply(lambda x: ita_holidays.get(str(x))).astype("category")
+        .apply(lambda x: ita_holidays.get(str(x)))\
+        .fillna("None").astype("category")
 
 
 def create_ts_features(
@@ -108,6 +109,42 @@ def create_ts_features(
     return dataframe
 
 
+def rolling_statistics(
+        ts: pd.Series,
+        lags: int,
+        statistics: list = ["mean"]) -> None:
+    """Plots the rolling statistics of a time series."""
+
+    fig, ax = plt.subplots()
+
+    # colors via tableau palette (tab:<colname>)
+    ax.plot(ts, color="tab:blue", label="Observed Values")  # actual series
+
+    if "mean" in statistics:  # if specified, plot rolling mean
+        ax.plot(ts.rolling(lags).mean(),
+                color="tab:red",
+                label="Rolling Mean")
+
+    if "std" in statistics:  # if specified, plot rolling standard deviation
+        ax.plot(ts.rolling(lags).std(),
+                color="tab:gray",
+                label="Rolling Standard Deviation")
+
+    if "mean" in statistics:
+        if "std" in statistics:
+            title = "Rolling Mean and Standard Deviation"
+        else:
+            title = "Rolling Mean"
+    else:
+        title = "Rolling Standard Deviation"
+
+    title += f"\nWindow size: {lags}"
+
+    ax.set_title(title)
+    ax.legend(loc="best")
+    plt.show()
+
+
 def get_time_format(time_unit: str) -> Optional[str]:
     """
     Takes a string such as "month" and returns
@@ -159,7 +196,7 @@ def subunits_boxplot(
     Accepted time-subunits are: year, month, weekday, hour, minute, second.
     """
     # duplicate the inputted time series to prevent overwriting
-    ts_ = ts.copy()
+    ts_ = pd.DataFrame(ts)
 
     # obtain the time format from the input subunit
     # e.g. "%B" and "month"
@@ -169,53 +206,17 @@ def subunits_boxplot(
     ts_[time_subunit] = ts_.index.strftime(time_format)
 
     # create a sorting key to reorder columns after pivoting
-    sorting_key = list(ts_.index.strftime(time_format).unique())
+    sorting_key = list(ts_[time_subunit].unique())
 
     # pivot time series and reorder columns
     df = ts_.pivot(columns=time_subunit, values=y).reindex(columns=sorting_key)
 
-    fig, ax = plt.subplots()
-    df.plot(
-        kind="box", ax=ax,
-        title=f"Daily Outflow of Bikes, {time_subunit.capitalize()} Boxplots",
-        **boxplot_props
-    )
-
-
-def rolling_statistics(
-        ts: pd.Series,
-        lags: int,
-        statistics: list = ["mean"]) -> None:
-    """Plots the rolling statistics of a time series."""
-
-    fig, ax = plt.subplots()
-
-    # colors via tableau palette (tab:<colname>)
-    ax.plot(ts, color="tab:blue", label="Observed Values")  # actual series
-
-    if "mean" in statistics:  # if specified, plot rolling mean
-        ax.plot(ts.rolling(lags).mean(),
-                color="tab:red",
-                label="Rolling Mean")
-
-    if "std" in statistics:  # if specified, plot rolling standard deviation
-        ax.plot(ts.rolling(lags).std(),
-                color="tab:gray",
-                label="Rolling Standard Deviation")
-
-    if "mean" in statistics:
-        if "std" in statistics:
-            title = "Rolling Mean and Standard Deviation"
-        else:
-            title = "Rolling Mean"
-    else:
-        title = "Rolling Standard Deviation"
-
-    title += f"\nWindow size: {lags}"
-
-    ax.set_title(title)
-    ax.legend(loc="best")
-    plt.show()
+    return ps.plotly_style(
+        df.plot(
+            kind="box",
+            title=f"Bike Rentals {time_subunit.capitalize()} Boxplot",
+            color_discrete_sequence=px.colors.qualitative.T10
+        ))
 
 
 def plot_acf_and_pacf(ts: pd.Series) -> None:

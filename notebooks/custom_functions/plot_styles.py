@@ -20,14 +20,19 @@ def matplotlib_styles(
     mpl.rc("axes", titlelocation="left", titlepad=12, titleweight="bold")
 
 
-def plotly_style(fig: Any) -> Any:
+def plotly_style(
+    fig: Any,
+    font: str = "DejaVuSansMono Nerd Font"
+) -> Any:
     """
     A shortcut to apply the settings I use most frequently for plotly figures.
     """
     return fig.update_layout(
+        font_family=font,
         template="none",
         title={
             "x": 0.05,
             # basically, what part of the title to put at position "x"
+            "xanchor": "left"
         }
     )

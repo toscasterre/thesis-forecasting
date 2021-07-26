@@ -60,5 +60,3 @@ def pivot_bike_flow(
         vals: str = "count") -> pd.DataFrame:
     """Transform the flow into a panel dataframe (wide format)"""
     return bike_flow.pivot(columns=cols, values=vals)
-
-
