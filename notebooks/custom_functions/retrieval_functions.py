@@ -10,9 +10,9 @@ def retrieve_bike_flow(
     db_conn_detail: dict = {"dbname": "bikemi", "user": "luca"},
     # e.g. station_column = {"nome_stazione_prelievo" : "stazione_partenza"}
     # `None` as a type hint is replaced by `type(None)`
-    station_column: None = None,
-    # alternatively, {"data_restituzione" : "giorno_restituzione"}
-    time_column: dict = {"data_prelievo": "giorno_partenza"},
+    station_column: bool = False,
+    # alternatively, ("data_restituzione",  "giorno_restituzione")
+    time_column: tuple = ("data_prelievo", "giorno_partenza"),
         trunc: str = "day") -> pd.DataFrame:
     """
     From the PostgreSQL database, extract a DataFrame of the rental data,
@@ -27,9 +27,9 @@ def retrieve_bike_flow(
     db_conn = psycopg2.connect(
         "dbname = {dbname} user = {user}".format(**db_conn_detail))
 
-    time_key, time_val = time_column.items()
+    time_key, time_val = time_column
 
-    if station_column is None:
+    if not station_column:
 
         query = f'''
             SELECT
@@ -39,7 +39,8 @@ def retrieve_bike_flow(
             GROUP BY {time_val};
             '''
     else:
-        station_key, station_val = station_column.items()
+
+        station_key, station_val = station_column
 
         query = f'''
             SELECT
