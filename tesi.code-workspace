@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"python.pythonPath": "/Users/luca/.pyenv/versions/miniconda3-latest/envs/bikemi/bin/python",
+		"python.analysis.extraPaths": [
+			"./notebooks/custom_functions"
+		]
+	}
+}

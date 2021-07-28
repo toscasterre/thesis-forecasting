@@ -2,10 +2,10 @@
 
 # takes as input a csv file and returns a csv whose column names are in snake-case. 
 
-for FILE in $@; do
+for FILE in "$@"; do
 
     # takes the header of the csv file and changes it to snake-case
-    NEW_HEADER=$(head -1 $FILE | tr "[:upper:]" "[:lower:]" | tr " " "_") 
+    NEW_HEADER=$(head -1 "$FILE" | tr "[:upper:]" "[:lower:]" | tr " " "_") 
 
     # substitutes to the first row of the csv the newly formatted one; then outputs the file.
     # note that sed requires creating a backup file (ending in this case with .bak):

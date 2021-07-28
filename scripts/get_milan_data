@@ -2,7 +2,7 @@
 
 TESI_DIR="${$1:=$HOME/tesi}"
 
-pushd $TESI_DIR
+pushd "$TESI_DIR" || exit 
 
 [ ! -d "./data/milan" ] && mkdir -p ./data/milan
 
@@ -22,7 +22,7 @@ echo -e "\nRetrieving NILs (.csv)"
 curl "https://dati.comune.milano.it/dataset/e8e765fc-d882-40b8-95d8-16ff3d39eb7c/resource/3fce7202-0076-4a7b-ac2c-d2ab9b5dc658/download/ds964_nil_wm_4326.csv" \
     -o ./data/milan/milan_nil.csv
 
-[ ! -d "./data/bikemi_metadata"] && mkdir -p ./data/bikemi_metadata
+[ ! -d "./data/bikemi_metadata" ] && mkdir -p ./data/bikemi_metadata
 
 echo -e "\nRetrieving Bikemi stalls locations (.geojson)"
 curl "https://dati.comune.milano.it/dataset/cc065002-cd21-4dcb-b84f-bba2fd9e0c86/resource/2d0bafbc-1739-4a14-9e5a-71a648e1fc5b/download/bikemi_stazioni.geojson" \
@@ -33,4 +33,4 @@ curl "https://dati.comune.milano.it/dataset/cc065002-cd21-4dcb-b84f-bba2fd9e0c86
     -o ./data/bikemi_metadata/bikemi_stalls.csv
 
 
-popd 
+popd || exit
