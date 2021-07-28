@@ -4,11 +4,11 @@
 
 FILE=~/tesi/research_journal/$(date +'%Y_%m_%d').md
 
-if [ ! -f $FILE ] ; then
+if [ ! -f "$FILE" ] ; then
     # echo "Today's entry does not exist."
-    touch $FILE
-    echo "# $(date +'%Y-%m-%d')" >> $FILE
-    $EDITOR $FILE
+    touch "$FILE"
+    echo "# $(date +'%Y-%m-%d')" >> "$FILE"
+    $EDITOR "$FILE"
 else
     echo -e "Today's entry already exists.\n"
     
@@ -19,7 +19,7 @@ else
 
         # (2) handle the input we were given
         case $ANSWER in
-            [yY]* ) $EDITOR $FILE
+            [yY]* ) $EDITOR "$FILE"
                     break;;
 
             [nN]* ) exit;;

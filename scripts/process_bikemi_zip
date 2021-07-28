@@ -6,12 +6,12 @@
 # use getopts (with the -s at the end!) to specify EXTRACTION_DIR
 
 # colored output "trick"
-source "$ZDOTDIR/colors.zsh"
+source "./formatting_colors"
 
 # see if the server is running (custom script, just a fancy conditional)
 pg_server_status # &>/dev/null # we are not interested if the server is running
 
-for ZIP_PATH in $@; do
+for ZIP_PATH in "$@"; do
     
     # name and create the extraction directory, starting from the filename
         # FYI:
@@ -21,7 +21,7 @@ for ZIP_PATH in $@; do
     EXTRACTION_DIR="${ZIP_PATH/.zip}"
 
     echo -e "${BOLD}${BLUE}=> ${WHITE}Create the extraction directory ${BLUE}${EXTRACTION_DIR}${RESET}"
-    mkdir -p "$EXTRACTION_DIR" && pushd "$EXTRACTION_DIR"
+    mkdir -p "$EXTRACTION_DIR" && pushd "$EXTRACTION_DIR" || exit
 
     # unzip the file
     echo -e "\n${BOLD}${BLUE}=> ${WHITE}Unzip ${BLUE}${ZIP}${RESET}"
@@ -55,8 +55,8 @@ for ZIP_PATH in $@; do
 
     # puts the csv into the bikemi PostgreSQL database
     # NOTE: arguments of csv_into_postgres are path/to/directories!
-    csv_into_postgres ${EXTRACTION_DIR}
+    csv_into_postgres "${EXTRACTION_DIR}"
 
-    popd
+    popd || exit
 
 done

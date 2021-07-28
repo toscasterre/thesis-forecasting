@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
 # import variables for making colored output easier
-source "$ZDOTDIR/colors.zsh"
+source "./formatting_colors"
 
 #checks if the server is running
 if [[ "$(pg_ctl status)" == "pg_ctl: no server running" ]]; then
@@ -15,5 +15,5 @@ fi
 # lists where postgres binary and server location are
 PG_STATUS=$(pg_ctl status -D /usr/local/var/postgres | sed "s/\"//g" |  awk "NR==2")
 
-echo -e "\n${BOLD}${WHITE}PostgreSQL binary:${BLUE}$(echo $PG_STATUS | awk 'BEGIN { FS = " " } ; {print $1}')${RESET}
-${BOLD}${WHITE}Server directory:${BLUE}$(echo $PG_STATUS | awk 'BEGIN { FS = " " } ; {print $3}')${RESET}"
+echo -e "\n${BOLD}${WHITE}PostgreSQL binary:${BLUE}$(echo "$PG_STATUS" | awk 'BEGIN { FS = " " } ; {print $1}')${RESET}
+${BOLD}${WHITE}Server directory:${BLUE}$(echo "$PG_STATUS" | awk 'BEGIN { FS = " " } ; {print $3}')${RESET}"

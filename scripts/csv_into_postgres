@@ -9,12 +9,12 @@
 # use getopts to specify source and target directory
 
 # for colored text output
-source "$ZDOTDIR/colors.zsh"
+source "./formatting_colors"
 
-for DIR in $@; do
+for DIR in "$@" ; do
 
     # temporarily cd into $DIR, both as relative or absolute path
-    pushd "$DIR"
+    pushd "$DIR" || exit
 
     # to deal with relative paths deeper than 1
     # e.g. "path/to/dir" instead of "dir"
@@ -40,7 +40,7 @@ for DIR in $@; do
 
     for CSV in *.csv; do
 
-        COLS="$( head -1 $CSV )"
+        COLS="$( head -1 "$CSV" )"
         
         echo "${BOLD}${CYAN}==>${WHITE} Copying data from ${CYAN}${CSV} ${WHITE}to table ${BLUE}${TABLE_NAME} ${WHITE}in the PostgreSQL database${RESET}"
         psql -c "SET datestyle TO iso, dmy; COPY ${TABLE_DIR}(${COLS}) FROM '$(pwd)/${CSV}' DELIMITER ',' CSV HEADER;" bikemi
