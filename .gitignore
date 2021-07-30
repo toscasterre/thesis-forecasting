@@ -7,7 +7,8 @@ data/bikemi
 # exclude work in progress folders
 wip
 
-# exclude .vscode settings as it is user- and os- specific.
-.vscode
+# boring, dont use it much
 .idea
-*.code_workspace
+
+# avoid personal and project specific IDE/programming language settings
+.Rprofile

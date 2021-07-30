@@ -1,0 +1,7 @@
+// project-specific settings
+{
+    "python.analysis.extraPaths": [
+        "./notebooks"
+    ],
+    "python.pythonPath": "C:\\Anaconda3\\envs\\bikemi_win\\python.exe",
+}
