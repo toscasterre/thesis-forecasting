@@ -12,3 +12,4 @@ wip
 
 # avoid personal and project specific IDE/programming language settings
 .Rprofile
+.vscode/settings.json
