@@ -10,3 +10,4 @@ wip
 # exclude .vscode settings as it is user- and os- specific.
 .vscode
 .idea
+*.code_workspace

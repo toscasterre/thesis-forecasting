@@ -1,0 +1,14 @@
+---
+title: "Cleaning Data"
+author: "Luca Baggi"
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+data <- read_csv("../data/bikemi_metadata/bikemi_stalls.csv")
+
+data %>% head()
+```
