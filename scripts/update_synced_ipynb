@@ -1,0 +1,51 @@
+#! /usr/bin/env bash
+
+_pair_notebooks () {
+if [[ ! -e "${TARGET_DIR}/$(basename "${1/.ipynb/.Rmd}")" ]] ; then
+    echo "${BOLD}Pairing ${CYAN}$(basename "$1")${RESET}${BOLD} to ${CYAN}$(basename "${1/.ipynb/.Rmd}")${RESET}"
+    jupytext --set-formats \
+    "$(basename "$EXEC_DIR")"///ipynb,"$(basename "$TARGET_DIR")"///Rmd \
+    "$1"
+    echo""
+fi
+}
+
+_update_sync () {
+    echo -e "${BOLD}Updating sync with ${CYAN}$(basename "${1/.ipynb/.Rmd}")${RESET}"
+    jupytext --sync "$1"
+    echo ""
+}
+
+# for formatting
+source "./formatting_colors"
+
+EXEC_DIR=${1:-"$HOME/tesi/notebooks"}
+TARGET_DIR=${2:-"$HOME/tesi/notebooks_r"}
+
+pushd "$(dirname "$EXEC_DIR")" 1>/dev/null || exit
+
+# reference: https://alvinalexander.com/linux-unix/shell-script-how-prompt-read-user-input-bash/
+while true ; do
+    # prompt user, and read command line argument
+    echo ""
+    read -rp "${BOLD}Pair notebooks to Rmd files in ${GREEN}$TARGET_DIR${RESET}${BOLD}? [y/n] ${RESET}" ANSWER
+    echo ""
+    # (2) handle the input we were given
+    case $ANSWER in
+        [yY]* ) for IPYNB in "$(basename "$EXEC_DIR")"/*.ipynb ; do
+                    _pair_notebooks "$IPYNB"
+                done
+
+                break;;
+
+        [nN]* ) for IPYNB in "$(basename "$EXEC_DIR")"/*.ipynb ; do
+                _update_sync "$IPYNB"
+                done
+        
+                break;;
+
+            * ) echo "Enter y or n, please.";;
+    esac
+done
+
+popd 1>/dev/null || exit

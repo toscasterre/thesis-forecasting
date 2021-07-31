@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-TESI_DIR="${$1:=$HOME/tesi}"
+TESI_DIR="${1:-$HOME/tesi}"
 
 pushd "$TESI_DIR" || exit 
 

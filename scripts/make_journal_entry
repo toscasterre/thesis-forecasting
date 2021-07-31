@@ -2,7 +2,7 @@
 
 # creates a new entry into the research journal of my thesis.
 
-FILE=~/tesi/research_journal/$(date +'%Y_%m_%d').md
+FILE="$HOME/tesi/research_journal/$(date +'%Y_%m_%d').md"
 
 if [ ! -f "$FILE" ] ; then
     # echo "Today's entry does not exist."
@@ -15,7 +15,7 @@ else
     # reference: https://alvinalexander.com/linux-unix/shell-script-how-prompt-read-user-input-bash/
     while true ; do
         # (1) prompt user, and read command line argument
-        read -p "Open in in $(basename "$EDITOR")? [y/n] " ANSWER
+        read -rp "Open in $(basename "$EDITOR")? [y/n] " ANSWER
 
         # (2) handle the input we were given
         case $ANSWER in
