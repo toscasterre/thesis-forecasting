@@ -8,20 +8,23 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 
 ```bash
 .
-├── README.md
 ├── data
 │   ├── arpa
 │   ├── bikemi_csv
 │   ├── bikemi_metadata
 │   └── milan
-├── environment_macos.yml
-├── environment_win.yml
 ├── jupyter/kernels/bikemi
 ├── notebooks
+│   └── custom_functions/
+├── notebooks_r
+├── renv
 ├── research_journal
 ├── scripts
-├── tesi.code-workspace
-└── thesis_body
+├── environment_macos.yml
+├── environment_win.yml
+├── README.md
+├── renv.lock
+└── tesi.Rproj
 ```
 
 * `README.md`: this file.
@@ -31,13 +34,18 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
   * [`bikemi_csv`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/bikemi_csv): data for time series analysis.
   * [`bikemi_metadata`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/bikemi_metadata): stalls locations.
   * [`milan`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/milan): districts (Municipi) and neighborhoods (NIL) coordinates.
-* [`environment_macos.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment_macos.yml) can be used to re-create the `conda` environment I am using via `conda create env --file environment_macos.yml`. Should work on Linux too.
-* [`environment_win.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment_win.yml) is needed if you want to replicate the analysis on Windows OS.
 * [`jupyter/kernels/bikemi/`](https://github.com/baggiponte/thesis-forecasting/tree/main/jupyter/kernels/bikemi): take the `bikemi` folder and copy it to your `$(jupyter --runtime)` to get a kernel specification file. This creates the option to select the environment as a kernel for your Notebooks.
-* [`notebooks`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment.yml) contains the notebooks with the analysis.
+* [`notebooks`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks) contains the notebooks with the analysis.
+  * [`notebooks`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks/custom_functions) contains the custom functions for the project.
+* [`notebooks_r`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks_r) is a backup directory to store notebooks converted into RMarkdown using Jupytext.
+* [`renv`](https://github.com/baggiponte/thesis-forecasting/tree/main/renv) stores the R packages for this project.
 * [`research_journal`](https://github.com/baggiponte/thesis-forecasting/tree/main/research_journal) has some of my considerations I wrote down. Actually, most of my errands are stored in a local knowledge tree with [logseq](https://github.com/logseq/logseq).
 * [`scripts`](https://github.com/baggiponte/thesis-forecasting/tree/main/scripts) contains the custom shell scripts I have written to process the data.
-* [`tesi.code-workspace`](https://github.com/baggiponte/thesis-forecasting/tree/main/tesi.code-workspace) the file to launch the project in Visual Studio Code
+* [`environment_macos.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment_macos.yml) can be used to re-create the `conda` environment I am using via `conda create env --file environment_macos.yml`. Should work on Linux as well.
+* [`environment_win.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment_win.yml) is needed if you want to replicate the analysis on Windows OS.
+* [`README.md`](https://github.com/baggiponte/thesis-forecasting/tree/main/README.md) this file.
+* [`renv.lock`](https://github.com/baggiponte/thesis-forecasting/tree/main/renv.lock) basically, `{renv}` equivalent of `environment.yml`.
+* [`tesi.Rproj`](https://github.com/baggiponte/thesis-forecasting/tree/main/tesi.Rproj) specific settings for the R Project environment.
 
 # Plan
 
@@ -65,7 +73,7 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 
 - [x] Clean multivariate data:
   - [x] `NaN` to `0`.
-- [ ] Match stalls with Milan Data using `geopandas`
+- [x] Match stalls with Milan Data using `geopandas`
   - To obtain dummy/categoricals with NIL and Municipi to aggregate
 - [x] Functions to get holidays and time series features
 

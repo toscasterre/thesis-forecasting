@@ -21,7 +21,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 # time series
-import custom_functions.time_series as ts # import custom functions
+import custom_functions.time_series_analysis as tsa # import custom functions
 
 #from sktime.utils.plotting import plot_series, plot_correlations
 

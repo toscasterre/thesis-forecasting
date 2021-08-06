@@ -1,8 +1,8 @@
-from typing import Any
+from typing import Union, List
 import pandas
 
 
-def anti_join(x: pandas.Series, y: pandas.Series, on: Any):
+def anti_join(x: pandas.Series, y: pandas.Series, on: Union[List[str], str]):
     """Return rows in x which are not present in y"""
 
     if type(on) is list:

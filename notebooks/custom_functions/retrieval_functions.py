@@ -4,15 +4,17 @@ import psycopg2
 # dataframes
 import pandas as pd
 
+from typing import Dict, List, Union
+
 
 def retrieve_bike_flow(
     table: str,
-    db_conn_detail: dict = {"dbname": "bikemi", "user": "luca"},
-    # e.g. station_column = {"nome_stazione_prelievo" : "stazione_partenza"}
-    # `None` as a type hint is replaced by `type(None)`
-    station_column: bool = False,
-    # alternatively, ("data_restituzione",  "giorno_restituzione")
-    time_column: tuple = ("data_prelievo", "giorno_partenza"),
+    db_conn_detail: Dict[str, str] = {"dbname": "bikemi", "user": "luca"},
+    # alternatively:
+    # station_column = ["nome_stazione_prelievo", "stazione_partenza"]
+    station_column: Union[None, List["str"]] = None,
+    # alternatively, ["data_restituzione",  "giorno_restituzione"]
+    time_column: List[str] = ["data_prelievo", "giorno_partenza"],
         trunc: str = "day") -> pd.DataFrame:
     """
     From the PostgreSQL database, extract a DataFrame of the rental data,
@@ -27,7 +29,7 @@ def retrieve_bike_flow(
     db_conn = psycopg2.connect(
         "dbname = {dbname} user = {user}".format(**db_conn_detail))
 
-    time_key, time_val = time_column
+    time_key, time_val = time_column[0], time_column[1]
 
     if not station_column:
 
@@ -40,7 +42,7 @@ def retrieve_bike_flow(
             '''
     else:
 
-        station_key, station_val = station_column
+        station_key, station_val = station_column[0], station_column[1]
 
         query = f'''
             SELECT

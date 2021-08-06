@@ -21,7 +21,7 @@ import plotly.express as px
 pd.options.plotting.backend = "plotly"
 
 # import custom functions
-import custom_functions.time_series as ts
+import custom_functions.time_series_analysis as tsa
 import custom_functions.plot_styles as ps
 
 ps.matplotlib_styles()

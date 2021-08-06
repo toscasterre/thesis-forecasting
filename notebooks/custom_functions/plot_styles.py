@@ -1,10 +1,10 @@
-from typing import Any
+from typing import Any, Tuple
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 
 def matplotlib_styles(
-    figsize: tuple = (15, 6),
+    figsize: Tuple[int, int] = (15, 6),
     linewidth: int = 2,
     font: str = "DejaVu Sans Mono"
 ) -> None:

@@ -4,12 +4,13 @@ thesis_*
 # exclude original data 
 data/bikemi
 
-# exclude work in progress folders
-wip
-
-# boring, dont use it much
-.idea
 
 # avoid personal and project specific IDE/programming language settings
 .Rprofile
 .vscode/settings.json
+
+# pyenv
+.python-version
+
+# boring, dont use it much
+.idea
