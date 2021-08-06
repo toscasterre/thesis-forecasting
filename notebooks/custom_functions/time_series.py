@@ -1,8 +1,8 @@
-# for type stubs
-from typing import Optional
-
 import pandas as pd
 import holidays
+
+# for type stubs
+from typing import Optional, List, Dict, Union
 
 # plotting
 import matplotlib.pyplot as plt
@@ -12,8 +12,6 @@ import custom_functions.plot_styles as ps
 # time series
 import statsmodels.tsa.api as tsa
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-
-# use this to print out colored output with `print()`
 
 
 class color:
@@ -47,7 +45,7 @@ def milan_holidays(ts: pd.DataFrame) -> pd.Series:
 
 def create_ts_features(
     dataframe: pd.DataFrame,
-    features: list = ["day", "month"]
+    features: List[str] = ["day", "month"]
 ) -> pd.DataFrame:
     """
         Generates time-series features out of a dataframe.
@@ -109,32 +107,55 @@ def create_ts_features(
     return dataframe
 
 
+def px_default_legend_dict() -> Dict[str, Union[int, float, str]]:
+    return {
+        "orientation": "h",
+        "yanchor": "bottom",
+        "y": 1,
+        "xanchor": "right",
+        "x": 1
+    }
+
+
 def px_rolling_statistics(
-        ts: pd.Series,
+        ts: pd.DataFrame,
+        col: str,
         lags: int,
-        statistics: list = ["mean"]) -> None:
-    """Plots the rolling statistics of a time series using Plotly"""
+        statistics: List[str] = ["mean"],
+        legend_args: Dict[str, Union[int, float, str]
+                          ] = px_default_legend_dict()
+) -> None:
+    """
+    Plots the rolling statistics of a time series using Plotly
+
+    Takes as input a pd.DataFrame with a DateTimeIndex.
+
+    """
+    title = "BikeMi Daily Rentals - Rolling "
+    series_name = ["observed_values"]
+    cols_to_plot = [ts[col]]
+
+    if "mean" in statistics:
+        title += "Mean "
+        series_name.append("rolling mean")
+        cols_to_plot.append(ts[col].rolling(lags).mean())
+
+    if "std" in statistics:
+        title += "Standard Deviation "
+        series_name.append("rolling stdev")
+        cols_to_plot.append(ts[col].rolling(lags).std())
+
+    title += f"(Window Size: {lags})"
 
     rolling = px.line(
         ts,
         x=ts.index,
-        y=[
-            ts,
-            ts.rolling(7).mean(),
-            ts.rolling(7).std()
-        ],
-        labels={"variable": "", "giorno_partenza": "", "value": ""},
+        y=[col for col in cols_to_plot],
+        labels={"count": "Rentals ", "giorno_partenza": "Date ", "value": ""},
         color_discrete_sequence=px.colors.qualitative.T10,
-        title="BikeMi Daily Rentals - Rolling Mean and Standard Deviation (Window Size: 7)"
-    ).update_layout(legend=dict(
-        orientation="h",
-        yanchor="bottom",
-        y=1.02,
-        xanchor="right",
-        x=1
-    ))
-
-    series_name = ["observed values", "rolling mean", "rolling stdev"]
+        title=title
+    ).update_layout(legend=legend_args)\
+        .update_traces(hovertemplate=None)
 
     for idx, name in enumerate(series_name):
         rolling.data[idx].name = name
@@ -145,7 +166,7 @@ def px_rolling_statistics(
 def plt_rolling_statistics(
         ts: pd.Series,
         lags: int,
-        statistics: list = ["mean"]) -> None:
+        statistics: List[str] = ["mean"]) -> None:
     """Plots the rolling statistics of a time series using Matplotlib"""
 
     fig, ax = plt.subplots()
@@ -206,17 +227,18 @@ def get_time_format(time_unit: str) -> Optional[str]:
 
 
 def default_boxplot_props(
-        line_width: float = 1.5,
-        median_linewidth: float = 2.5,
-        whiskers_linewidth: int = 1,
-        median_color: str = "tomato") -> dict:
+    line_width: float = 1.5,
+    median_linewidth: float = 2.5,
+    whiskers_linewidth: int = 1,
+    median_color: str = "tomato"
+) -> Dict[str, Dict[str, Union[int, float]]]:
     # colors: https://matplotlib.org/stable/gallery/color/named_colors.html
-    return dict(
-        boxprops=dict(lw=line_width),
-        medianprops=dict(lw=median_linewidth),
-        whiskerprops=dict(lw=whiskers_linewidth),
-        capprops=dict(lw=line_width)
-    )
+    return {
+        "boxprops": {"lw": line_width},
+        "medianprops": {"lw": median_linewidth},
+        "whiskerprops": {"lw": whiskers_linewidth},
+        "capprops": {"lw": line_width}
+    }
 
 
 def subunits_boxplot(
@@ -242,7 +264,8 @@ def subunits_boxplot(
     sorting_key = list(ts_[time_subunit].unique())
 
     # pivot time series and reorder columns
-    df = ts_.pivot(columns=time_subunit, values=y).reindex(columns=sorting_key)
+    df = ts_.pivot(columns=time_subunit, values=y).reindex(
+        columns=sorting_key)
 
     return ps.plotly_style(
         df.plot(
