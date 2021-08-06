@@ -27,7 +27,6 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 └── tesi.Rproj
 ```
 
-* `README.md`: this file.
 * [`data`](https://github.com/baggiponte/thesis-forecasting/tree/main/data) contains:
   * [`arpa`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/arpa) actually not needed
     * Could be exploited with time series for weather data from each measuring station.
