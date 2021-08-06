@@ -109,11 +109,44 @@ def create_ts_features(
     return dataframe
 
 
-def rolling_statistics(
+def px_rolling_statistics(
         ts: pd.Series,
         lags: int,
         statistics: list = ["mean"]) -> None:
-    """Plots the rolling statistics of a time series."""
+    """Plots the rolling statistics of a time series using Plotly"""
+
+    rolling = px.line(
+        ts,
+        x=ts.index,
+        y=[
+            ts,
+            ts.rolling(7).mean(),
+            ts.rolling(7).std()
+        ],
+        labels={"variable": "", "giorno_partenza": "", "value": ""},
+        color_discrete_sequence=px.colors.qualitative.T10,
+        title="BikeMi Daily Rentals - Rolling Mean and Standard Deviation (Window Size: 7)"
+    ).update_layout(legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1
+    ))
+
+    series_name = ["observed values", "rolling mean", "rolling stdev"]
+
+    for idx, name in enumerate(series_name):
+        rolling.data[idx].name = name
+
+    return ps.plotly_style(rolling)
+
+
+def plt_rolling_statistics(
+        ts: pd.Series,
+        lags: int,
+        statistics: list = ["mean"]) -> None:
+    """Plots the rolling statistics of a time series using Matplotlib"""
 
     fig, ax = plt.subplots()
 
