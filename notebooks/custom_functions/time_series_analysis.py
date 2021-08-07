@@ -253,5 +253,5 @@ def subunits_boxplot(
         df.plot(
             kind="box",
             title=f"Bike Rentals {time_subunit.capitalize()} Boxplot",
-            color_discrete_sequence=px.colors.qualitative.T10
+            color_discrete_sequence=px.colors.qualitative.Vivid
         ))
