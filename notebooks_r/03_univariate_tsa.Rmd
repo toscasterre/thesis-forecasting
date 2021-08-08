@@ -6,11 +6,19 @@ jupyter:
       extension: .Rmd
       format_name: rmarkdown
       format_version: '1.2'
+<<<<<<< HEAD
       jupytext_version: 1.11.4
   kernelspec:
     display_name: Forecasting Bikemi
     language: python
     name: bikemi
+=======
+      jupytext_version: 1.10.3
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
+>>>>>>> bc7053a6779ec0993d6ca7eae184c38c7c349529
 ---
 
 # Import Libraries, Load Data and Generate Features
@@ -94,7 +102,11 @@ hist_holidays = daily_outflow.plot.bar(
         "count": "Rentals ",
         "giorno_partenza" : ""
     }
+<<<<<<< HEAD
 )
+=======
+).update_traces(hovertemplate=None)
+>>>>>>> bc7053a6779ec0993d6ca7eae184c38c7c349529
 
 ps.plotly_style(hist_holidays)
 ```
