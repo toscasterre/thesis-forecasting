@@ -1,0 +1,343 @@
+---
+jupyter:
+  jupytext:
+    formats: notebooks///ipynb,notebooks_r///Rmd
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.10.3
+  kernelspec:
+    display_name: Deep Learning Forecasting
+    language: python
+    name: bikemi_win
+---
+
+# Import Libraries
+
+```{python init_cell=TRUE}
+# custom function for time series statistics
+import custom_functions.time_series_functions as tsf
+
+# to add holidays features
+import holidays
+
+# Data visualisations
+import matplotlib.pyplot as plt
+
+# Base libraries
+import numpy as np
+import pandas as pd
+
+# More data viz
+import plotly.express as px
+import seaborn as sns
+
+# to use pandas dtypes in matplotlib plots
+from pandas.plotting import register_matplotlib_converters
+
+register_matplotlib_converters()
+
+# set plotly as automatick backend for plot wih pandas
+pd.options.plotting.backend = "plotly"
+
+# create a dict to update plotly layout
+plotly_styles = dict(
+    font_family="DejaVuSansMono Nerd Font",
+    template="none",
+    title={
+        "x": 0.05,
+        # basically, what part of the title to put at position "x"
+        "xanchor": "left",
+    },
+)
+
+
+# set settings for seaborn
+sns.set_style(style="darkgrid", rc={"axes.facecolor": ".9", "grid.color": ".8"})
+sns.set_palette(palette="deep")
+sns_c = sns.color_palette(palette="deep")  # will be useful later
+
+# visualise plots inline
+# %matplotlib inline
+
+# customise matplotlib and sns plot dimensions 
+plt.rcParams["figure.figsize"] = [12, 6]
+plt.rcParams["figure.dpi"] = 100
+```
+
+# Load Data and Preprocessing
+
+```{python init_cell=TRUE}
+daily_outflow = pd.read_csv("../data/bikemi_csv/daily_outflow.csv", parse_dates=[0])
+
+daily_outflow = (
+    daily_outflow.assign(
+        year=lambda x: x["giorno_partenza"].dt.year,
+        month=lambda x: x["giorno_partenza"].dt.month,
+        month_name=lambda x: x["giorno_partenza"].dt.month_name().astype("category"),
+        week=lambda x: x["giorno_partenza"].dt.isocalendar().week,
+        day=lambda x: x["giorno_partenza"].dt.weekday,
+        day_name=lambda x: x["giorno_partenza"].dt.day_name(),
+        day_of_month=lambda x: x["giorno_partenza"].dt.day,
+        dayofyear=lambda x: x["giorno_partenza"].dt.dayofyear,
+        # alternatively:
+        # holiday = lambda ts: list(map(lambda x: holidays.CountryHoliday("IT").get(x), ts["giorno_partenza"]))
+        holiday=lambda ts: ts["giorno_partenza"].apply(
+            lambda x: holidays.CountryHoliday("IT").get(x)
+        ),
+    )
+    .set_index("giorno_partenza")
+    .astype({"day_name": "string"})
+)
+
+daily_outflow
+```
+
+# Basic Plotting
+
+
+## Time Series Plot
+
+```{python}
+daily_outflow.plot(
+    y="count",
+    title="BikeMi Daily Rentals, 2019",
+    color_discrete_sequence=px.colors.qualitative.T10,
+).update_layout(**plotly_styles).update_traces(hovertemplate=None)
+```
+
+It is clear that the series is non-stationary and displays strong seasonal patterns. We can perform a Dickey-Fuller test to ensure this:
+
+```{python}
+from statsmodels.tsa.stattools import adfuller, kpss
+```
+
+## Rolling Statistics
+
+```{python}
+daily_outflow.plot(
+    y=[
+        "count",
+        daily_outflow["count"].rolling(7).mean(),
+        daily_outflow["count"].rolling(7).std(),
+    ],
+    title="Daily Rentals with Rolling Statistics (Window Size: 7)",
+    color_discrete_sequence=px.colors.qualitative.Pastel,
+).update_layout(**plotly_styles).update_traces(hovertemplate=None)
+```
+
+```{python}
+daily_outflow.plot(
+    y=[
+        "count",
+        daily_outflow["count"].rolling(30).mean(),
+        daily_outflow["count"].rolling(30).std(),
+    ],
+    title="Daily Rentals with Rolling Statistics (Window Size: 30)",
+    color_discrete_sequence=px.colors.qualitative.Pastel,
+).update_layout(**plotly_styles).update_traces(hovertemplate=None)
+```
+
+The most relevant thing about these statistics is that the seasonal component of the time series does not really smooth out even with a 30 days lag, suggesting a strong dependence even with past lags.
+
+Given this distribution, we expect a strong relationship between data points that are seven lags from each other. More importantly, we expect that this variance will hinder the accuracy of our forecasts. This may require transforming the data (e.g. by taking logs or applying a Box-Cox transformation and searching for the optimal parameter $\lambda$) or *decomposing the time series*.
+
+We can also make a pretty plot to export:
+
+```{python}
+fig, ax = plt.subplots(2, 1, figsize=(12, 9), constrained_layout=True)
+
+# create the windows
+ma = [7, 30]
+
+for i, m in enumerate(ma):
+
+    daily_outflow[f"moving_average_{m}"] = (
+        daily_outflow["count"].rolling(window=m).mean()
+    )
+
+    sns.lineplot(
+        x=daily_outflow.index,
+        y="count",
+        label="count",
+        data=daily_outflow,
+        alpha=0.5,
+        ax=ax[i],
+    )
+    sns.lineplot(
+        x=daily_outflow.index,
+        y=f"moving_average_{m}",
+        label=f"moving_average_{m}",
+        data=daily_outflow,
+        color=sns_c[i + 1],
+        ax=ax[i],
+    )
+    ax[i].legend(loc="upper left")
+    ax[i].set(title="", ylabel="")
+plt.suptitle("Bikemi Rentals (Daily) - Smooth Moving Average", y=1.02)
+```
+
+## Seasonal Plots
+
+```{python}
+# play with color palettes: https://plotly.com/python/discrete-color/
+
+pd.pivot_table(
+    data=daily_outflow[["day_name", "month_name", "count"]],
+    index="day_name",
+    columns="month_name",
+)["count"].plot(color_discrete_sequence=px.colors.qualitative.Dark24).update_layout(
+    **plotly_styles
+).update_traces(
+    hovertemplate=None
+)
+```
+
+# Transforming the Data
+
+
+## First Differences
+
+
+We can also plot the first differences or the seasonal differences to see how the data transforms:
+
+```{python}
+daily_outflow.plot(
+    y=daily_outflow["count"].diff(),
+    color_discrete_sequence=px.colors.qualitative.Pastel,
+    title="BikeMi Daily Rentals, First Differences (2019)",
+).update_layout(**plotly_styles).update_traces(hovertemplate=None)
+```
+
+The data seems stationary, but still displays a strong seasonality and a great variance. This suggests that performing an ARIMA might not actually prove useful - a SARIMA could indeed yield better results. Let's see what comes out with seasonal differences, i.e. subtracting the value of 7 days before.
+
+
+## Seasonal Differencing
+
+```{python}
+daily_outflow.plot(
+    y=daily_outflow["count"].diff(7),
+    color_discrete_sequence=px.colors.qualitative.Vivid,
+    title="BikeMi Daily Rentals, 7-Day Differences (2019)",
+).update_layout(**plotly_styles).update_traces(hovertemplate=None)
+```
+
+This seemingly removes any seasonality and leaves us with a lot of variance, still. We can use our human knowledge to explain some of this variation: holidays, first of all. Then we would expect the temperature to play a role, in conjunction with precipitation (i.e. the winter), which could explain the greater variance around the last months of the year.
+
+This suggests that even a SARIMA model might not compete with something like Prophet, which can exploit holiday patterns. However, without the aid of external data, neither of the two models can take into account rainy days or colder weather - even via categorical variables such as dummies for each month.
+
+```{python}
+import numpy as np
+
+daily_outflow.plot(
+    y=daily_outflow["count"].apply(np.log).diff(7),
+    color_discrete_sequence=px.colors.qualitative.Vivid,
+    title="BikeMi Daily Rentals, Logs, 7-Day Differences (2019)",
+).update_layout(**plotly_styles).update_traces(hovertemplate=None)
+```
+
+When we apply a log-transformation to the data, variance reduces a bit (as the differences between two consecutive observations decrease).
+
+
+# Time Series Decomposition
+
+
+Here we perform some elementary time series decomposition. As of now, the aim of this part is to simply get an idea of the components of our target time series, rather then performing a satisfactory and state-of-the-art decomposition. More advanced techniques are recommended, instead of elementary `additive` and `multiplicative` decomposition.
+
+```{python}
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+# We use the parameter `period` = 365 to extract the yearly seasonality.
+weekly_seasonal_decomposition = seasonal_decompose(
+    x=daily_outflow["count"], model="additive", period=7
+)
+
+pd.options.plotting.backend = "matplotlib"
+fig, ax = plt.subplots(4, 1, figsize=(12, 12), constrained_layout=True)
+
+weekly_seasonal_decomposition.observed.plot(c=sns_c[0], ax=ax[0])
+ax[0].set(title="observed", xlabel="")
+weekly_seasonal_decomposition.trend.plot(c=sns_c[1], ax=ax[1])
+ax[1].set(title="trend", xlabel="")
+weekly_seasonal_decomposition.seasonal.plot(c=sns_c[2], ax=ax[2])
+ax[2].set(title="seasonal", xlabel="")
+weekly_seasonal_decomposition.resid.plot(c=sns_c[3], ax=ax[3])
+ax[3].set(title="residual", xlabel="")
+```
+
+# Autocorrelation and Partial Autocorrelation Plots
+
+
+The exploratory analysis showed a strong seasonality in the data: let's see it with autocorrelation plots.
+
+```{python}
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+
+fig, ax = plt.subplots(2, 1, constrained_layout=True)
+plot_acf(
+    x=daily_outflow["count"],
+    ax=ax[0],
+    title="BikeMi Rentals Autocorrelation",
+    zero=False,
+)
+plot_pacf(
+    x=daily_outflow["count"],
+    ax=ax[1],
+    title="BikeMi Rentals Partial Autocorrelation",
+    zero=False,
+);
+```
+
+These plots show us that there is a strong and significant autocorrelation until at least the 30th lag. This fact should not be too surprising: we could already spot it from the 30 day window moving average, but is still remarkable. This will likely entail a greater MA component for our (S)ARIMA models.
+
+Partial autocorrelation displays another strong link with seasonality: statistically speaking, there is correlation with the residuals at the 14th to 16th lag - and arguably even beyond. We also expect an AR component for our models.
+
+The declining autocorrelation not only displays a strong seasonal pattern, but also a trend.
+
+
+# Advanced Dickey Fuller Test
+
+```{python}
+tsa.perform_adfuller(daily_outflow["count"])
+```
+
+The test statistic is greater than any critical value: in other words, we cannot reject the null hypothesis and the series is indeed non-stationary.
+
+
+# Time-Series Decomposition
+
+There are several alternatives:
+
+* Apply a transformation (e.g., take logs);
+* Subtract the rolling average (it can work here, since the frequency is clear. It becomes more complex in case of high-frequency data: which window shall be selected?)
+
+```{python}
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+# We use the parameter `period` = 365 to extract the yearly seasonality.
+seas_decomp_yearly = seasonal_decompose(
+    x=daily_data_df["temperature"], model="additive", period=365
+)
+
+fig, ax = plt.subplots(4, 1, figsize=(12, 12), constrained_layout=True)
+
+seas_decomp_yearly.observed.plot(c=sns_c[0], ax=ax[0])
+ax[0].set(title="observed", ylabel=r"$^\circ$C")
+seas_decomp_yearly.trend.plot(c=sns_c[1], ax=ax[1])
+ax[1].set(title="trend", ylabel=r"$^\circ$C")
+seas_decomp_yearly.seasonal.plot(c=sns_c[2], ax=ax[2])
+ax[2].set(title="seasonal", ylabel=r"$^\circ$C")
+seas_decomp_yearly.resid.plot(c=sns_c[3], ax=ax[3])
+ax[3].set(title="residual", ylabel=r"$^\circ$C")
+```
+
+As explained in the [official documentation](https://www.sktime.org/en/latest/api_reference/modules/auto_generated/sktime.forecasting.arima.AutoARIMA.html?highlight=seasonal%20decomposition),
+
+The auto-ARIMA process seeks to identify the most optimal parameters for an ARIMA model, settling on a single fitted ARIMA model. This process is based on the commonly-used R function, forecast::auto.arima [3].
+
+Auto-ARIMA works by conducting differencing tests (i.e., Kwiatkowski–Phillips–Schmidt–Shin, Augmented Dickey-Fuller or Phillips–Perron) to determine the order of differencing, d, and then fitting models within ranges of defined start_p, max_p, start_q, max_q ranges. If the seasonal optional is enabled, auto-ARIMA also seeks to identify the optimal P and Q hyper-parameters after conducting the Canova-Hansen to determine the optimal order of seasonal differencing, D.
+
+In order to find the best model, auto-ARIMA optimizes for a given information_criterion, one of (‘aic’, ‘aicc’, ‘bic’, ‘hqic’, ‘oob’) (Akaike Information Criterion, Corrected Akaike Information Criterion, Bayesian Information Criterion, Hannan-Quinn Information Criterion, or “out of bag”–for validation scoring–respectively) and returns the ARIMA which minimizes the value.
+
+Note that due to stationarity issues, auto-ARIMA might not find a suitable model that will converge. If this is the case, a ValueError will be thrown suggesting stationarity-inducing measures be taken prior to re-fitting or that a new range of order values be selected. Non- stepwise (i.e., essentially a grid search) selection can be slow, especially for seasonal data. Stepwise algorithm is outlined in Hyndman and Khandakar (2008).
