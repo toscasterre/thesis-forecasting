@@ -2,14 +2,14 @@
 jupyter:
   jupytext:
     formats: notebooks///ipynb,notebooks_r///Rmd
-    main_language: python
     text_representation:
       extension: .Rmd
       format_name: rmarkdown
       format_version: '1.2'
-      jupytext_version: 1.11.4
+      jupytext_version: 1.10.3
   kernelspec:
-    display_name: 'Python 3.9.6 64-bit (''bikemi'': conda)'
+    display_name: Python 3 (ipykernel)
+    language: python
     name: python3
 ---
 
@@ -17,14 +17,16 @@ jupyter:
 
 ```{python}
 import pandas as pd
-pd.options.plotting.backend = "plotly" # change to an interactive plotting backend
 
-# plotting library
-import plotly.express as px
+pd.options.plotting.backend = "plotly"  # change to an interactive plotting backend
+
+import custom_functions.plot_styles as ps
 
 # custom functions
 import custom_functions.retrieval_functions as rf
-import custom_functions.plot_styles as ps
+
+# plotting library
+import plotly.express as px
 ```
 
 To resolve the `Pylance(reportMissingImports)`, you have to add to `.vscode/settings.json` the paths from which you import what's needed in `"python.analysis.extraPaths"`:
@@ -43,7 +45,7 @@ To resolve the `Pylance(reportMissingImports)`, you have to add to `.vscode/sett
 First, we run a custom script to check if the `PostgreSQL` server is started or to start it.
 
 ```{python}
-# !bash $MYBINS/pg_server_status 
+# !bash $MYBINS/pg_server_status
 
 # in alternative:
 # get_ipython().system('bash $MYBINS/pg_server_status')
@@ -94,7 +96,7 @@ We can also check the number of trips that finished in the 2020 (i.e., the `dail
 ```{python}
 daily_inflow = rf.retrieve_bike_flow(
     table="bikemi_2019",
-    time_column=("data_restituzione", "giorno_restituzione"),
+    time_column=["data_restituzione", "giorno_restituzione"],
 )
 
 daily_inflow.tail()
@@ -113,13 +115,14 @@ daily_outflow[:"2019-12-31"].to_csv("../data/bikemi_csv/daily_outflow.csv")
 station_daily_outflow = (
     rf.retrieve_bike_flow(
         table="bikemi_2019",
-        station_column=("nome_stazione_prelievo", "stazione_partenza")
+        station_column=["nome_stazione_prelievo", "stazione_partenza"],
     )
     # it's easier if we don't pivot to wider immediately
-    #.pipe(rf.pivot_bike_flow, cols="stazione_partenza")
+    # .pipe(rf.pivot_bike_flow, cols="stazione_partenza")
     # .fillna(0) later
-    .convert_dtypes() # make double into integers
-    .sort_values(by=["giorno_partenza","stazione_partenza"], ascending=False)
+    .convert_dtypes().sort_values(  # make double into integers
+        by=["giorno_partenza", "stazione_partenza"], ascending=False
+    )
 )
 
 station_daily_outflow.tail()
@@ -128,7 +131,9 @@ station_daily_outflow.tail()
 At first glance, there appears to be quite a few missing values. We also need to get rid of the January 2020 data:
 
 ```{python}
-station_daily_outflow = station_daily_outflow.loc[station_daily_outflow.index != "2020-01-01"]
+station_daily_outflow = station_daily_outflow.loc[
+    station_daily_outflow.index != "2020-01-01"
+]
 ```
 
 Then we look into the missing data:
@@ -138,9 +143,12 @@ station_wide = station_daily_outflow.pivot(columns="stazione_partenza")
 ```
 
 ```{python}
-station_missing_obs = station_wide.isnull().sum() \
-    .reset_index() \
-    .rename(columns={"index" : "station_name", 0: "missing_obs"})
+station_missing_obs = (
+    station_wide.isnull()
+    .sum()
+    .reset_index()
+    .rename(columns={"index": "station_name", 0: "missing_obs"})
+)
 
 station_missing_obs.head()
 ```
@@ -157,9 +165,7 @@ This shows - as expected - that some stations are basically not used at all, whi
 labels = ["very_high", "high", "average", "low", "very_low"]
 
 station_missing_obs["usage_ranking"] = pd.cut(
-    station_missing_obs["pct_missing"],
-    bins = 5,
-    labels=labels 
+    station_missing_obs["pct_missing"], bins=5, labels=labels
 )
 ```
 
@@ -169,16 +175,16 @@ We can tabulate and plot this data:
 
 ```{python}
 # `.size()` counts the number of member in each category
-fig = station_missing_obs.groupby("usage_ranking").size() \
+fig = (
+    station_missing_obs.groupby("usage_ranking")
+    .size()
     .plot(
-        kind = "barh",
-        template = "none",
-        labels = dict(
-            value = "count",
-            usage_ranking = ""
-        ),
-        title = "Stations Ranked by Missing Values (%)"
+        kind="barh",
+        template="none",
+        labels=dict(value="count", usage_ranking=""),
+        title="Stations Ranked by Missing Values (%)",
     )
+)
 
 ps.plotly_style(fig)
 
@@ -204,7 +210,5 @@ hourly_outflow = rf.retrieve_bike_flow(table="bikemi_2019", trunc="hour")
 ```
 
 ```{python}
-ps.plotly_style(hourly_outflow.plot(
-    title = "Hourly Bike Count, 2019"
-))
+ps.plotly_style(hourly_outflow.plot(title="Hourly Bike Count, 2019"))
 ```
