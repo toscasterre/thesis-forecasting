@@ -13,7 +13,9 @@ jupyter:
     name: bikemi_win
 ---
 
+<!-- #region tags=[] jp-MarkdownHeadingCollapsed=true -->
 # Import Libraries
+<!-- #endregion -->
 
 ```{python init_cell=TRUE}
 # custom function for time series statistics
@@ -35,6 +37,11 @@ import seaborn as sns
 
 # to use pandas dtypes in matplotlib plots
 from pandas.plotting import register_matplotlib_converters
+
+# rich
+from rich.console import Console
+
+console = Console()
 
 register_matplotlib_converters()
 
@@ -61,12 +68,14 @@ sns_c = sns.color_palette(palette="deep")  # will be useful later
 # visualise plots inline
 # %matplotlib inline
 
-# customise matplotlib and sns plot dimensions 
+# customise matplotlib and sns plot dimensions
 plt.rcParams["figure.figsize"] = [12, 6]
 plt.rcParams["figure.dpi"] = 100
 ```
 
+<!-- #region jp-MarkdownHeadingCollapsed=true tags=[] -->
 # Load Data and Preprocessing
+<!-- #endregion -->
 
 ```{python init_cell=TRUE}
 daily_outflow = pd.read_csv("../data/bikemi_csv/daily_outflow.csv", parse_dates=[0])
@@ -88,16 +97,17 @@ daily_outflow = (
         ),
     )
     .set_index("giorno_partenza")
-    .astype({"day_name": "string"})
+    .astype({"day_name": "category", "holiday": "category"})
 )
 
-daily_outflow
+daily_outflow.info()
 ```
 
 # Basic Plotting
 
-
+<!-- #region jp-MarkdownHeadingCollapsed=true tags=[] -->
 ## Time Series Plot
+<!-- #endregion -->
 
 ```{python}
 daily_outflow.plot(
@@ -109,11 +119,9 @@ daily_outflow.plot(
 
 It is clear that the series is non-stationary and displays strong seasonal patterns. We can perform a Dickey-Fuller test to ensure this:
 
-```{python}
-from statsmodels.tsa.stattools import adfuller, kpss
-```
-
+<!-- #region jp-MarkdownHeadingCollapsed=true tags=[] -->
 ## Rolling Statistics
+<!-- #endregion -->
 
 ```{python}
 daily_outflow.plot(
@@ -178,7 +186,9 @@ for i, m in enumerate(ma):
 plt.suptitle("Bikemi Rentals (Daily) - Smooth Moving Average", y=1.02)
 ```
 
+<!-- #region jp-MarkdownHeadingCollapsed=true tags=[] -->
 ## Seasonal Plots
+<!-- #endregion -->
 
 ```{python}
 # play with color palettes: https://plotly.com/python/discrete-color/
@@ -194,8 +204,9 @@ pd.pivot_table(
 )
 ```
 
+<!-- #region jp-MarkdownHeadingCollapsed=true tags=[] -->
 # Transforming the Data
-
+<!-- #endregion -->
 
 ## First Differences
 
@@ -265,6 +276,43 @@ ax[2].set(title="seasonal", xlabel="")
 weekly_seasonal_decomposition.resid.plot(c=sns_c[3], ax=ax[3])
 ax[3].set(title="residual", xlabel="")
 ```
+
+We choose the `additive` decomposition instead of the `multiplicative` as the seasonal component does not appear to be increasing as a function of the trend one.
+
+
+## Testing for Stationarity
+
+
+Two tests are employed: the Augmented Dickey-Fuller and the KPSS test.
+
+* The Dickey-Fuller test's null hypothesis is that there is a unit root, i.e. is non-stationary.
+* The KPSS test's null hypothesis is that the series is level or trend stationary.
+
+The KPSS test differs from the Dickey-Fuller: its null hypothesis is the "opposite" of the Dickey-Fuller and we have to be more careful in how we read the test statistics or the p-value.
+
+For the Dickey-Fuller, a p-value greater than 5% will indicate that we fail to reject the null hypothesis that there is a unit root - in other words, the series is non-stationary. The KPSS test's null hypothesis (not rejected when the p-value is greater than 5) is that the series is level or trend-stationary. In other words, **contrary to the ADF test, the non-stationarity is the alternative hypothesis**.
+
+In other words, we expect the ADF p-value to be greater than the significance threshold and the KPSS one to be smaller.
+
+```{python}
+from statsmodels.tsa.stattools import adfuller, kpss
+
+adfuller_results = adfuller(daily_outflow["count"], regression="ct")
+kpss_results = kpss(daily_outflow["count"], regression="ct", nlags="auto")
+
+
+console.print(
+    f"""
+Advanced Dickey-Fuller p-value is {adfuller_results[1]:.2%}: \
+{"there is a unit root - i.e. the series is non-stationary" if adfuller_results[1] > 0.05 else "there is no unit root - the series is stationary"}.
+KPSS p-value is {kpss_results[1]:.2%}: \
+{"the series is stationary (there is no unit root)" if kpss_results[1] > 0.05 else "the series is non-stationary (there is a unit root)"}.
+    """
+)
+```
+
+Using the `auto` procedure for selecting the number of lags (`nlags`) of the KPSS test returns a warning: `The actual p-value is smaller than the p-value returned`. The KPSS 
+
 
 # Autocorrelation and Partial Autocorrelation Plots
 
