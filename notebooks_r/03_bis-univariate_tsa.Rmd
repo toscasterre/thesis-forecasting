@@ -8,12 +8,12 @@ jupyter:
       format_version: '1.2'
       jupytext_version: 1.10.3
   kernelspec:
-    display_name: Deep Learning Forecasting
+    display_name: Python 3 (ipykernel)
     language: python
-    name: bikemi_win
+    name: python3
 ---
 
-<!-- #region tags=[] jp-MarkdownHeadingCollapsed=true -->
+<!-- #region jp-MarkdownHeadingCollapsed=true tags=[] -->
 # Import Libraries
 <!-- #endregion -->
 
@@ -343,42 +343,6 @@ Partial autocorrelation displays another strong link with seasonality: statistic
 
 The declining autocorrelation not only displays a strong seasonal pattern, but also a trend.
 
-
-# Advanced Dickey Fuller Test
-
-```{python}
-tsa.perform_adfuller(daily_outflow["count"])
-```
-
-The test statistic is greater than any critical value: in other words, we cannot reject the null hypothesis and the series is indeed non-stationary.
-
-
-# Time-Series Decomposition
-
-There are several alternatives:
-
-* Apply a transformation (e.g., take logs);
-* Subtract the rolling average (it can work here, since the frequency is clear. It becomes more complex in case of high-frequency data: which window shall be selected?)
-
-```{python}
-from statsmodels.tsa.seasonal import seasonal_decompose
-
-# We use the parameter `period` = 365 to extract the yearly seasonality.
-seas_decomp_yearly = seasonal_decompose(
-    x=daily_data_df["temperature"], model="additive", period=365
-)
-
-fig, ax = plt.subplots(4, 1, figsize=(12, 12), constrained_layout=True)
-
-seas_decomp_yearly.observed.plot(c=sns_c[0], ax=ax[0])
-ax[0].set(title="observed", ylabel=r"$^\circ$C")
-seas_decomp_yearly.trend.plot(c=sns_c[1], ax=ax[1])
-ax[1].set(title="trend", ylabel=r"$^\circ$C")
-seas_decomp_yearly.seasonal.plot(c=sns_c[2], ax=ax[2])
-ax[2].set(title="seasonal", ylabel=r"$^\circ$C")
-seas_decomp_yearly.resid.plot(c=sns_c[3], ax=ax[3])
-ax[3].set(title="residual", ylabel=r"$^\circ$C")
-```
 
 As explained in the [official documentation](https://www.sktime.org/en/latest/api_reference/modules/auto_generated/sktime.forecasting.arima.AutoARIMA.html?highlight=seasonal%20decomposition),
 
