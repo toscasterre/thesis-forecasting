@@ -1,13 +1,14 @@
 # do not add folders with this prefix
 thesis_*
+.virtual_documents
 
 # exclude original data 
 data/bikemi
 
-
 # avoid personal and project specific IDE/programming language settings
 .Rprofile
 .vscode/settings.json
+*.Rproj
 
 # pyenv
 .python-version
