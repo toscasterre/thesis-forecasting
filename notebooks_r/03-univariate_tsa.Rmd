@@ -30,6 +30,7 @@ jupyter:
       extension: .Rmd
       format_name: rmarkdown
       format_version: '1.2'
+<<<<<<< HEAD:notebooks_r/03-univariate_tsa.Rmd
       jupytext_version: 1.11.4
   kernelspec:
     display_name: Forecasting Bikemi
@@ -38,6 +39,13 @@ jupyter:
 =======
     name: bikemi_win
 >>>>>>> 89beb3c9dea1dcf88d07769783883dbdeac2754e:notebooks_r/03-univariate_tsa.Rmd
+=======
+      jupytext_version: 1.10.3
+  kernelspec:
+    display_name: Deep Learning Forecasting
+    language: python
+    name: bikemi_win
+>>>>>>> 89beb3c9dea1dcf88d07769783883dbdeac2754e:notebooks_r/03_univariate_tsa.Rmd
 ---
 
 # Import Libraries, Load Data and Generate Features
@@ -48,6 +56,7 @@ import custom_functions.plot_styles as ps
 import custom_functions.time_series_analysis as tsa
 import pandas as pd
 import plotly.express as px
+<<<<<<< HEAD:notebooks_r/03-univariate_tsa.Rmd
 <<<<<<< HEAD:notebooks_r/03_univariate_tsa.Rmd
 
 pd.options.plotting.backend = "plotly"
@@ -60,6 +69,10 @@ import custom_functions.time_series_analysis as tsa
 
 pd.options.plotting.backend = "plotly"
 >>>>>>> 89beb3c9dea1dcf88d07769783883dbdeac2754e:notebooks_r/03-univariate_tsa.Rmd
+=======
+
+pd.options.plotting.backend = "plotly"
+>>>>>>> 89beb3c9dea1dcf88d07769783883dbdeac2754e:notebooks_r/03_univariate_tsa.Rmd
 
 ps.matplotlib_styles()
 ```
