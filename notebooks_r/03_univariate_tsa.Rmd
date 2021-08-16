@@ -1,11 +1,4 @@
 ---
-jupyter:
-  jupytext:
-    formats: notebooks///ipynb,notebooks_r///Rmd
-    text_representation:
-      extension: .Rmd
-      format_name: rmarkdown
-      format_version: '1.2'
 <<<<<<< HEAD
       jupytext_version: 1.11.4
   kernelspec:
@@ -19,6 +12,18 @@ jupyter:
     language: python
     name: python3
 >>>>>>> bc7053a6779ec0993d6ca7eae184c38c7c349529
+jupyter:
+  jupytext:
+    formats: notebooks///ipynb,notebooks_r///Rmd
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.11.4
+  kernelspec:
+    display_name: Forecasting Bikemi
+    language: python
+    name: bikemi
 ---
 
 # Import Libraries, Load Data and Generate Features
@@ -26,21 +31,19 @@ jupyter:
 ```{python}
 import pandas as pd
 import plotly.express as px
+
 pd.options.plotting.backend = "plotly"
+
+import custom_functions.plot_styles as ps
 
 # import custom functions
 import custom_functions.time_series_analysis as tsa
-import custom_functions.plot_styles as ps
 
 ps.matplotlib_styles()
 ```
 
 ```{python}
-df = pd.read_csv(
-    "../data/bikemi_csv/daily_outflow.csv",
-    parse_dates=[0],
-    index_col=[0]
-)
+df = pd.read_csv("../data/bikemi_csv/daily_outflow.csv", parse_dates=[0], index_col=[0])
 
 daily_outflow = tsa.create_ts_features(
     df, features=["day", "week", "month", "weekends", "holidays"]
@@ -60,10 +63,10 @@ ts_plot = daily_outflow.plot(
     y="count",
     title="Daily BikeMi Rentals (2019)",
     color_discrete_sequence=px.colors.qualitative.T10,
-    labels = {
+    labels={
         "count": "Rentals ",
-        "giorno_partenza" : "Date ",
-    }
+        "giorno_partenza": "Date ",
+    },
 )
 
 ps.plotly_style(ts_plot)
@@ -76,16 +79,12 @@ The first thing that comes to mind is that the series displays a great variance.
 
 ```{python}
 hist_weekends = daily_outflow.plot.bar(
-    x = daily_outflow.index,
-    y = "count",
+    x=daily_outflow.index,
+    y="count",
     title="BikeMi Rentals against Weekends (2019)",
-    color = "is_weekend",
+    color="is_weekend",
     color_discrete_sequence=px.colors.qualitative.Pastel,
-    labels = {
-        "count": "Rentals ",
-        "giorno_partenza" : "Date ",
-        "is_weekend": "Weekend "
-    }
+    labels={"count": "Rentals ", "giorno_partenza": "Date ", "is_weekend": "Weekend "},
 )
 
 ps.plotly_style(hist_weekends)
@@ -119,19 +118,13 @@ We can plot rolling means to get a better sense of these fluctuations.
 ```{python}
 # inspect values with `fig.data`
 tsa.px_rolling_statistics(
-    ts = daily_outflow,
-    col = "count",
-    lags = 7,
-    statistics=["mean", "std"]
+    ts=daily_outflow, col="count", lags=7, statistics=["mean", "std"]
 )
 ```
 
 ```{python}
 tsa.px_rolling_statistics(
-    ts = daily_outflow,
-    col = "count",
-    lags = 30,
-    statistics=["mean", "std"]
+    ts=daily_outflow, col="count", lags=30, statistics=["mean", "std"]
 )
 ```
 
@@ -141,11 +134,11 @@ We could plot the individual values for each month to display the difference in 
 ## Seasonality Boxplots
 
 ```{python}
-tsa.subunits_boxplot(daily_outflow["count"], y = "count", time_subunit = "month")
+tsa.subunits_boxplot(daily_outflow["count"], y="count", time_subunit="month")
 ```
 
 However, the most important source of variation clearly is the weekly seasonality. The boxplot function is designed to accept various time formats, so we can adapt it pretty quickly:
 
 ```{python}
-tsa.subunits_boxplot(daily_outflow["count"], y = "count", time_subunit = "weekday")
+tsa.subunits_boxplot(daily_outflow["count"], y="count", time_subunit="weekday")
 ```
