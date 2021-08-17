@@ -6,7 +6,7 @@ jupyter:
       extension: .Rmd
       format_name: rmarkdown
       format_version: '1.2'
-      jupytext_version: 1.11.4
+      jupytext_version: 1.10.3
   kernelspec:
     display_name: Deep Learning Forecasting
     language: python
@@ -73,8 +73,12 @@ y_pred = naive_forecaster.predict(fh)
 mean_absolute_percentage_error(y_test, y_pred)
 ```
 
-Our model has 64% MAPE
+Our model has 64% MAPE - whereas one might have expected something more. Let's plot it to see the differences:
 
+```{python}
+from sktime.utils.plotting import plot_series
+plot_series(daily_rentals, y_pred, labels=["y", "y_pred"]);
+```
 
 * [This](https://www.sciencedirect.com/science/article/pii/S0169207000000674) Explains well how auto models are used
 * [Theta-forecaster](https://www.sciencedirect.com/science/article/pii/S0169207000000662) Exploits seasonal patterns
