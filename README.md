@@ -33,7 +33,7 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
   * [`bikemi_csv`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/bikemi_csv): data for time series analysis.
   * [`bikemi_metadata`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/bikemi_metadata): stalls locations.
   * [`milan`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/milan): districts (Municipi) and neighborhoods (NIL) coordinates.
-* [`jupyter/kernels/bikemi/`](https://github.com/baggiponte/thesis-forecasting/tree/main/jupyter/kernels/bikemi): take the `bikemi` folder and copy it to your `$(jupyter --runtime)` to get a kernel specification file. This creates the option to select the environment as a kernel for your Notebooks.
+* [`jupyter/kernels/bikemi/`](https://github.com/baggiponte/thesis-forecasting/tree/main/jupyter/kernels/bikemi): take the `bikemi` folder and copy it to your `$(jupyter --data-dir)` to get a kernel specification file. This creates the option to select the environment as a kernel for your Notebooks.
 * [`notebooks`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks) contains the notebooks with the analysis.
   * [`notebooks`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks/custom_functions) contains the custom functions for the project.
 * [`notebooks_r`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks_r) is a backup directory to store notebooks converted into RMarkdown using Jupytext.
