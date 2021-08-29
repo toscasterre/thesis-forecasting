@@ -13,21 +13,71 @@ jupyter:
     name: bikemi
 ---
 
+<!-- #region tags=[] jp-MarkdownHeadingCollapsed=true -->
 # Import Libraries and Load Data
+<!-- #endregion -->
 
-```{python}
+```{python init_cell=TRUE}
+# Data visualisations
+import matplotlib.pyplot as plt
+
+# Base libraries
+import numpy as np
 import pandas as pd
+
+# More data viz
+import plotly.express as px
+import seaborn as sns
+
+# to use pandas dtypes in matplotlib plots
+from pandas.plotting import register_matplotlib_converters
+
+# rich
 from rich.console import Console
 
+# define rich console for formatted output
 console = Console()
+
+# have pandas types plotted with matplotlib
+register_matplotlib_converters()
+
+# set plotly as backend for plots wih pandas
+pd.options.plotting.backend = "plotly"
+
+# create a dict to update plotly layout
+plotly_styles = dict(
+    font_family="DejaVuSansMono Nerd Font",
+    template="none",
+    title={
+        "x": 0.05,
+        # basically, what part of the title to put at position "x"
+        "xanchor": "left",
+    },
+)
+
+
+# set settings for seaborn
+sns.set_style(style="darkgrid", rc={"axes.facecolor": ".9", "grid.color": ".8"})
+sns.set_palette(palette="deep")
+sns_c = sns.color_palette(palette="deep")  # will be useful later
+
+# visualise plots inline
+# %matplotlib inline
+
+# customise matplotlib and sns plot dimensions
+plt.rcParams["figure.figsize"] = [12, 6]
+plt.rcParams["figure.dpi"] = 100
 ```
 
 We use `squeeze=True` to indicate that our data has only one column and we want to retrieve a `pandas.Series` (see [here](https://machinelearningmastery.com/load-explore-time-series-data-python/))
 
 ```{python}
 daily_rentals = pd.read_csv(
-    "../data/bikemi_csv/daily_outflow.csv", index_col=[0], parse_dates=[0], squeeze=True
-).asfreq(freq="D")
+    "../data/bikemi_csv/daily_outflow.csv",
+    index_col=[0],
+    parse_dates=[0],
+    squeeze=True
+).asfreq(freq="D") # set frequency
 
 print(f"Our data is a {type(daily_rentals)}")
 
@@ -40,10 +90,11 @@ We also need to make sure our index has a frequency - which we did with `.asfreq
 daily_rentals.index
 ```
 
-# Naive forecaster
+<!-- #region jp-MarkdownHeadingCollapsed=true tags=[] -->
+# Naïve forecaster
+<!-- #endregion -->
 
-
-We need to establish a benchmark:
+We need to fit a naïve forecaster to have a benchmark for our other methods:
 
 ```{python}
 from sktime.forecasting.base import ForecastingHorizon
@@ -70,7 +121,9 @@ naive_forecaster.fit(y_train)
 y_pred = naive_forecaster.predict(fh)
 
 # naive forecaster error
-mean_absolute_percentage_error(y_test, y_pred)
+naive_error = mean_absolute_percentage_error(y_test, y_pred)
+
+print(naive_error)
 ```
 
 Our model has 64% MAPE - whereas one might have expected something more. Let's plot it to see the differences:
@@ -78,39 +131,10 @@ Our model has 64% MAPE - whereas one might have expected something more. Let's p
 ```{python}
 from sktime.utils.plotting import plot_series
 
-plot_series(daily_rentals, y_pred, labels=["y", "y_pred"]);
+plot_series(daily_rentals, y_pred, labels=["observed", "predicted"]);
 ```
 
-Maybe we can build a more realiable forecaster by taking first differences:
+# ARIMA Model
 
-```{python}
-plot_series(daily_rentals.diff(1).diff(7))
-```
 
-```{python}
-from statsmodels.tsa.stattools import adfuller
-
-adfuller_results = adfuller(daily_rentals.diff(1).diff(7).dropna(), regression="ct")
-
-console.print(
-    f"Advanced Dickey-Fuller p-value is {adfuller_results[1]:.2%}: "
-    f'{"there is a unit root - i.e. the series is non-stationary" if adfuller_results[1] > 0.05 else "there is no unit root - the series is stationary"}'
-)
-```
-
-* [This](https://www.sciencedirect.com/science/article/pii/S0169207000000674) Explains well how auto models are used
-* [Theta-forecaster](https://www.sciencedirect.com/science/article/pii/S0169207000000662) Exploits seasonal patterns
-
-```{python}
-
-```
-
-As explained in the [official documentation](https://www.sktime.org/en/latest/api_reference/modules/auto_generated/sktime.forecasting.arima.AutoARIMA.html?highlight=seasonal%20decomposition),
-
-The auto-ARIMA process seeks to identify the most optimal parameters for an ARIMA model, settling on a single fitted ARIMA model. This process is based on the commonly-used R function, forecast::auto.arima [3].
-
-Auto-ARIMA works by conducting differencing tests (i.e., Kwiatkowski–Phillips–Schmidt–Shin, Augmented Dickey-Fuller or Phillips–Perron) to determine the order of differencing, d, and then fitting models within ranges of defined start_p, max_p, start_q, max_q ranges. If the seasonal optional is enabled, auto-ARIMA also seeks to identify the optimal P and Q hyper-parameters after conducting the Canova-Hansen to determine the optimal order of seasonal differencing, D.
-
-In order to find the best model, auto-ARIMA optimizes for a given information_criterion, one of (‘aic’, ‘aicc’, ‘bic’, ‘hqic’, ‘oob’) (Akaike Information Criterion, Corrected Akaike Information Criterion, Bayesian Information Criterion, Hannan-Quinn Information Criterion, or “out of bag”–for validation scoring–respectively) and returns the ARIMA which minimizes the value.
-
-Note that due to stationarity issues, auto-ARIMA might not find a suitable model that will converge. If this is the case, a ValueError will be thrown suggesting stationarity-inducing measures be taken prior to re-fitting or that a new range of order values be selected. Non- stepwise (i.e., essentially a grid search) selection can be slow, especially for seasonal data. Stepwise algorithm is outlined in Hyndman and Khandakar (2008).
+The autocorrelation plot suggested us to 
