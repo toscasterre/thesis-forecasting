@@ -1,5 +1,7 @@
 # Deep Neural Networks for Time Series Forecasting: An Effort Worth Pursuing?
 
+[![CodeFactor](https://www.codefactor.io/repository/github/baggiponte/thesis-forecasting/badge?s=15440e769166c9c9571f2d7b8d3c7fcdcf5c9ecb)](https://www.codefactor.io/repository/github/baggiponte/thesis-forecasting)
+
 This is the repository for my graduate thesis on neural forecasting, i.e. the application of deep learning to time series forecasting.
 
 * Capture correlation between series 
@@ -17,14 +19,11 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 ├── notebooks
 │   └── custom_functions/
 ├── notebooks_r
-├── renv
 ├── research_journal
 ├── scripts
 ├── environment_macos.yml
 ├── environment_win.yml
-├── README.md
-├── renv.lock
-└── tesi.Rproj
+└── README.md
 ```
 
 * [`data`](https://github.com/baggiponte/thesis-forecasting/tree/main/data) contains:
@@ -37,14 +36,11 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 * [`notebooks`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks) contains the notebooks with the analysis.
   * [`notebooks`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks/custom_functions) contains the custom functions for the project.
 * [`notebooks_r`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks_r) is a backup directory to store notebooks converted into RMarkdown using Jupytext.
-* [`renv`](https://github.com/baggiponte/thesis-forecasting/tree/main/renv) stores the R packages for this project.
 * [`research_journal`](https://github.com/baggiponte/thesis-forecasting/tree/main/research_journal) has some of my considerations I wrote down. Actually, most of my errands are stored in a local knowledge tree with [logseq](https://github.com/logseq/logseq).
 * [`scripts`](https://github.com/baggiponte/thesis-forecasting/tree/main/scripts) contains the custom shell scripts I have written to process the data.
 * [`environment_macos.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment_macos.yml) can be used to re-create the `conda` environment I am using via `conda create env --file environment_macos.yml`. Should work on Linux as well.
 * [`environment_win.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment_win.yml) is needed if you want to replicate the analysis on Windows OS.
 * [`README.md`](https://github.com/baggiponte/thesis-forecasting/tree/main/README.md) this file.
-* [`renv.lock`](https://github.com/baggiponte/thesis-forecasting/tree/main/renv.lock) basically, `{renv}` equivalent of `environment.yml`.
-* [`tesi.Rproj`](https://github.com/baggiponte/thesis-forecasting/tree/main/tesi.Rproj) specific settings for the R Project environment.
 
 # Plan
 
