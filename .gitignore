@@ -1,22 +1,13 @@
-# do not add folders with this prefix
+# temporarily
 thesis_*
-.virtual_documents
-.ipynb_checkpoints
-__pycache__
-
-*.code-workspace
+notebooks_r
 
 # exclude original data 
 data/bikemi
 
 # avoid personal and project specific IDE/programming language settings
-.Rprofile
 .vscode/settings.json
-*.Rproj
-
-# pyenv
-.python-version
+*.code-workspace
 
 # boring, dont use it much
 .idea
-.Rproj.user
