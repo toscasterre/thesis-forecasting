@@ -2,12 +2,18 @@
 thesis_*
 notebooks_r
 
+# for windows
+.ipynb_checkpoints
+.virtual_documents
+__pycache__
+
 # exclude original data 
 data/bikemi
 
 # avoid personal and project specific IDE/programming language settings
 .vscode/settings.json
-*.code-workspace
+.code-workspace
+.jupyterlab-workspace
 
 # boring, dont use it much
 .idea
