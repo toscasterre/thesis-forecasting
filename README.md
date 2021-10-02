@@ -10,6 +10,7 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 
 ```bash
 .
+├── body
 ├── data
 │   ├── arpa
 │   ├── bikemi_csv
@@ -26,6 +27,7 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
 └── README.md
 ```
 
+* [`data`](https://github.com/baggiponte/thesis-forecasting/tree/main/body) contains the corpus of the thesis, created via the [Jupyter Book](https://jupyterbook.org/intro.html) project.
 * [`data`](https://github.com/baggiponte/thesis-forecasting/tree/main/data) contains:
   * [`arpa`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/arpa) actually not needed
     * Could be exploited with time series for weather data from each measuring station.
@@ -34,8 +36,7 @@ This is the repository for my graduate thesis on neural forecasting, i.e. the ap
   * [`milan`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/milan): districts (Municipi) and neighborhoods (NIL) coordinates.
 * [`jupyter/kernels/bikemi/`](https://github.com/baggiponte/thesis-forecasting/tree/main/jupyter/kernels/bikemi): take the `bikemi` folder and copy it to your `$(jupyter --data-dir)` to get a kernel specification file. This creates the option to select the environment as a kernel for your Notebooks.
 * [`notebooks`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks) contains the notebooks with the analysis.
-  * [`notebooks`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks/custom_functions) contains the custom functions for the project.
-* [`notebooks_r`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks_r) is a backup directory to store notebooks converted into RMarkdown using Jupytext.
+  * [`custom_functions`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks/custom_functions) contains the custom functions for the project.
 * [`research_journal`](https://github.com/baggiponte/thesis-forecasting/tree/main/research_journal) has some of my considerations I wrote down. Actually, most of my errands are stored in a local knowledge tree with [logseq](https://github.com/logseq/logseq).
 * [`scripts`](https://github.com/baggiponte/thesis-forecasting/tree/main/scripts) contains the custom shell scripts I have written to process the data.
 * [`environment_macos.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment_macos.yml) can be used to re-create the `conda` environment I am using via `conda create env --file environment_macos.yml`. Should work on Linux as well.
