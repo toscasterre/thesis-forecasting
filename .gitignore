@@ -1,5 +1,5 @@
 # temporarily
-thesis_*
+body-misc
 notebooks_r
 
 # for windows
@@ -11,9 +11,7 @@ __pycache__
 data/bikemi
 
 # avoid personal and project specific IDE/programming language settings
-.vscode/settings.json
+.vscode
 .code-workspace
-.jupyterlab-workspace
-
-# boring, dont use it much
+tesi.jupyterlab-workspace
 .idea
