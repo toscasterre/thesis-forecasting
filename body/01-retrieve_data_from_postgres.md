@@ -12,7 +12,9 @@ kernelspec:
   name: python3
 ---
 
-# Import Libraries
+# Data Ingestion
+
+## Import Libraries
 
 ```{code-cell} ipython3
 import pandas as pd
@@ -41,7 +43,7 @@ To resolve the `Pylance(reportMissingImports)`, you have to add to `.vscode/sett
 
 +++
 
-# Check in on the PostgreSQL Server
+## Check in on the PostgreSQL Server
 First, we run a custom script to check if the `PostgreSQL` server is started or to start it.
 
 ```{code-cell} ipython3
@@ -64,7 +66,7 @@ Besides, the parameter `trunc` is set to default to `day`: this will mean that t
 
 +++
 
-# Retrieve Data Aggregated at the Municipality Level
+## Retrieve Data Aggregated at the Municipality Level
 
 ```{code-cell} ipython3
 # when no argument other than the table name is specified, daily data for Milan is retrieved
@@ -109,7 +111,7 @@ This discrepancy suggests that some data from 2020 was spilled into the 2019 Exc
 daily_outflow[:"2019-12-31"].to_csv("../data/bikemi_csv/daily_outflow.csv")
 ```
 
-# Retrieve Data Aggregated at Station-Level
+## Retrieve Data Aggregated at Station-Level
 
 ```{code-cell} ipython3
 # when the station_columns is specified, data for each station is retrieved
@@ -202,7 +204,7 @@ We don't need to save the wide `DataFrame` too, as we can pivot the table with e
 
 +++
 
-# Hourly Data
+## Hourly Data
 
 We could also extract hourly data, but we argued it will be noisy:
 

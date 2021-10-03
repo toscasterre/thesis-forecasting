@@ -32,7 +32,7 @@ mkdir -p ../data/bikemi_metadata && \
     curl "https://dati.comune.milano.it/dataset/cc065002-cd21-4dcb-b84f-bba2fd9e0c86/resource/4c31029c-22c9-49f7-b145-91374feac41c/download/bikemi_stazioni.csv" -o ../data/bikemi_metadata/bikemi_stalls.csv
 ```
 
-# Neighbourhoods [NIL]
+## Neighbourhoods [NIL]
 
 +++
 
@@ -57,7 +57,7 @@ curl "https://dati.comune.milano.it/dataset/e8e765fc-d882-40b8-95d8-16ff3d39eb7c
 
 +++
 
-# Municipi
+## Municipi
 
 ```{code-cell} ipython3
 %%bash

@@ -12,11 +12,11 @@ kernelspec:
   name: bikemi
 ---
 
-# Prophet 
+# Prophet
 
 +++ {"jp-MarkdownHeadingCollapsed": true, "tags": []}
 
-# What is Prophet? 
+## What is Prophet?
 
 +++
 
@@ -30,11 +30,11 @@ Prophet should work best with medium-to-high frequency data, with overlapping se
 
 +++ {"tags": []}
 
-# Controversy about Prophet
+## Controversy about Prophet
 
 +++
 
-# Import Libraries
+## Import Libraries
 
 ```{code-cell} ipython3
 # data manipulation
@@ -63,7 +63,7 @@ plt.rcParams["figure.figsize"] = [12, 9]
 plt.rcParams["figure.dpi"] = 100
 ```
 
-# Define Metrics 
+## Define Metrics
 
 ```{code-cell} ipython3
 from sktime.performance_metrics.forecasting import (
@@ -96,7 +96,7 @@ def model_diagnostics(
     return pd.DataFrame({"metrics": metrics, "scores": scores})
 ```
 
-# Load Data 
+## Load Data
 
 +++
 
@@ -113,18 +113,18 @@ rentals = (
 y_train, y_test = temporal_train_test_split(rentals, test_size=0.1)
 ```
 
-# Prophet Model 
+## Prophet Model
 
 +++
 
-## Fit Model 
+### Fit Model
 
 ```{code-cell} ipython3
 model = Prophet()
 model.fit(y_train)
 ```
 
-## Define Forecasting Horizon
+### Define Forecasting Horizon
 
 ```{code-cell} ipython3
 # forecasting horizon size
@@ -133,13 +133,13 @@ fh_size = y_test.shape[0]
 fh = model.make_future_dataframe(periods=fh_size)
 ```
 
-## Forecast
+### Forecast
 
 ```{code-cell} ipython3
 y_pred = model.predict(fh)
 ```
 
-# Plot 
+## Plot
 
 +++
 
@@ -183,7 +183,6 @@ def sktime_plot_prophet(
         sk_y_test,
         sk_y_pred,
         labels=labels)
-
 ```
 
 ```{code-cell} ipython3

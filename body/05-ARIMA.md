@@ -14,7 +14,9 @@ kernelspec:
 
 +++ {"incorrectly_encoded_metadata": "tags=[] jp-MarkdownHeadingCollapsed=true"}
 
-# Import Libraries and Load Data
+# ARIMA
+
+## Import Libraries and Load Data
 
 ```{code-cell} ipython3
 :init_cell: true
@@ -97,7 +99,7 @@ daily_rentals.index
 
 +++ {"incorrectly_encoded_metadata": "jp-MarkdownHeadingCollapsed=true", "tags": []}
 
-# Naïve forecaster
+## Naïve forecaster
 
 +++
 
@@ -189,7 +191,7 @@ plot_series(daily_rentals, naive_pred, labels=["observed", "naive forecaster"])
 plt.show()
 ```
 
-# ARIMA Model
+## ARIMA Model
 
 +++
 
@@ -271,7 +273,7 @@ The Ljung-Box is a portmanteau test for autocorrelation of the residuals. Our mo
 ar = ARIMA()
 ```
 
-# SARIMAX
+## SARIMAX
 
 +++
 
@@ -346,7 +348,7 @@ Every time component is statistically insignificant
 
 +++
 
-# Auto ARIMA
+## Auto ARIMA
 
 +++
 
@@ -368,10 +370,4 @@ plot_series(daily_rentals, auto_arima_pred, labels=["observed", "auto-arima"])
 plt.title(f"error: {round(auto_arima_error * 100)}%")
 
 plt.show()
-```
-
-# Prophet
-
-```{code-cell} ipython3
-from sktime.forecasting.fbprophet import Prophet
 ```

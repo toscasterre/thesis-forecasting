@@ -14,7 +14,7 @@ kernelspec:
 
 +++ {"incorrectly_encoded_metadata": "jp-MarkdownHeadingCollapsed=true", "jp-MarkdownHeadingCollapsed": true, "tags": []}
 
-# Transforming the Data
+# Data Transformation and Stationarity
 
 +++
 
@@ -86,7 +86,7 @@ daily_outflow.info()
 
 +++ {"tags": []}
 
-# First Decomposition
+## First Decomposition
 
 +++
 
@@ -161,7 +161,7 @@ While the first part of the series is slightly better handled, the declining tre
 
 +++ {"tags": []}
 
-# Differencing
+## Differencing
 
 ```{code-cell} ipython3
 pd.options.plotting.backend = "plotly"
@@ -169,7 +169,7 @@ pd.options.plotting.backend = "plotly"
 
 +++ {"tags": []}
 
-## First Differencing
+### First Differencing
 
 +++
 
@@ -189,7 +189,7 @@ First differencing remarks the time-varying nature of the seasonal component of 
 
 +++ {"tags": []}
 
-## Seasonal Differencing
+### Seasonal Differencing
 
 ```{code-cell} ipython3
 daily_outflow.plot(
@@ -240,7 +240,7 @@ However, we might not be satisfied with this - let's have a look at the double d
 
 +++ {"tags": []}
 
-## Log Double Differences
+### Log Double Differences
 
 ```{code-cell} ipython3
 (
@@ -277,7 +277,7 @@ This suggests that even a SARIMA model might not compete with something like Pro
 
 +++ {"tags": []}
 
-# Autocorrelation and Partial Autocorrelation Plots
+## Autocorrelation and Partial Autocorrelation Plots
 
 ```{code-cell} ipython3
 pd.options.plotting.backend = "matplotlib"
@@ -305,11 +305,11 @@ plot_pacf(
 plt.plot()
 ```
 
-The autocorrelation plot shows a sinusoidal dependence with past lags; the first (and second) lags are significant, and so do the multiples of 7, even beyond the 30th lag. This fact should not be too surprising: we could already spot it from the 30 day window moving average, but is still remarkable. This will likely entail a greater MA component for our (S)ARIMA models; in particular, the ACF suggests a moving average component with 1-2 lags and possibly even more seasonal lags. The partial autocorrelation function indicates an autoregressive component of 1 and a seasonal AR component of perhaps 1 lag. 
+The autocorrelation plot shows a sinusoidal dependence with past lags; the first (and second) lags are significant, and so do the multiples of 7, even beyond the 30th lag. This fact should not be too surprising: we could already spot it from the 30 day window moving average, but is still remarkable. This will likely entail a greater MA component for our (S)ARIMA models; in particular, the ACF suggests a moving average component with 1-2 lags and possibly even more seasonal lags. The partial autocorrelation function indicates an autoregressive component of 1 and a seasonal AR component of perhaps 1 lag.
 
 +++ {"tags": []}
 
-# STL Decomposition
+## STL Decomposition
 
 +++ {"citation-manager": {"citations": {"hmqko": [{"id": "7765261/JEKFIWNG", "source": "zotero"}]}}, "tags": []}
 

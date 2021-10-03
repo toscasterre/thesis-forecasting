@@ -14,7 +14,9 @@ kernelspec:
 
 +++ {"tags": []}
 
-# Import Libraries and Load Data
+# Spatial Data Operations
+
+## Import Libraries and Load Data
 
 ```{code-cell} ipython3
 # import custom functions for joins and cleaning strings
@@ -109,11 +111,11 @@ station_outflow.info()
 
 +++ {"incorrectly_encoded_metadata": "tags=[] jp-MarkdownHeadingCollapsed=true"}
 
-# First Join: BikeMi Stalls and Time Series Data
+## First Join: BikeMi Stalls and Time Series Data
 
 +++
 
-## Tentative Join
+### Tentative Join
 
 ```{code-cell} ipython3
 # join the index of the table specified as the first argument on the column specified by the "on" argument
@@ -147,7 +149,7 @@ Number of stalls in our time series: {unique_stations.size}.
 )
 ```
 
-## String Matching
+### String Matching
 
 +++
 
@@ -188,7 +190,7 @@ Now we can retry the join, after applying the custom function for cleaning strin
 
 +++
 
-## Cleaned Data
+### Cleaned Data
 
 ```{code-cell} ipython3
 clean_outflow = cs.clean_df(station_outflow, col="stazione_partenza", inplace=True)
@@ -210,7 +212,7 @@ Notice that we lose just a small part of the observations. Now it's finally time
 
 +++ {"tags": []}
 
-# Two Spatial Joins
+## Two Spatial Joins
 
 +++
 
@@ -225,7 +227,7 @@ Let's proceed with a spatial operation, to assign each stall to its NIL, i.e. ne
 
 +++ {"tags": []}
 
-## Second Spatial Join: Georeferenced Time Series and Local Neighbourhoods (NIL)
+### Second Spatial Join: Georeferenced Time Series and Local Neighbourhoods (NIL)
 
 ```{code-cell} ipython3
 geo_outflow_nil = (
@@ -284,7 +286,7 @@ Each approach has its pros and cons. The first requires going back on our code a
 
 +++
 
-### `groubpy` and Double Lambda Function
+#### `groubpy` and Double Lambda Function
 
 +++
 
@@ -439,7 +441,7 @@ px.scatter_mapbox(
 )
 ```
 
-# Save the Final Dataset
+## Save the Final Dataset
 
 ```{code-cell} ipython3
 nil_aggregated_outflow.to_csv("../data/bikemi_csv/nil_daily_outflow.csv")
@@ -447,7 +449,7 @@ nil_aggregated_outflow.to_csv("../data/bikemi_csv/nil_daily_outflow.csv")
 
 +++ {"tags": []}
 
-# Appendix: Join with Municipi Data
+## Appendix: Join with Municipi Data
 
 +++
 

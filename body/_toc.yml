@@ -2,7 +2,23 @@
 # Learn more at https://jupyterbook.org/customize/toc.html
 
 format: jb-book
-root: intro
+root: frontmatter
 chapters:
-- file: markdown
-- file: notebooks
+parts:
+  - caption: Introduction
+    chapters:
+      - file: introduction
+  - caption: Data
+    chapters:
+      - file: bikemi
+      - file: 00-retrieve_milan_data
+      - file: 01-retrieve_data_from_postgres
+      - file: 02-spatial_joins
+  - caption: Time Series Modelling
+    chapters:
+      - file: 03-time_series_analysis
+      - file: 04-data_transform_and_stationarity
+      - file: 05-ARIMA
+      - file: 06-Prophet
+  - caption: Deep Learning
+    chapters:

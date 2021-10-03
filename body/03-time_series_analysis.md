@@ -126,7 +126,7 @@ daily_outflow.head(10)
 
 +++ {"incorrectly_encoded_metadata": "jp-MarkdownHeadingCollapsed=true", "tags": []}
 
-# Time Series Plot
+## Time Series Plot
 
 ```{code-cell} ipython3
 daily_outflow.plot(
@@ -138,7 +138,7 @@ daily_outflow.plot(
 
 +++ {"incorrectly_encoded_metadata": "jp-MarkdownHeadingCollapsed=true", "tags": []}
 
-# Rolling Statistics
+## Rolling Statistics
 
 +++
 
@@ -214,7 +214,7 @@ for i, m in enumerate(ma):
 plt.suptitle("Bikemi Rentals (Daily) - Smooth Moving Average", y=1.02)
 ```
 
-# Histograms
+## Histograms
 
 +++
 
@@ -246,7 +246,7 @@ daily_outflow.plot.bar(
 )
 ```
 
-# Other Kinds of Seasonalities: Monthly and Daily Data Distributions
+## Other Kinds of Seasonalities: Monthly and Daily Data Distributions
 
 +++
 
@@ -254,7 +254,7 @@ Let's have a closer look at seasonal patterns. We import some custom functions w
 
 +++ {"incorrectly_encoded_metadata": "jp-MarkdownHeadingCollapsed=true", "tags": []}
 
-## Seasonal Plots
+### Seasonal Plots
 
 ```{code-cell} ipython3
 # play with color palettes: https://plotly.com/python/discrete-color/
@@ -280,7 +280,7 @@ Note: the plot starts on Tuesday because the data starts on Tuesday and the cate
 
 +++ {"tags": []}
 
-# Appendix: Functions for Rolling Statistics
+## Appendix: Functions for Rolling Statistics
 
 +++
 
