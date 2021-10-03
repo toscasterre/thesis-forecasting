@@ -1,0 +1,84 @@
+#! /usr/bin/env bash
+
+_pair_notebooks () {
+
+    # the format of the paired notebook, i.e. Rmd, md:myst...
+    TO_FORMAT="$1"
+
+    # origin file
+    FROM_FILE="$(basename "$2")"
+
+    # destination filename
+    EXTENSION="${TO_FORMAT/:*/}" # if format is md:myst, remove ":myst"
+    TO_FILE="${FROM_FILE/.ipynb/"$EXTENSION"}"
+
+    # run the script only if the file ($1) is not already paired at the destination
+    if [[ ! -e "${TARGET_DIR}/$TO_FILE" ]] ; then
+        
+        echo "${BOLD}Pairing ${CYAN}${FROM_FILE}${RESET}${BOLD} to ${CYAN}${TO_FILE}${RESET}"
+        
+        # pair the notebook from the execution dir to the desired format in the destination dir
+        jupytext --set-formats \
+        "$(basename "$EXEC_DIR")"///ipynb,"$(basename "$TARGET_DIR")"///"$TO_FORMAT" \
+        "$FROM_FILE"
+        
+        # just add a blank line
+        echo""
+    fi
+}
+
+_update_sync () {
+
+    TO_FORMAT="$1"
+
+    FROM_FILE="$(basename $"2")"
+
+    EXTENSION="${TO_FORMAT/:*/}"
+    TO_FILE="${FROM_FILE/.ipynb/"${EXTENSION}"}"
+
+    echo -e "${BOLD}Updating sync between ${CYAN}${FROM_FILE}${RESET}${BOLD} to ${CYAN}${TO_FILE}${RESET}"
+    
+    # sync notebooks
+    jupytext --sync "$FROM_FILE"
+    
+    # echo a blank line
+    echo ""
+}
+
+# shellcheck source=formatting_colors
+source "formatting_colors"
+
+TO_FORMAT=${1:-"md:myst"}
+ROOT_DIR=${2:-"$HOME/tesi"}
+EXEC_DIR=${3:-"/notebooks"}
+TARGET_DIR=${4:-"/body"}
+
+pushd "$ROOT_DIR" 1>/dev/null || exit
+
+# reference: https://alvinalexander.com/linux-unix/shell-script-how-prompt-read-user-input-bash/
+while true ; do
+
+    # prompt user, and read command line argument
+    echo -e "\n${BOLD}This will affect notebooks in ${GREEN}${EXEC_DIR}${RESET}${BOLD} and ${CYAN}${TO_FORMAT}${RESET}${BOLD} files in ${GREEN}${TARGET_DIR}${RESET}"
+    read -rp "${BOLD}Do you want to ${CYAN}pair [p]${RESET}${BOLD} notebooks or ${CYAN}sync [s]${RESET}${BOLD} the updates?${RESET}" ANSWER
+    echo ""
+
+    # handle the input
+    case $ANSWER in
+        [pP]* ) for IPYNB in "$EXEC_DIR"/*.ipynb ; do
+                    _pair_notebooks "$TO_FORMAT" "$IPYNB"
+                done
+
+                break;;
+
+        [sS]* ) for IPYNB in "$EXEC_DIR"/*.ipynb ; do
+                    _update_sync "$TO_FORMAT" "$IPYNB"
+                done
+        
+                break;;
+
+            * ) echo "Enter y or n, please.";;
+    esac
+done
+
+popd 1>/dev/null || exit
