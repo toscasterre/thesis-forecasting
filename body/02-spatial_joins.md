@@ -7,9 +7,9 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.13.0
 kernelspec:
-  display_name: Deep Learning Forecasting
+  display_name: Python [conda env:bikemi]
   language: python
-  name: bikemi
+  name: conda-env-bikemi-py
 ---
 
 +++ {"tags": []}
@@ -19,23 +19,23 @@ kernelspec:
 ## Import Libraries and Load Data
 
 ```{code-cell} ipython3
-# import custom functions for joins and cleaning strings
-import custom_functions.clean_strings as cs
-import custom_functions.joins as j
+# reading and manipulating data
+import pandas as pd
 
-# main libs
+# geo libs
 import geopandas
+import contextily as cx
 
 # plotting
 import matplotlib.pyplot as plt
 
-# reading and manipulating data
-import pandas as pd
 
 # for nice output statements, such as with `print()`:
 from rich.console import Console
 
-%matplotlib inline
+# import custom functions for joins and cleaning strings
+import custom_functions.clean_strings as cs
+import custom_functions.joins as j
 
 console = Console()
 ```
@@ -46,17 +46,47 @@ Let's import the data. `geopandas.GeoDataFrame` can have as many `geopandas.GeoS
 # load stalls lon-lat table
 bikemi_stalls = geopandas.read_file("../data/bikemi_metadata/bikemi_stalls.geojson")
 
-# load NIL lon-lat table
-nil = geopandas.read_file("../data/milan/milan_nil.geojson")
+# load pedestrian areas in Milan, including Area C
+pedestrian_areas = geopandas.read_file("../data/milan/area_c.geojson")
 
-# actually not needed, municipi categorical var is already in bikemi_stalls
-municipi = geopandas.read_file("../data/milan/milan_municipi.geojson")
+# load NIL lon-lat table
+nil = geopandas.read_file("../data/milan/nil.geojson")
+```
+
+## Select Area C
+
++++
+
+Area C was introduced in 2008 and delimits the so called "Bastioni" area.
+
+```{code-cell} ipython3
+area_c = pedestrian_areas.loc[pedestrian_areas.tipo == "AREA_C"]
+```
+
+```{code-cell} ipython3
+# define ax object and dimensions
+fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+
+# plot both objects on the same axes; order matters
+area_c.plot(ax=ax, cmap="Set2")
+# cx.add_basemap(ax)  # does not work within the ECB
+
+ax.axis("off")
+
+plt.show()
+```
+
+Then we need to select the NILs/BikeMi stalls that intersect with this area.
+
+```{code-cell} ipython3
+nil
 ```
 
 ```{code-cell} ipython3
 # select only the column we need + rename
 nil = (
     nil[["ID_NIL", "NIL", "geometry"]]
+    # rename NILS
     .assign(NIL=lambda x: x["NIL"].str.title())
     .astype({"ID_NIL": "string", "NIL": "string"})
     .rename(columns={"NIL": "nil", "ID_NIL": "nil_number"})
