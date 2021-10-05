@@ -9,7 +9,7 @@ jupytext:
 kernelspec:
   display_name: Deep Learning Forecasting
   language: python
-  name: bikemi_win
+  name: bikemi
 ---
 
 # BikeMi Metadata and External Data
