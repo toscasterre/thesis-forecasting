@@ -11,7 +11,6 @@ parts:
   - caption: Data
     chapters:
       - file: bikemi
-      - file: 00-retrieve_milan_data
       - file: 01-retrieve_data_from_postgres
       - file: 02-spatial_joins
   - caption: Time Series Modelling
