@@ -10,7 +10,7 @@ __pycache__
 data/bikemi
 
 # avoid personal and project specific IDE/programming language settings
+*.jupyterlab-workspace
 .vscode
 .code-workspace
-tesi.jupyterlab-workspace
 .idea
