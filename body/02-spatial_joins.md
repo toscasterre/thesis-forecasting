@@ -21,10 +21,11 @@ kernelspec:
 ```{code-cell} ipython3
 # reading and manipulating data
 import pandas as pd
+import numpy as np
 
 # geo libs
 import geopandas
-import contextily as cx
+# import contextily as cx
 
 # plotting
 import matplotlib.pyplot as plt
@@ -44,49 +45,24 @@ Let's import the data. `geopandas.GeoDataFrame` can have as many `geopandas.GeoS
 
 ```{code-cell} ipython3
 # load stalls lon-lat table
-bikemi_stalls = geopandas.read_file("../data/bikemi_metadata/bikemi_stalls.geojson")
+bikemi_stalls = (
+    geopandas.read_file("../data/bikemi_metadata/bikemi_stalls.geojson")
+    [["nome", "zd_attuale", "anno", "stalli", "geometry"]]
+    .rename(columns={"zd_attuale": "municipio", "stalli": "numero_stalli"})
+    .sort_values(by=["nome"], ascending=True)
+    .astype({"nome": "string", "municipio": "string"})
+    .set_index("nome")
+)
 
-# load pedestrian areas in Milan, including Area C
-pedestrian_areas = geopandas.read_file("../data/milan/area_c.geojson")
+bikemi_stalls.info()
+```
 
+```{code-cell} ipython3
 # load NIL lon-lat table
-nil = geopandas.read_file("../data/milan/nil.geojson")
-```
-
-## Select Area C
-
-+++
-
-Area C was introduced in 2008 and delimits the so called "Bastioni" area.
-
-```{code-cell} ipython3
-area_c = pedestrian_areas.loc[pedestrian_areas.tipo == "AREA_C"]
-```
-
-```{code-cell} ipython3
-# define ax object and dimensions
-fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-
-# plot both objects on the same axes; order matters
-area_c.plot(ax=ax, cmap="Set2")
-# cx.add_basemap(ax)  # does not work within the ECB
-
-ax.axis("off")
-
-plt.show()
-```
-
-Then we need to select the NILs/BikeMi stalls that intersect with this area.
-
-```{code-cell} ipython3
-nil
-```
-
-```{code-cell} ipython3
-# select only the column we need + rename
 nil = (
-    nil[["ID_NIL", "NIL", "geometry"]]
-    # rename NILS
+    geopandas.read_file("../data/milan/nil.geojson")
+    [["ID_NIL", "NIL", "geometry"]]
+    # turn the names in the column to titlecase
     .assign(NIL=lambda x: x["NIL"].str.title())
     .astype({"ID_NIL": "string", "NIL": "string"})
     .rename(columns={"NIL": "nil", "ID_NIL": "nil_number"})
@@ -97,17 +73,23 @@ nil = (
 nil.info()
 ```
 
-```{code-cell} ipython3
-# select only the column we need + rename
-bikemi_stalls = (
-    bikemi_stalls[["nome", "zd_attuale", "geometry", "anno"]]
-    .rename(columns={"zd_attuale": "municipio"})
-    .sort_values(by=["nome"], ascending=True)
-    .astype({"nome": "string", "municipio": "string"})
-    .set_index("nome")
-)
+Area C was introduced in 2008 and delimits the so called "Bastioni" area. Then we need to select the NILs/BikeMi stalls that intersect with this area.
 
-bikemi_stalls.info()
+```{code-cell} ipython3
+# load pedestrian areas in Milan, filter for Area C
+pedestrian_zones = geopandas.read_file("../data/milan/area_c.geojson")[["tipo", "geometry"]]
+area_c = pedestrian_zones.query("tipo == 'AREA_C'")
+area_b = pedestrian_zones.query("tipo == 'AREA_B'")
+```
+
+### Check CRS
+
+```{code-cell} ipython3
+console.print(f"""
+NIL crs is {nil.crs}
+Area C crs is {area_c.crs}
+Area B crs is {area_b.crs}
+""")
 ```
 
 We have geometries. Let's make a first plot, to see how it looks like.
@@ -115,13 +97,17 @@ We have geometries. Let's make a first plot, to see how it looks like.
 ```{code-cell} ipython3
 # define ax object and dimensions
 fig, ax = plt.subplots(figsize=(10, 10))
+# cx.add_basemap(ax)
 
 # plot both objects on the same axes; order matters
-nil.plot(ax=ax, cmap="Blues")
-bikemi_stalls.plot(ax=ax, color="tab:red")
+nil.plot(ax=ax, cmap="BuGn")
+area_b.plot(ax=ax, cmap="YlGn", alpha=0.5)
+area_c.plot(ax=ax, cmap="Pastel1", alpha=0.6)
+bikemi_stalls.plot(ax=ax, color="teal", alpha=0.8)
 
 # remove the axis lines
 plt.axis("off")
+plt.title("BikeMi Stalls (dots), Area C (red), Area B (yellow) and Milan NIL")
 plt.show()
 ```
 
@@ -129,15 +115,41 @@ Finally, let's load the time series data:
 
 ```{code-cell} ipython3
 # load the time series for each station in the long format
-station_outflow = pd.read_csv(
+bikemi_rentals = pd.read_csv(
     "../data/bikemi_csv/station_daily_outflow.csv",
     parse_dates=[0],
     index_col=[0],
     dtype={"stazione_partenza": "string"},
 )
 
-station_outflow.info()
+bikemi_rentals.info()
 ```
+
+## Assign Bikemi Stalls to Area C and Area B
+
+```{code-cell} ipython3
+geo_stalls = (
+    geopandas
+    .sjoin(bikemi_stalls, area_c.set_index("tipo"), how="left", op="intersects")
+    .rename(columns={"index_right": "area_c"})
+)
+
+geo_stalls = (
+    geopandas
+    .sjoin(geo_stalls, area_b.set_index("tipo"), how="left", op="intersects")
+    .rename(columns={"index_right": "area_b"})
+)
+```
+
+```{code-cell} ipython3
+geo_stalls.info()
+```
+
+Only 81 stalls are in the Area C and 317 fall within the Area B.
+
++++
+
+## Join
 
 +++ {"incorrectly_encoded_metadata": "tags=[] jp-MarkdownHeadingCollapsed=true"}
 
@@ -151,7 +163,7 @@ station_outflow.info()
 # join the index of the table specified as the first argument on the column specified by the "on" argument
 tentative_join = geopandas.GeoDataFrame(
     # the data to pass as first argument:
-    station_outflow.join(bikemi_stalls, on="stazione_partenza").sort_values(
+    bikemi_rentals.join(bikemi_stalls, on="stazione_partenza").sort_values(
         ["giorno_partenza", "stazione_partenza"], ascending=True
     ),
     # then set the coordinate reference system
@@ -166,7 +178,7 @@ Some information is actually lost! There are some observations from the dataset 
 ```{code-cell} ipython3
 unique_stalls = pd.Series(bikemi_stalls.index.unique())
 unique_stations = pd.Series(
-    station_outflow["stazione_partenza"].sort_values(ascending=True).unique(),
+    bikemi_rentals["stazione_partenza"].sort_values(ascending=True).unique(),
     name="stazione_partenza",
 )
 
@@ -223,7 +235,7 @@ Now we can retry the join, after applying the custom function for cleaning strin
 ### Cleaned Data
 
 ```{code-cell} ipython3
-clean_outflow = cs.clean_df(station_outflow, col="stazione_partenza", inplace=True)
+clean_outflow = cs.clean_df(bikemi_rentals, col="stazione_partenza", inplace=True)
 clean_bikemi_stalls = cs.clean_df(
     bikemi_stalls.drop("anno", axis=1).reset_index(), col="nome", inplace=True
 ).set_index("nome")
