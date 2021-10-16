@@ -8,6 +8,7 @@ __pycache__
 
 # exclude original data 
 data/bikemi
+data/misc
 
 # avoid personal and project specific IDE/programming language settings
 *.jupyterlab-workspace

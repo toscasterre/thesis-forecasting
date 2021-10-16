@@ -5,11 +5,11 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.13.0
+    jupytext_version: 1.10.3
 kernelspec:
-  display_name: Python [conda env:bikemi]
+  display_name: Deep Learning Forecasting
   language: python
-  name: conda-env-bikemi-py
+  name: bikemi
 ---
 
 +++ {"tags": []}
@@ -44,7 +44,7 @@ console = Console()
 Let's import the data. `geopandas.GeoDataFrame` can have as many `geopandas.GeoSeries` objects within, but only one is active at a time.
 
 ```{code-cell} ipython3
-# load stalls lon-lat table
+# load stalls lat-lon table
 bikemi_stalls = (
     geopandas.read_file("../data/bikemi_metadata/bikemi_stalls.geojson")
     [["nome", "zd_attuale", "anno", "stalli", "geometry"]]

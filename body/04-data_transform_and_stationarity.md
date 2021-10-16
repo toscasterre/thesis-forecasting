@@ -5,14 +5,14 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.13.0
+    jupytext_version: 1.10.3
 kernelspec:
   display_name: Deep Learning Forecasting
   language: python
   name: bikemi
 ---
 
-+++ {"incorrectly_encoded_metadata": "jp-MarkdownHeadingCollapsed=true", "jp-MarkdownHeadingCollapsed": true, "tags": []}
++++ {"incorrectly_encoded_metadata": "jp-MarkdownHeadingCollapsed=true", "tags": []}
 
 # Data Transformation and Stationarity
 
