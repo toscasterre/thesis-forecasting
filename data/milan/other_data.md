@@ -1,3 +1,0 @@
-* [Milan Air Quality Stations](https://dati.comune.milano.it/dataset/ds484_stazioni_di_monitoraggio_inquinanti_atmosferici_dellarpa_sit/resource/635c6508-b335-48b1-b3c8-d43e78ad3380)
-* [Report Air Qualiti 2021](https://dati.comune.milano.it/dataset/ds414-report-qualita-aria-2021/resource/b022773b-7d6c-440c-8146-a05fddd9496f)
-* [Pollutant Measurements 2021](https://dati.comune.milano.it/dataset/ds413-rilevazione-qualita-aria-2021/resource/7636e84c-8dd6-430d-9ce8-8aa243e18fd3)

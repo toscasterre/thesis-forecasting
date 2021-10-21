@@ -7,7 +7,7 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.10.3
 kernelspec:
-  display_name: Deep Learning Forecasting
+  display_name: Bike Sharing Forecasting
   language: python
   name: bikemi
 ---
@@ -21,22 +21,20 @@ kernelspec:
 ```{code-cell} ipython3
 # reading and manipulating data
 import pandas as pd
-import numpy as np
 
 # geo libs
 import geopandas
-# import contextily as cx
+import contextily as cx
 
 # plotting
 import matplotlib.pyplot as plt
-
 
 # for nice output statements, such as with `print()`:
 from rich.console import Console
 
 # import custom functions for joins and cleaning strings
 import custom_functions.clean_strings as cs
-import custom_functions.joins as j
+from custom_functions.joins import anti_join, mismatches
 
 console = Console()
 ```
@@ -46,7 +44,7 @@ Let's import the data. `geopandas.GeoDataFrame` can have as many `geopandas.GeoS
 ```{code-cell} ipython3
 # load stalls lat-lon table
 bikemi_stalls = (
-    geopandas.read_file("../data/bikemi_metadata/bikemi_stalls.geojson")
+    geopandas.read_file("../data/bikemi_stalls.geojson")
     [["nome", "zd_attuale", "anno", "stalli", "geometry"]]
     .rename(columns={"zd_attuale": "municipio", "stalli": "numero_stalli"})
     .sort_values(by=["nome"], ascending=True)
@@ -58,9 +56,28 @@ bikemi_stalls.info()
 ```
 
 ```{code-cell} ipython3
+bikemi_stalls.crs
+```
+
+```{code-cell} ipython3
+milan_boundaries = geopandas.read_file("../data/milan-circonvallazione.geojson")
+```
+
+```{code-cell} ipython3
+bikemi_stalls.sjoin(milan_boundaries, predicate="intersects")
+```
+
+```{code-cell} ipython3
+fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+
+milan_boundaries.to_crs(3857).plot(ax=ax, alpha=0.3)
+cx.add_basemap(ax)
+```
+
+```{code-cell} ipython3
 # load NIL lon-lat table
 nil = (
-    geopandas.read_file("../data/milan/nil.geojson")
+    geopandas.read_file("../data/milan/milan-administrative-nil.geojson")
     [["ID_NIL", "NIL", "geometry"]]
     # turn the names in the column to titlecase
     .assign(NIL=lambda x: x["NIL"].str.title())

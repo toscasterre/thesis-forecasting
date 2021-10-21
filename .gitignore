@@ -1,14 +1,14 @@
 # temporarily
 body-misc
+body/_build 
+
+# do not push original .xlsx data
+data/bikemi-original_data
 
 # for windows
 .ipynb_checkpoints
 .virtual_documents
 __pycache__
-
-# exclude original data 
-data/bikemi
-data/misc
 
 # avoid personal and project specific IDE/programming language settings
 *.jupyterlab-workspace

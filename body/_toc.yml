@@ -3,21 +3,13 @@
 
 format: jb-book
 root: frontmatter
+defaults:
+  numbered: true
 chapters:
-parts:
-  - caption: Introduction
-    chapters:
-      - file: introduction
-  - caption: Data
-    chapters:
-      - file: bikemi
-      - file: 01-retrieve_data_from_postgres
-      - file: 02-spatial_joins
-  - caption: Time Series Modelling
-    chapters:
-      - file: 03-time_series_analysis
-      - file: 04-data_transform_and_stationarity
-      - file: 05-ARIMA
-      - file: 06-Prophet
-  - caption: Deep Learning
-    chapters:
+  - file: introduction
+  - file: 01-retrieve_data_from_postgres
+  - file: 02-spatial_joins
+  - file: 03-time_series_analysis
+  - file: 04-data_transform_and_stationarity
+  - file: 05-ARIMA
+  - file: 06-Prophet
