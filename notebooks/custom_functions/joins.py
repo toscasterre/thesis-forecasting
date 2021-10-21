@@ -42,5 +42,4 @@ def mismatches(
         {mismatched_stalls.size} stalls are only in the stalls data.
         """)
         return None
-    else:
-        return mismatched_stations, mismatched_stalls
+    return mismatched_stations, mismatched_stalls
