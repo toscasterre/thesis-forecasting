@@ -1,15 +1,15 @@
 # Book settings
 # Learn more at https://jupyterbook.org/customize/config.html
 
-title: A Comparison of Forecasting Techniques in Bike Sharing Services 
-author: Luca Baggi 
+title: A Comparison of Forecasting Techniques in Bike Sharing Services
+author: Luca Baggi
 logo: logo_tesi_unimi_spes.jpg
-only_build_toc_files: true 
+only_build_toc_files: true
 
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html
 execute:
-  execute_notebooks: cache 
+  execute_notebooks: cache
 
 parse:
   myst_enable_extensions:
