@@ -1,6 +1,6 @@
 # temporarily
-body-misc
 body/_build 
+administrative_stuff
 
 # do not push original .xlsx data
 data/bikemi-original_data

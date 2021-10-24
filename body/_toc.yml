@@ -6,10 +6,6 @@ root: frontmatter
 defaults:
   numbered: true
 chapters:
-  - file: introduction
-  - file: 01-retrieve_data_from_postgres
-  - file: 02-spatial_joins
-  - file: 03-time_series_analysis
-  - file: 04-data_transform_and_stationarity
-  - file: 05-ARIMA
-  - file: 06-Prophet
+  - file: 01-introduction
+  - file: 02-bikesharing_and_bikemi
+  - file: 03-data_ingestion_and_spatial_operations
