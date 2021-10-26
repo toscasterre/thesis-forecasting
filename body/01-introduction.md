@@ -79,7 +79,7 @@ This experiment has many drawbacks and limitations: as a starter, it does not in
 
 ## The Open Source Stack, Transparency and Reproducibility
 
-+++ {"citation-manager": {"citations": {"62uvg": [{"id": "7765261/TETPEMAA", "source": "zotero"}], "8zx6q": [{"id": "7765261/3H89U9U4", "source": "zotero"}], "dzp54": [{"id": "7765261/NL5V5ZU2", "source": "zotero"}], "faiu8": [], "xrhbz": [{"id": "7765261/WG5DS986", "source": "zotero"}], "yvvrd": [{"id": "7765261/G8QHY6EY", "source": "zotero"}]}}, "tags": []}
++++ {"citation-manager": {"citations": {"8zx6q": [{"id": "7765261/3H89U9U4", "source": "zotero"}], "yvvrd": [{"id": "7765261/G8QHY6EY", "source": "zotero"}], "xrhbz": [{"id": "7765261/WG5DS986", "source": "zotero"}], "dzp54": [{"id": "7765261/NL5V5ZU2", "source": "zotero"}], "62uvg": [{"id": "7765261/TETPEMAA", "source": "zotero"}], "faiu8": []}}, "tags": []}
 
 This is one of the many (millions?) projects to benefit from the existence of the open source community. This project was developed end-to-end using open source tools, starting from PostgreSQL to store the data and many Python libraries to train the models. Jupyter Notebooks have been the main developing tool <cite id="8zx6q">(Perkel, 2018)</cite>, and Jupyter Books <cite id="yvvrd">(Executable Books Community, 2020)</cite> to convert the code into a $\LaTeX$ publication, thanks to `pandoc` working in the background <cite id="xrhbz">(<i>Pandoc - About Pandoc</i>, n.d.)</cite>. 
 
