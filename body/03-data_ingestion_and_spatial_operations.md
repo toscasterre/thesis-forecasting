@@ -17,7 +17,7 @@ kernelspec:
 ```{code-cell} ipython3
 # data manipulation
 import pandas as pd
-import geopandas as gpd
+import geopandas
 
 # connecting to the local database with the data
 import psycopg2
@@ -74,7 +74,7 @@ pd.read_sql(sql=query, con=conn).astype("int")
 
 ## BikeMi Data Analysis 
 
-+++
++++ {"jp-MarkdownHeadingCollapsed": true, "tags": []}
 
 ### Finalising Data Selection
 
@@ -103,7 +103,9 @@ query = """
 """
 ```
 
-### Users and Patterns
++++ {"tags": [], "jp-MarkdownHeadingCollapsed": true}
+
+### Top Users and Habits
 
 ```{code-cell} ipython3
 query = """
@@ -170,6 +172,122 @@ pd.read_sql(query, conn).astype({"anno": "int"}).head(10).set_index("cliente_ano
 As expected, there are more observations from the years 2016 and 2017 as these are complete years. The great number of usage translates to an average of almost 4 trips per day - i.e., to reach the first train station and then the workplace.
 
 +++
+
+### Top Usage Patterns
+
+```{code-cell} ipython3
+query = """
+    SELECT
+        nome_stazione_prelievo,
+        numero_stazione_prelievo,
+        nome_stazione_restituzione,
+        numero_stazione_restituzione,
+        COUNT(*) AS numero_noleggi
+    FROM bikemi_rentals
+    GROUP BY 
+        nome_stazione_prelievo,
+        numero_stazione_prelievo,
+        nome_stazione_restituzione,
+        numero_stazione_restituzione
+    ORDER BY numero_noleggi DESC;
+"""
+
+trips_rankings = pd.read_sql(query, conn)
+```
+
+Quite unexpectedly, the top trip routes are not to and from stations. To be exact, `Coni Zugna Solari` is close to both the station in Porta Genova as well as the Navigli and Darsena, which partly explains its popularity.
+
+```{code-cell} ipython3
+trips_rankings.head(10)
+```
+
+The ranking is basically unchanged if we look only at data from Monday to Friday and within "core" commuting hours (say, from 7 to 10 and from 17 to 20):
+
+```{code-cell} ipython3
+query = """
+    SELECT
+        nome_stazione_prelievo,
+        numero_stazione_prelievo,
+        nome_stazione_restituzione,
+        numero_stazione_restituzione,
+        COUNT(*) AS numero_noleggi
+    FROM bikemi_rentals
+    WHERE
+        EXTRACT('dow' FROM data_restituzione) BETWEEN 0 AND 4 AND
+        EXTRACT('hour' FROM data_restituzione) BETWEEN 7 AND 10 OR 
+        EXTRACT('hour' FROM data_restituzione) BETWEEN 17 AND 20 
+    GROUP BY 
+        nome_stazione_prelievo,
+        numero_stazione_prelievo,
+        nome_stazione_restituzione,
+        numero_stazione_restituzione
+    ORDER BY numero_noleggi DESC;
+"""
+
+trips_rankings_commuting_hours = pd.read_sql(query, conn)
+```
+
+```{code-cell} ipython3
+trips_rankings_commuting_hours.head(10)
+```
+
+This reinforces the conclusion that BikeMi is consistently used for commuting purposes. However, this data can be better explored including its spatial representation.
+
++++
+
+## Stalls Spatial Data
+
++++ {"citation-manager": {"citations": {"tfga6": [{"id": "7765261/RZW74C9X", "source": "zotero"}]}}, "tags": []}
+
+On its open data portal, the Comune di Milano publishes all sorts of open data - like the daily entrances in the so-called Area C, where access to private cars is limited. On this treasure trove of data, we can also find things like the location of column fountains and newsstands, but also the geo-referenced data of bike tracks and the location of [BikeMi Stations](https://dati.comune.milano.it/it/dataset/ds65_infogeo_aree_sosta_bike_sharing_localizzazione_). As noted previously, the service has some 320 stations, spread quite unevenly across the town, as it was outlined by previous studies <cite id="tfga6">(Saibene &#38; Manzi, 2015)</cite>. As a starter, we filter out all stations that have been introduced after 2019.
+
+```{code-cell} ipython3
+bikemi_stalls = (
+    geopandas.read_file("../data/bikemi_stalls.geojson")
+    .filter(["numero", "nome", "zd_attuale", "anno", "geometry"])
+    .rename(columns={"numero": "numero_stazione", "zd_attuale": "municipio" })
+    .set_index("numero_stazione")
+    .query("anno < 2019")
+    .astype({"anno": "int"})
+)
+
+bikemi_stalls.head()
+```
+
+The data is represented with the (geographic) coordinate reference system (CRS) `EPSG:4326`, but in order to use the `contextily` library we need to cast it to the (projected) reference system `EPSG:3587`. As the picture shows, the stalls stretch to the North, towards Bicocca and Sesto San Giovanni. We can already see that the stalls distribution outside the city centre follows bike lanes (in blue).
+
+```{code-cell} ipython3
+bikelanes = geopandas.read_file("../data/milan/milan-transports-bike_lanes.geojson")
+
+fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+
+bikemi_stalls.to_crs(3857).plot(ax=ax, c="firebrick")
+bikelanes.to_crs(3857).plot(ax=ax)
+cx.add_basemap(ax)
+
+plt.axis("off")
+
+plt.show()
+```
+
+```{code-cell} ipython3
+metro_stations = geopandas.read_file("../data/milan/milan-transports-metro_stops.geojson")
+train_stations = geopandas.read_file("../data/milan/milan-transports-train_stations.zip")
+area_circonvallazione = geopandas.read_file("../data/milan-circonvallazione.geojson")
+
+# train_stations.to_csv("../data/milan/milan-transports-train_stations.csv", index=False)
+
+train_stations_circ = train_stations.to_crs(4326).sjoin(area_circonvallazione)
+bikemi_stalls_circ = bikemi_stalls.sjoin(area_circonvallazione)
+```
+
+```{code-cell} ipython3
+fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+
+train_stations_circ.to_crs(3857).plot(ax=ax, marker="X")
+bikemi_stalls_circ.to_crs(3857).plot(ax=ax, c='firebrick')
+cx.add_basemap(ax)
+```
 
 ## Retrieve Data Aggregated at Station-Level
 
