@@ -12,7 +12,7 @@ kernelspec:
   name: bikemi
 ---
 
-# Data Ingestion
+# BikeMi Data
 
 ```{code-cell} ipython3
 # data manipulation
@@ -31,34 +31,40 @@ import contextily as cx
 conn = psycopg2.connect("dbname=bikemi user=luca")
 ```
 
-The data was made available thanks to a partnership established by Prof. Giancarlo Manzi of the University of Milan and Clear Channel, the provider of the service. The data is comprised of all the individual trips performed by each client (cliente_anonimizzato). This includes the bike type (which can either be a regular bike or an electric bike), the bike identifier, the station of departure and arrival with the time, plus the total travel distance.
++++ {"tags": [], "jp-MarkdownHeadingCollapsed": true}
+
+## Data Ingestion
+
++++
+
+The data was made available thanks to a partnership established by Prof. Giancarlo Manzi of the University of Milan and Clear Channel Italia, the provider of the service. The data is comprised of all the individual trips performed by each client (`cliente_anonimizzato`). This includes the bike type (which can either be a regular bike or an electric bike), the bike identifier, the station of departure and arrival with the time, the duration of the trip `durata_noleggio` plus the total travel distance. We do not know how the total travel distance `distanza_totale` is computed.
 
 ```{code-cell} ipython3
 query = """
     SELECT *
-    FROM bikemi_rentals
+    FROM bikemi_source_data
     LIMIT 5;
 """
 
 pd.read_sql(sql=query, con=conn)
 ```
 
-+++ {"citation-manager": {"citations": {"tcloo": [{"id": "7765261/2TTUU9QV", "source": "zotero"}]}}, "tags": []}
++++ {"citation-manager": {"citations": {"tcloo": [{"id": "7765261/2TTUU9QV", "source": "zotero"}], "jf5wt": [{"id": "7765261/NQ8DBQNG", "source": "zotero"}], "ge16g": [{"id": "7765261/574YW5KY", "source": "zotero"}], "1xb31": [{"id": "7765261/NQ8DBQNG", "source": "zotero"}]}}, "tags": []}
 
-The data available ranges from the first of June, 2015, to the first of October, 2020, totalling to 15842891 observations. Besides, data was made available in Excel spreadsheets, following the [Office Open XML SpreadsheetML File Format](https://docs.microsoft.com/en-us/openspecs/office_standards/ms-xlsx/f780b2d6-8252-4074-9fe3-5d7bc4830968) (the `.xlsx` file format). Python's Pandas library has methods to read `.xlsx` files; however, given how big these files are, data manipulation would have proven unfeasible.
+The data available ranges from the first of June, 2015, to the first of October, 2020, totalling to 15.842.891 observations. Data was made available in Excel spreadsheets, following the [Office Open XML SpreadsheetML File Format](https://docs.microsoft.com/en-us/openspecs/office_standards/ms-xlsx/f780b2d6-8252-4074-9fe3-5d7bc4830968) (the `.xlsx` file format). Python's Pandas library has methods to read `.xlsx` files; however, given how big these files are, data manipulation would have proven unfeasible.
 
-For this reason, we resorted to some useful and popular open source tools, which we used to build `bash` scripts and functions to automate conversion from `.xlsx` to `.csv` files, perform some elementary data cleaning and load the data into a local PostgreSQL database. Format conversion to Comma-Separated Values (`.csv`) was performed using [`csvkit`](https://github.com/wireservice/csvkit), a Python package to perform basic operations on `.csv` files from the command line. Being written in Python, `csvkit` can be slow. However, as part of a major trend for several command-line applications, `csvkit` was rewritten in Rust, a fast and secure programming language whose popularity has been rising in the last couple of years <cite id=\"jc6it\">(Perkel, 2020)</cite>. Much alike Julia <cite id=\"54bj7\">(Perkel, 2019)</cite>, Rust is becoming a tool for data science, as well as scientific computing (for example in bio-statistics) as it is \"a language that offer[s] the 'expressiveness' of Python but the speed of languages such as C and C++\" <cite id=\"k79mf\">(Perkel, 2020)</cite>.
+For this reason, we resorted to some useful and popular open source tools, which we used to build `bash` scripts and functions to automate conversion from `.xlsx` to `.csv` files, perform some elementary data cleaning and load the data into a local PostgreSQL database. Format conversion to Comma-Separated Values (`.csv`) was performed using [`csvkit`](https://github.com/wireservice/csvkit), a Python package to perform basic operations on `.csv` files from the command line. Being written in Python, `csvkit` can be slow. However, as part of a major trend for several command-line applications, `csvkit` was rewritten in Rust, a fast and secure programming language whose popularity has been rising in the last couple of years <cite id="jf5wt">(Perkel, 2020)</cite>. Much alike Julia <cite id="ge16g">(Perkel, 2019)</cite>, Rust is becoming a tool for data science, as well as scientific computing (for example in bio-statistics) as it is "a language that offer[s] the 'expressiveness' of Python but the speed of languages such as C and C++" <cite id="1xb31">(Perkel, 2020)</cite>.
 
-The Rust port of `csvkit` is called [`xsv`](https://github.com/BurntSushi/xsv), and is blazing fast. Much alike `awk` <cite id="tcloo">(<i>Gawk - GNU Project - Free Software Foundation (FSF)</i>, n.d.)</cite>, `xsv` can perform filtering operations, but also joins and partitions, as well as computing summary statistics. `xsv` does not offer (yet) format conversion, but was used to filter out a negligible number of invalid observations from each original `.xslx` files (after the conversion to `.csv`), and select only the columns that would enter the final dataset.
+The Rust port of `csvkit` is called [`xsv`](https://github.com/BurntSushi/xsv), and is blazing fast. Much alike `awk` <cite id="tcloo">(<i>Gawk - GNU Project - Free Software Foundation (FSF)</i>, n.d.)</cite>, `xsv` can perform filtering operations, but also joins and partitions, as well as computing summary statistics. `xsv` does not offer format conversion (yet), but was used to filter out a negligible number of invalid observations from each original `.xslx` files (after the conversion to `.csv`), and select only the columns that would enter the final dataset.
 
-Finally, `psql` (PostgreSQL's command line utility) was used to upload the 'clean' data into a local database instance. PostgreSQL was also used to perform basic survey statistics, like computing the number of rows, and data aggregation (such as counting the number of observations by year). Looking at the frequency tables by year, there appears to be an oddly small number of observations from 2018. This is because there is indeed missing data from June 2018 until the end of the year. For this reason, we only work with data from June 2015 to the end of May 2018.
+Finally, `psql` (PostgreSQL's command line utility) was used to upload the 'clean' data into a local database instance. PostgreSQL was also used to perform basic survey statistics, like computing the number of rows, and data aggregation (such as counting the number of observations by year). Looking at the frequency tables by year, there appears to be an oddly small number of observations from 2018. This is because there is indeed missing data from June 2018 until the end of the year. For this reason, we chose to work only with data from June 2015 to the end of May 2018.
 
 ```{code-cell} ipython3
 query = """
     SELECT
         EXTRACT('year' FROM b.data_prelievo) AS date,
         COUNT(b.bici)
-    FROM bikemi_rentals b
+    FROM bikemi_source_data b
     -- WHERE EXTRACT('year' FROM b.data_prelievo) < 2019
     GROUP BY EXTRACT('year' FROM b.data_prelievo);
 """
@@ -66,11 +72,102 @@ query = """
 pd.read_sql(sql=query, con=conn).astype("int")
 ```
 
-## Data Pre-processing
+## BikeMi Data Analysis 
 
 +++
 
-According to the official BikeMi website website, "BikeMi today has 320 stations distributed in the key points of the city and 5430 bicycles (4280 classic bicycles 1000 e-bikes and 150 pedal-assisted bicycles with child seat)". From the website we can access the open APIs and the live map of the stations. We can retrieve the geographic coordinates of the stations either from the API or from the excellent open data portal from the Municipality of Milan
+### Finalising Data Selection
+
++++
+
+In addition to selecting only trips from June 2015 to June 2018, we also disregard all rentals whose duration is smaller than one minute - as previously done in the literature. This leaves us with more than 11,7 million observations. We store these in a [materialised view](https://www.postgresql.org/docs/current/sql-creatematerializedview.html):
+
+```{code-cell} ipython3
+query = """
+    CREATE MATERIALIZED VIEW IF NOT EXISTS bikemi_rentals AS (
+        SELECT
+            b.tipo_bici,
+            b.cliente_anonimizzato,
+            DATE_TRUNC('second', b.data_prelievo) AS data_prelievo,
+            b.numero_stazione_prelievo,
+            b.nome_stazione_prelievo,
+            DATE_TRUNC('second', b.data_restituzione) AS data_restituzione,
+            b.numero_stazione_restituzione,
+            b.nome_stazione_restituzione,
+            b.durata_noleggio
+        FROM bikemi_source_data b
+        WHERE
+            EXTRACT('year' FROM b.data_restituzione) < 2019 AND
+            durata_noleggio > interval '1 minute'
+    );
+"""
+```
+
+### Users and Patterns
+
+```{code-cell} ipython3
+query = """
+    SELECT
+        COUNT(DISTINCT cliente_anonimizzato)
+    FROM bikemi_rentals;
+    """
+
+pd.read_sql(query, conn)
+```
+
+The service has almost 200 thousands unique subscribers in the time period. Then breakdown by year is the following:
+
+```{code-cell} ipython3
+query = """
+    SELECT
+        EXTRACT('year' FROM data_prelievo) AS anno,
+        COUNT(DISTINCT cliente_anonimizzato)
+    FROM bikemi_rentals
+    GROUP BY EXTRACT('year' FROM data_prelievo);
+    """
+
+pd.read_sql(query, conn).astype({"anno": "int"}).set_index("anno")
+```
+
+The number of subscriptions is declining in 2015 and 2018, as there are observations for six months only. In particular, for the year 2018 the count is even lower because the autumn/winter months are missing.
+
+It is also interesting to look at the top users:
+
+```{code-cell} ipython3
+query = """
+    SELECT
+        cliente_anonimizzato,
+        COUNT(*) AS noleggi_totali
+    FROM bikemi_rentals b
+    GROUP BY
+        cliente_anonimizzato
+    ORDER BY noleggi_totali DESC
+"""
+
+users_ranking = pd.read_sql(query, conn).set_index("cliente_anonimizzato")
+
+users_ranking.head(10)
+```
+
+But it might be of greater interest to look at the distribution by year:
+
+```{code-cell} ipython3
+query = """
+    SELECT
+        cliente_anonimizzato,
+        COUNT(*) AS noleggi_totali,
+        EXTRACT('year' FROM data_prelievo) AS anno
+    FROM bikemi_rentals b
+    GROUP BY
+        cliente_anonimizzato,
+        EXTRACT('year' FROM data_prelievo)
+    ORDER BY noleggi_totali DESC
+"""
+
+pd.read_sql(query, conn).astype({"anno": "int"}).head(10).set_index("cliente_anonimizzato")
+```
+
+As expected, there are more observations from the years 2016 and 2017 as these are complete years. The great number of usage translates to an average of almost 4 trips per day - i.e., to reach the first train station and then the workplace.
 
 +++
 
