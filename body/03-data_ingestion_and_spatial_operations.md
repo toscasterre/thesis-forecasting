@@ -15,6 +15,9 @@ kernelspec:
 # BikeMi Data
 
 ```{code-cell} ipython3
+# path manipulation
+from pathlib import Path
+
 # data manipulation
 import pandas as pd
 import geopandas
@@ -26,6 +29,10 @@ import psycopg2
 import plotly.express as px
 import matplotlib.pyplot as plt
 import contextily as cx
+
+# create paths
+data_path = Path(Path.cwd().parents[0] / "data")
+milan_data = Path(data_path / "milan")
 
 # establish connection with the database
 conn = psycopg2.connect("dbname=bikemi user=luca")
@@ -72,9 +79,11 @@ query = """
 pd.read_sql(sql=query, con=conn).astype("int")
 ```
 
-## BikeMi Data Analysis 
++++ {"tags": [], "jp-MarkdownHeadingCollapsed": true}
 
-+++ {"jp-MarkdownHeadingCollapsed": true, "tags": []}
+## BikeMi Data Analysis
+
++++ {"tags": [], "jp-MarkdownHeadingCollapsed": true}
 
 ### Finalising Data Selection
 
@@ -105,7 +114,7 @@ query = """
 
 +++ {"tags": [], "jp-MarkdownHeadingCollapsed": true}
 
-### Top Users and Habits
+### Top Users and Commuting Habits
 
 ```{code-cell} ipython3
 query = """
@@ -171,9 +180,81 @@ pd.read_sql(query, conn).astype({"anno": "int"}).head(10).set_index("cliente_ano
 
 As expected, there are more observations from the years 2016 and 2017 as these are complete years. The great number of usage translates to an average of almost 4 trips per day - i.e., to reach the first train station and then the workplace.
 
++++ {"jp-MarkdownHeadingCollapsed": true, "tags": []}
+
+### Usage Patterns and Origin-Destination Matrix
+
 +++
 
-### Top Usage Patterns
+As a starter, it is useful to look at the origin-destination (OD) matrix, to see which are the most popular starting and departure points. On the aggregate level, the most popular points on the OD matrix are the train stations and sightseeing places such as Duomo.
+
+```{code-cell} ipython3
+top_departure_stations_query = """
+    SELECT
+        nome_stazione_prelievo,
+        COUNT(*) AS numero_noleggi
+    FROM bikemi_rentals
+    GROUP BY
+        nome_stazione_prelievo
+    ORDER BY numero_noleggi DESC;
+"""
+
+top_departure_stations = pd.read_sql(top_departure_stations_query, conn)
+
+top_arrival_stations_query = """
+    SELECT
+        nome_stazione_restituzione,
+        COUNT(*) AS numero_noleggi
+    FROM bikemi_rentals
+    GROUP BY
+        nome_stazione_restituzione
+    ORDER BY numero_noleggi DESC;
+"""
+
+top_arrival_stations = pd.read_sql(top_arrival_stations_query, conn)
+
+pd.concat([top_departure_stations, top_arrival_stations], axis=1).head(10)
+```
+
+The ranking is basically unchanged if we look only at data from Monday to Friday and within "core" commuting hours (say, from 7 to 10 and from 17 to 20). However, trips towards stations become more frequent and destinations such as Moscova are slightly less popular. Indeed, employees might straight bike to Moscova after work to take a sip from their Negroni.
+
+```{code-cell} ipython3
+top_departure_stations_query = """
+    SELECT
+        nome_stazione_prelievo,
+        COUNT(*) AS numero_noleggi
+    FROM bikemi_rentals
+    WHERE
+        EXTRACT('dow' FROM data_restituzione) BETWEEN 0 AND 4 AND
+        EXTRACT('hour' FROM data_restituzione) BETWEEN 7 AND 10 OR
+        EXTRACT('hour' FROM data_restituzione) BETWEEN 17 AND 20
+    GROUP BY
+        nome_stazione_prelievo
+    ORDER BY numero_noleggi DESC;
+"""
+
+top_departure_stations = pd.read_sql(top_departure_stations_query, conn)
+
+top_arrival_stations_query = """
+    SELECT
+        nome_stazione_restituzione,
+        COUNT(*) AS numero_noleggi
+    FROM bikemi_rentals
+    WHERE
+        EXTRACT('dow' FROM data_restituzione) BETWEEN 0 AND 4 AND
+        EXTRACT('hour' FROM data_restituzione) BETWEEN 7 AND 10 OR
+        EXTRACT('hour' FROM data_restituzione) BETWEEN 17 AND 20
+    GROUP BY
+        nome_stazione_restituzione
+    ORDER BY numero_noleggi DESC;
+"""
+
+top_arrival_stations = pd.read_sql(top_arrival_stations_query, conn)
+
+pd.concat([top_departure_stations, top_arrival_stations], axis=1).head(10)
+```
+
+The behaviour changes if we look ad the individual trips, i.e. if we `GROUP BY` both departure and destination stations (`nome_stazione_prelievo` and `nome_stazione_restituzione`). To be exact, `Coni Zugna Solari` is close to both the station in Porta Genova as well as the Navigli and Darsena, which partly explains its popularity.
 
 ```{code-cell} ipython3
 query = """
@@ -184,7 +265,7 @@ query = """
         numero_stazione_restituzione,
         COUNT(*) AS numero_noleggi
     FROM bikemi_rentals
-    GROUP BY 
+    GROUP BY
         nome_stazione_prelievo,
         numero_stazione_prelievo,
         nome_stazione_restituzione,
@@ -193,15 +274,11 @@ query = """
 """
 
 trips_rankings = pd.read_sql(query, conn)
-```
 
-Quite unexpectedly, the top trip routes are not to and from stations. To be exact, `Coni Zugna Solari` is close to both the station in Porta Genova as well as the Navigli and Darsena, which partly explains its popularity.
-
-```{code-cell} ipython3
 trips_rankings.head(10)
 ```
 
-The ranking is basically unchanged if we look only at data from Monday to Friday and within "core" commuting hours (say, from 7 to 10 and from 17 to 20):
+The same considerations apply when looking at the commuting hours:
 
 ```{code-cell} ipython3
 query = """
@@ -214,9 +291,9 @@ query = """
     FROM bikemi_rentals
     WHERE
         EXTRACT('dow' FROM data_restituzione) BETWEEN 0 AND 4 AND
-        EXTRACT('hour' FROM data_restituzione) BETWEEN 7 AND 10 OR 
-        EXTRACT('hour' FROM data_restituzione) BETWEEN 17 AND 20 
-    GROUP BY 
+        EXTRACT('hour' FROM data_restituzione) BETWEEN 7 AND 10 OR
+        EXTRACT('hour' FROM data_restituzione) BETWEEN 17 AND 20
+    GROUP BY
         nome_stazione_prelievo,
         numero_stazione_prelievo,
         nome_stazione_restituzione,
@@ -225,9 +302,7 @@ query = """
 """
 
 trips_rankings_commuting_hours = pd.read_sql(query, conn)
-```
 
-```{code-cell} ipython3
 trips_rankings_commuting_hours.head(10)
 ```
 
@@ -235,15 +310,15 @@ This reinforces the conclusion that BikeMi is consistently used for commuting pu
 
 +++
 
-## Stalls Spatial Data
+## Spatial Data Operations
 
 +++ {"citation-manager": {"citations": {"tfga6": [{"id": "7765261/RZW74C9X", "source": "zotero"}]}}, "tags": []}
 
-On its open data portal, the Comune di Milano publishes all sorts of open data - like the daily entrances in the so-called Area C, where access to private cars is limited. On this treasure trove of data, we can also find things like the location of column fountains and newsstands, but also the geo-referenced data of bike tracks and the location of [BikeMi Stations](https://dati.comune.milano.it/it/dataset/ds65_infogeo_aree_sosta_bike_sharing_localizzazione_). As noted previously, the service has some 320 stations, spread quite unevenly across the town, as it was outlined by previous studies <cite id="tfga6">(Saibene &#38; Manzi, 2015)</cite>. As a starter, we filter out all stations that have been introduced after 2019.
+On its open data portal, the Comune di Milano publishes all sorts of open data - like the daily entrances in the so-called Area C, where access to private cars is limited. On this treasure trove of data, we can also find things like the location of column fountains and newsstands, but also the geo-referenced data of bike tracks and the location of [BikeMi Stations](https://dati.comune.milano.it/it/dataset/ds65_infogeo_aree_sosta_bike_sharing_localizzazione_). As noted previously, the service has some 320 stations, spread unevenly across the town, as it was outlined by previous studies <cite id="tfga6">(Saibene &#38; Manzi, 2015)</cite>. As a starter, we filter out all stations that have been introduced after 2019.
 
 ```{code-cell} ipython3
 bikemi_stalls = (
-    geopandas.read_file("../data/bikemi_stalls.geojson")
+    geopandas.read_file(Path(milan_data / "bikemi-stalls.geojson"))
     .filter(["numero", "nome", "zd_attuale", "anno", "geometry"])
     .rename(columns={"numero": "numero_stazione", "zd_attuale": "municipio" })
     .set_index("numero_stazione")
@@ -254,39 +329,89 @@ bikemi_stalls = (
 bikemi_stalls.head()
 ```
 
-The data is represented with the (geographic) coordinate reference system (CRS) `EPSG:4326`, but in order to use the `contextily` library we need to cast it to the (projected) reference system `EPSG:3587`. As the picture shows, the stalls stretch to the North, towards Bicocca and Sesto San Giovanni. We can already see that the stalls distribution outside the city centre follows bike lanes (in blue).
+The data is represented with the (geographic) coordinate reference system (CRS) `EPSG:4326`, but in order to use the `contextily` library we need to cast it to the (projected) reference system `EPSG:3587`. As the map shows, the stalls stretch to the North, towards Bicocca and Sesto San Giovanni. We can already see that the stalls distribution outside the city centre follows bike lanes (in blue).
 
 ```{code-cell} ipython3
-bikelanes = geopandas.read_file("../data/milan/milan-transports-bike_lanes.geojson")
+bike_lanes = geopandas.read_file(Path(milan_data / "transports-bike_lanes.geojson"))
 
 fig, ax = plt.subplots(1, 1, figsize=(10, 10))
 
-bikemi_stalls.to_crs(3857).plot(ax=ax, c="firebrick")
-bikelanes.to_crs(3857).plot(ax=ax)
+bikemi_stalls.to_crs(3857).plot(ax=ax, c="firebrick", marker=".")
+bike_lanes.to_crs(3857).plot(ax=ax)
 cx.add_basemap(ax)
 
 plt.axis("off")
 
+plt.title("BikeMi Stalls (Red Dots) and Bike Lanes (Blue)")
+
 plt.show()
 ```
 
++++ {"citation-manager": {"citations": {"sopwq": [{"id": "7765261/RZW74C9X", "source": "zotero"}]}}, "tags": []}
+
+The stalls in the outer stations are not as used as the ones in the city centre. Some are practically unused, or display low variance. Besides, the great count of stations would represent a problem in the context of multivariate regressions (the so-called $p > n$ problem). Hence, we need to come up with a criteria to remove the number of stations. Previously, authors have chosen to analyse just the area inside the Bastioni, or "Area C" <cite id="sopwq">(Saibene &#38; Manzi, 2015)</cite>. This choice seems restricting, as it leaves out most of the train stations. For the purpose of our analysis, even given the limitations in the available data, it would be better to widen the range. The following map depicts the distribution of train and metro stations that fall within the city of Milan, shaded in blue:
+
 ```{code-cell} ipython3
-metro_stations = geopandas.read_file("../data/milan/milan-transports-metro_stops.geojson")
-train_stations = geopandas.read_file("../data/milan/milan-transports-train_stations.zip")
-area_circonvallazione = geopandas.read_file("../data/milan-circonvallazione.geojson")
+metro_stations = geopandas.read_file(Path(milan_data / "transports-metro_stops.geojson"))
 
-# train_stations.to_csv("../data/milan/milan-transports-train_stations.csv", index=False)
+# train_stations = geopandas.read_file(Path(milan_data / "transports-train_stations.zip"))
+# train_stations.to_file("../data/milan/milan-transports-train_stations.geojson", driver="GeoJSON")
 
-train_stations_circ = train_stations.to_crs(4326).sjoin(area_circonvallazione)
-bikemi_stalls_circ = bikemi_stalls.sjoin(area_circonvallazione)
+train_stations = geopandas.read_file(Path(milan_data / "transports-train_stations.geojson"))
+
+municipi = (
+    geopandas
+    .read_file(Path(milan_data / "administrative-municipi.geojson"))
+    .rename(str.lower, axis=1)
+    .filter(["geometry", "municipio"])
+)
+
+nil = (
+    geopandas
+    .read_file(Path(milan_data / "administrative-nil.geojson"))
+    .rename(str.lower, axis=1)
+    .filter(["id_nil", "nil", "geometry"])
+)
+
+milan = municipi.dissolve().rename({"municipio": "milano"}, axis=1)
 ```
 
 ```{code-cell} ipython3
+milan_train_stations = train_stations.to_crs(4326).sjoin(milan)
+milan_metro_stations = metro_stations.sjoin(milan)
+
+fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+
+nil.to_crs(3857).plot(ax=ax, alpha=0.2)
+milan_train_stations.to_crs(3857).plot(ax=ax, marker="X")
+milan_metro_stations.to_crs(3857).plot(ax=ax, marker="^", c="tomato")
+cx.add_basemap(ax)
+
+plt.axis("off")
+
+plt.title("Train and Metro Stations in Milan")
+
+plt.show()
+```
+
+To avoid taking too many stations in, we choose to work only with those that fall inside the ring that encapsulates Milan. This is arguably limiting, as the area does not take in Lambrate and Villapizzone/Bovisa train stations. However, one might argue that it is unlikely for to choose to go to Lambrate and then rent a bike to get to the city centre, as they can just get to Centrale; the same goes for the other stations. In other words, this area contains the sufficient amount of stations to provide a useful forecast for the policymaker, albeit neglecting the outer stalls. This reinforces the bias towards the centre of the city, but given the technical constraints seems to be the more viable option. However, as a comparison, the Area C would only contain one train station, whereas this area contains all of the top rentals stalls from the origin-destination (OD) matrix.
+
+```{code-cell} ipython3
+area_circonvallazione = geopandas.read_file(Path(milan_data / "custom-area_circonvallazione.geojson"))
+train_stations_circ = train_stations.to_crs(4326).sjoin(area_circonvallazione)
+bikemi_stalls_circ = bikemi_stalls.sjoin(area_circonvallazione)
+
 fig, ax = plt.subplots(1, 1, figsize=(10, 10))
 
 train_stations_circ.to_crs(3857).plot(ax=ax, marker="X")
-bikemi_stalls_circ.to_crs(3857).plot(ax=ax, c='firebrick')
+bikemi_stalls_circ.to_crs(3857).plot(ax=ax, c='firebrick', marker=".")
 cx.add_basemap(ax)
+
+plt.axis("off")
+
+plt.title("BikeMi Stalls and Train Stations inside the Circonvallazione Area in Milan")
+
+plt.show()
 ```
 
 ## Retrieve Data Aggregated at Station-Level
