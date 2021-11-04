@@ -314,7 +314,7 @@ This reinforces the conclusion that BikeMi is consistently used for commuting pu
 
 +++ {"citation-manager": {"citations": {"tfga6": [{"id": "7765261/RZW74C9X", "source": "zotero"}]}}, "tags": []}
 
-On its open data portal, the Comune di Milano publishes all sorts of open data - like the daily entrances in the so-called Area C, where access to private cars is limited. On this treasure trove of data, we can also find things like the location of column fountains and newsstands, but also the geo-referenced data of bike tracks and the location of [BikeMi Stations](https://dati.comune.milano.it/it/dataset/ds65_infogeo_aree_sosta_bike_sharing_localizzazione_). As noted previously, the service has some 320 stations, spread unevenly across the town, as it was outlined by previous studies <cite id="tfga6">(Saibene &#38; Manzi, 2015)</cite>. As a starter, we filter out all stations that have been introduced after 2019.
+On its open data portal, the Comune di Milano publishes all sorts of open data - like the daily entrances in the so-called Area C, where access to private cars is limited. On this treasure trove of data, we can also find things like the location of column fountains and newsstands, but also the geo-referenced data of bike tracks and the location of [BikeMi Stations](https://dati.comune.milano.it/it/dataset/ds65_infogeo_aree_sosta_bike_sharing_localizzazione_). As noted previously, the service has some 320 stations, spread unevenly across the town, as it was outlined by previous studies <cite id="tfga6">(Saibene &#38; Manzi, 2015)</cite>. As a starter, we filter out all stations that have been introduced after 2019. This leaves us with 281 official stations, versus 279 in the historic data.
 
 ```{code-cell} ipython3
 bikemi_stalls = (
@@ -325,6 +325,8 @@ bikemi_stalls = (
     .query("anno < 2019")
     .astype({"anno": "int"})
 )
+
+# bikemi_stalls.to_csv(Path(milan_data / "bikemi-stalls.csv"))
 
 bikemi_stalls.head()
 ```
@@ -347,9 +349,46 @@ plt.title("BikeMi Stalls (Red Dots) and Bike Lanes (Blue)")
 plt.show()
 ```
 
++++ {"tags": []}
+
+The stalls in the outer stations are not as used as the ones in the city centre. Some are practically unused, or display low variance. Besides, the great count of stations would represent a problem in the context of multivariate regressions (the so-called $p > n$ problem). Hence, we need to come up with a criteria to remove the number of stations. 
+
+```{code-cell} ipython3
+query_daily_rentals_by_station = """
+    WITH cross_table AS (SELECT
+        d.date AS data_partenza,
+        s.nome AS stazione_partenza,
+        s.numero_stazione
+    FROM bikemi_stalls s
+    CROSS JOIN (
+       SELECT generate_series (timestamp '2015-06-01'
+                             , timestamp '2018-06-01'
+                             , interval  '1 day')::date
+       ) d(date)
+    ORDER BY nome, date ASC)
+
+    SELECT
+        c.data_partenza,
+        c.stazione_partenza,
+        c.numero_stazione,
+        COUNT(b.*) AS noleggi_giornalieri
+    FROM cross_table c
+    LEFT JOIN bikemi_rentals b
+        ON b.numero_stazione_prelievo = c.numero_stazione
+        AND DATE_TRUNC('day', b.data_prelievo)::date = c.data_partenza
+    GROUP BY
+        c.data_partenza,
+        c.stazione_partenza,
+        c.numero_stazione
+    ORDER BY stazione_partenza, data_partenza ASC;
+"""
+
+daily_rentals_by_station
+```
+
 +++ {"citation-manager": {"citations": {"sopwq": [{"id": "7765261/RZW74C9X", "source": "zotero"}]}}, "tags": []}
 
-The stalls in the outer stations are not as used as the ones in the city centre. Some are practically unused, or display low variance. Besides, the great count of stations would represent a problem in the context of multivariate regressions (the so-called $p > n$ problem). Hence, we need to come up with a criteria to remove the number of stations. Previously, authors have chosen to analyse just the area inside the Bastioni, or "Area C" <cite id="sopwq">(Saibene &#38; Manzi, 2015)</cite>. This choice seems restricting, as it leaves out most of the train stations. For the purpose of our analysis, even given the limitations in the available data, it would be better to widen the range. The following map depicts the distribution of train and metro stations that fall within the city of Milan, shaded in blue:
+Previously, authors have chosen to analyse just the area inside the Bastioni, or "Area C" <cite id="sopwq">(Saibene &#38; Manzi, 2015)</cite>. This choice seems restricting, as it leaves out most of the train stations. For the purpose of our analysis, even given the limitations in the available data, it would be better to widen the range. The following map depicts the distribution of train and metro stations that fall within the city of Milan, shaded in blue:
 
 ```{code-cell} ipython3
 metro_stations = geopandas.read_file(Path(milan_data / "transports-metro_stops.geojson"))
