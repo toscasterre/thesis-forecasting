@@ -21,6 +21,7 @@ from pathlib import Path
 # data manipulation
 import pandas as pd
 import geopandas
+import numpy as np
 
 # connecting to the local database with the data
 import psycopg2
@@ -38,7 +39,7 @@ milan_data = Path(data_path / "milan")
 conn = psycopg2.connect("dbname=bikemi user=luca")
 ```
 
-+++ {"tags": [], "jp-MarkdownHeadingCollapsed": true}
++++ {"tags": []}
 
 ## Data Ingestion
 
@@ -83,7 +84,7 @@ pd.read_sql(sql=query, con=conn).astype("int")
 
 ## BikeMi Data Analysis
 
-+++ {"tags": [], "jp-MarkdownHeadingCollapsed": true}
++++ {"tags": []}
 
 ### Finalising Data Selection
 
@@ -351,10 +352,12 @@ plt.show()
 
 +++ {"tags": []}
 
-The stalls in the outer stations are not as used as the ones in the city centre. Some are practically unused, or display low variance. Besides, the great count of stations would represent a problem in the context of multivariate regressions (the so-called $p > n$ problem). Hence, we need to come up with a criteria to remove the number of stations. 
+The stalls in the outer stations are not as used as the ones in the city centre. Some are practically unused, or display low variance. Besides, the great count of stations would represent a problem in the context of multivariate regressions (the so-called $p > n$ problem). Hence, we need to come up with a criteria to reduce the number of stations. We create another two `materialised views` with the daily and hourly rentals, by station. If we simply were to `GROUP BY` station names and time units, we would obtain series with gaps in the time index. We first create a table with all possible combinations of stations and dates using a `CROSS JOIN` and a common table expression (or `CTE`), then left join on this table the values obtained via the `GROUP BY` on the reference table. A similar query is used to obtain the hourly rentals, with hourly time intervals instead of daily ones. 
 
 ```{code-cell} ipython3
-query_daily_rentals_by_station = """
+# query with cross join used to create the second materialised view
+# another similar one is used to create the view for hourly observations
+materialised_view_daily_rentals = """
     WITH cross_table AS (SELECT
         d.date AS data_partenza,
         s.nome AS stazione_partenza,
@@ -383,7 +386,44 @@ query_daily_rentals_by_station = """
     ORDER BY stazione_partenza, data_partenza ASC;
 """
 
-daily_rentals_by_station
+retrieve_daily_rentals = """
+    SELECT * FROM daily_rentals;
+"""
+
+daily_rentals = pd.read_sql(retrieve_daily_rentals, conn).set_index("data_partenza")
+```
+
+We then proceed to analyse the missing values, broken down by station.
+
+```{code-cell} ipython3
+obs_number = daily_rentals.index.unique().shape[0]
+
+stations_missing_obs = (
+    daily_rentals[[col for col in daily_rentals.columns if "numero_stazione" not in col]]
+    .pivot(columns="stazione_partenza")
+    .replace(0, np.nan)
+    .isna().sum()
+    .sort_values(ascending=False)
+    .pipe(pd.DataFrame)
+    # drop the redundant index
+    .droplevel(0)
+    .rename({0: "missing_values"}, axis=1)
+    # create the % by dividing the number of missing values by the length of the datetime idnex
+    .assign(pct_missing=lambda x: x.missing_values / obs_number)
+)
+
+# labels for the categorical variable, assumed to be ascending order
+labels = ["very_low", "low", "average", "high", "very_high"]
+
+stations_missing_obs["missing_obs_ranking"] = pd.cut(
+    stations_missing_obs["pct_missing"], bins=5, labels=labels
+)
+
+stations_missing_obs.missing_obs_ranking.plot(kind="hist")
+```
+
+```{code-cell} ipython3
+daily_rentals.index.unique().shape[0]
 ```
 
 +++ {"citation-manager": {"citations": {"sopwq": [{"id": "7765261/RZW74C9X", "source": "zotero"}]}}, "tags": []}
