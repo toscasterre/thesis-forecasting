@@ -338,13 +338,16 @@ On its open data portal, the Comune di Milano publishes all sorts of open data -
 bikemi_stalls = (
     geopandas.read_file(Path(milan_data / "bikemi-stalls.geo.json"))
     .filter(["numero", "nome", "zd_attuale", "anno", "geometry"])
-    .rename(columns={"numero": "numero_stazione", "zd_attuale": "municipio" })
+    .rename(columns={
+        "numero": "numero_stazione",
+        "zd_attuale": "municipio",
+        "geometry": "stalls_geometry"
+    })
+    .set_geometry("stalls_geometry")
     .set_index("numero_stazione")
     .query("anno < 2019")
     .astype({"anno": "int"})
 )
-
-# bikemi_stalls.to_csv(Path(milan_data / "bikemi-stalls.csv"))
 
 bikemi_stalls.head()
 ```
@@ -503,12 +506,17 @@ plt.show()
 
 ### Area of Analysis
 
-+++ {"citation-manager": {"citations": {"sopwq": [{"id": "7765261/RZW74C9X", "source": "zotero"}]}}, "tags": []}
++++ {"citation-manager": {"citations": {"sopwq": [{"id": "7765261/RZW74C9X", "source": "zotero"}], "srqoj": [{"id": "7765261/VTA4UCWW", "source": "zotero"}]}}, "tags": []}
 
-Besides dropping the "emptiest" stations, we should also come up with a way to narrow down the geographic area inside which we perform the analysis. Previously, authors have chosen to analyse just the area inside the Bastioni, or "Area C" <cite id="sopwq">(Saibene &#38; Manzi, 2015)</cite>. This choice seems restricting, as it leaves out most of the train stations.
+Besides dropping the "emptiest" stations, we should also come up with a way to narrow down the geographic area inside which we perform the analysis. Previously, authors have chosen to analyse just the area inside the Bastioni, or "Area C" <cite id="sopwq">(Saibene &#38; Manzi, 2015)</cite> or the whole set of stations <cite id="srqoj">(Toro et al., 2020)</cite>. This was mainly due to the different purpose of their analysis and the data availability (Saibene and Manzi analyse data from 2008 to 2012). For our goal, as well as the policymaker perspective, this choice seems restricting, as it leaves out most of the train stations. It is worth noting that analysing the bike sharing traffic inside of Area C can be appropriate: for example, since, the municipality publishes the number of daily accesses to the area, which could be used to evaluate the effect of sharing services on traffic. 
 
 ```{code-cell} ipython3
-area_c = geopandas.read_file(Path(milan_data / "administrative-area_c.geo.json")).filter(["tipo", "geometry"]).query("tipo == 'AREA_C'")
+area_c = (
+    geopandas
+    .read_file(Path(milan_data / "administrative-area_c.geo.json"))
+    .filter(["tipo", "geometry"])
+    .query("tipo == 'AREA_C'")
+)
 
 fig, ax = plt.subplots(figsize=(10, 10))
 
@@ -525,7 +533,9 @@ plt.show()
 
 +++ {"tags": []}
 
-For the purpose of our analysis, this would be simply too limiting and it would be better to widen the range. The following map depicts the distribution of train and metro stations that fall within the city of Milan, shaded in blue:
+The area we propose is the road ring across Milan, informally referred to as Circonvallazione. This area encapsulates the city centre, as well as most of the train stations, and is represented by the green shade in the map below. This is arguably limiting, as the area does not take in Lambrate and Villapizzone/Bovisa train stations. However, one might argue that it is unlikely for to choose to go to Lambrate and then rent a bike to get to the city centre, as they can just get to Centrale; the same goes for the other stations. In other words, this area contains the sufficient amount of stations to provide a useful forecast for the policymaker, albeit neglecting the outer stalls.
+
+This approach might just reinforce the bias towards the centre of the city, but given the technical constraints seems to be the more viable option. However, as a comparison, the Area C would only contain one train station, whereas this area contains all of the top rentals stalls from the origin-destination (OD) matrix.
 
 ```{code-cell} ipython3
 metro_stations = geopandas.read_file(Path(milan_data / "transports-metro_stops.geo.json"))
@@ -533,13 +543,21 @@ metro_stations = geopandas.read_file(Path(milan_data / "transports-metro_stops.g
 # train_stations = geopandas.read_file(Path(milan_data / "transports-train_stations.zip"))
 # train_stations.to_file("../data/milan/milan-transports-train_stations.geo.json", driver="GeoJSON")
 
-train_stations = geopandas.read_file(Path(milan_data / "transports-train_stations.geo.json"))
+train_stations = (
+    geopandas
+    .read_file(Path(milan_data / "transports-train_stations.geo.json"))
+    .rename(str.lower, axis=1)
+    .rename({"geometry": "train_geometry"}, axis=1)
+    .set_geometry("train_geometry")
+)
 
 municipi = (
     geopandas
     .read_file(Path(milan_data / "administrative-municipi.geo.json"))
     .rename(str.lower, axis=1)
     .filter(["geometry", "municipio"])
+    .rename({"geometry": "municipi_geometry"}, axis=1)
+    .set_geometry("municipi_geometry")
 )
 
 nil = (
@@ -547,6 +565,8 @@ nil = (
     .read_file(Path(milan_data / "administrative-nil.geo.json"))
     .rename(str.lower, axis=1)
     .filter(["id_nil", "nil", "geometry"])
+    .rename({"geometry": "nil_geometry"}, axis=1)
+    .set_geometry("nil_geometry")
 )
 
 milan = municipi.dissolve().rename({"municipio": "milano"}, axis=1)
@@ -556,12 +576,15 @@ milan = municipi.dissolve().rename({"municipio": "milano"}, axis=1)
 milan_train_stations = train_stations.to_crs(4326).sjoin(milan)
 milan_metro_stations = metro_stations.sjoin(milan)
 
+area_circonvallazione = geopandas.read_file(Path(milan_data / "custom-area_circonvallazione.geo.json"))
+
 fig, ax = plt.subplots(1, 1, figsize=(10, 10))
 
 trains_dict = {"color": "tab:blue", "marker": "X"}
 metro_dict = {"color": "rebeccapurple", "marker": "^"}
 
 nil.to_crs(3857).plot(ax=ax, alpha=0.2)
+area_circonvallazione.to_crs(3857).plot(ax=ax, color="mediumseagreen", alpha=0.4)
 milan_train_stations.to_crs(3857).plot(ax=ax, **trains_dict)
 milan_metro_stations.to_crs(3857).plot(ax=ax, **metro_dict)
 cx.add_basemap(ax)
@@ -573,16 +596,39 @@ plt.title("Train Stations (Blue) and Metro Stations (Orange) in Milan", **title_
 plt.show()
 ```
 
-To avoid taking too many stations in, we choose to work only with those that fall inside the road ring that encapsulates Milan. This is arguably limiting, as the area does not take in Lambrate and Villapizzone/Bovisa train stations. However, one might argue that it is unlikely for to choose to go to Lambrate and then rent a bike to get to the city centre, as they can just get to Centrale; the same goes for the other stations. In other words, this area contains the sufficient amount of stations to provide a useful forecast for the policymaker, albeit neglecting the outer stalls.
-
-This approach might just reinforce the bias towards the centre of the city, but given the technical constraints seems to be the more viable option. However, as a comparison, the Area C would only contain one train station, whereas this area contains all of the top rentals stalls from the origin-destination (OD) matrix.
+This leaves us with the following stations: 
 
 ```{code-cell} ipython3
-area_circonvallazione = geopandas.read_file(Path(milan_data / "custom-area_circonvallazione.geo.json"))
-train_stations_circ = train_stations.to_crs(4326).sjoin(area_circonvallazione)
-metro_stations_circ = metro_stations.sjoin(area_circonvallazione)
-bikemi_stalls_circ = bikemi_stalls_nulls.sjoin(area_circonvallazione)
 
+```
+
+```{code-cell} ipython3
+bikemi_stalls_nulls.head()
+```
+
+```{code-cell} ipython3
+train_stations_circ = (
+    train_stations
+    .to_crs(4326)
+    .sjoin(area_circonvallazione)
+    .drop("index_right", axis=1)
+)
+
+metro_stations_circ = (
+    metro_stations
+    .sjoin(area_circonvallazione)
+    .drop("index_right", axis=1)
+)
+
+bikemi_stalls_circ = (
+    bikemi_stalls_nulls
+    # select only the stations with low null values
+    .query("null_obs_ranking == 'very_low'")
+    .sjoin(area_circonvallazione)
+    .drop("index_right", axis=1)
+)
+
+# plot the resulting data
 fig, ax = plt.subplots(1, 1, figsize=(10, 10))
 
 train_stations_circ.to_crs(3857).plot(ax=ax, **trains_dict)
@@ -597,108 +643,14 @@ plt.title("BikeMi Stalls and Stations Inside the Circonvallazione", **title_font
 plt.show()
 ```
 
-## Retrieve Data Aggregated at Station-Level
-
 ```{code-cell} ipython3
-# when the station_columns is specified, data for each station is retrieved
-station_daily_outflow = (
-    rf.retrieve_bike_flow(
-        table="bikemi_2019",
-        station_column=["nome_stazione_prelievo", "stazione_partenza"],
-    )
-    # it"s easier if we don"t pivot to wider immediately
-    # .pipe(rf.pivot_bike_flow, cols="stazione_partenza")
-    # .fillna(0) later
-    .convert_dtypes().sort_values(  # make double into integers
-        by=["giorno_partenza", "stazione_partenza"], ascending=False
-    )
+# nils_circ = nil.sjoin(area_circonvallazione)
+bikemi_stalls_final = (
+    bikemi_stalls_circ
+    .sjoin(nil, how="left")
+    .sort_values("numero_stazione")
+    [["nome", "stalls_geometry", "anno", "nil", "id_nil", "municipio"]]
 )
 
-station_daily_outflow.tail()
-```
-
-At first glance, there appears to be quite a few missing values. We also need to get rid of the January 2020 data:
-
-```{code-cell} ipython3
-station_daily_outflow = station_daily_outflow.loc[
-    station_daily_outflow.index != "2020-01-01"
-]
-```
-
-Then we look into the missing data:
-
-```{code-cell} ipython3
-station_wide = station_daily_outflow.pivot(columns="stazione_partenza")
-```
-
-```{code-cell} ipython3
-station_missing_obs = (
-    station_wide.isnull()
-    .sum()
-    .reset_index()
-    .rename(columns={"index": "station_name", 0: "missing_obs"})
-)
-
-station_missing_obs.head()
-```
-
-```{code-cell} ipython3
-station_missing_obs["pct_missing"] = station_missing_obs["missing_obs"] / 366 * 100
-
-station_missing_obs.sort_values("pct_missing", ascending=False).head(10)
-```
-
-This shows - as expected - that some stations are basically not used at all, while some others are quite popular. Let"s try to categorise them:
-
-```{code-cell} ipython3
-labels = ["very_high", "high", "average", "low", "very_low"]
-
-station_missing_obs["usage_ranking"] = pd.cut(
-    station_missing_obs["pct_missing"], bins=5, labels=labels
-)
-```
-
-`pd.cut()` will always return a `category` `dtype`. These can also be further manipulated via [`pandas.DataFrame.cat.set_categories()`](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.cat.set_categories.html) (works with `pandas.Index` and `pandas.DataFrame` too.)
-
-We can tabulate and plot this data:
-
-```{code-cell} ipython3
-# `.size()` counts the number of member in each category
-fig = (
-    station_missing_obs.groupby("usage_ranking")
-    .size()
-    .plot(
-        kind="barh",
-        template="none",
-        labels=dict(value="count", usage_ranking=""),
-        title="Stations Ranked by Missing Values (%)",
-    )
-)
-
-ps.plotly_style(fig)
-
-fig.show()
-```
-
-Before saving the data to a `.csv` file, we should replace the missing observations with `0`:
-
-```{code-cell} ipython3
-station_daily_outflow.fillna(0).to_csv("../data/bikemi_csv/station_daily_outflow.csv")
-```
-
-We don"t need to save the wide `DataFrame` too, as we can pivot the table with ease.
-
-+++
-
-## Hourly Data
-
-We could also extract hourly data, but we argued it will be noisy:
-
-```{code-cell} ipython3
-# we can also extract the hourly data at the aggregate level:
-hourly_outflow = rf.retrieve_bike_flow(table="bikemi_2019", trunc="hour")
-```
-
-```{code-cell} ipython3
-ps.plotly_style(hourly_outflow.plot(title="Hourly Bike Count, 2019"))
+bikemi_stalls_final.to_csv(Path(milan_data / "bikemi-selected_stalls.csv"))
 ```
