@@ -2,16 +2,11 @@
 body/_build 
 administrative_stuff
 
-# do not push original .xlsx data
+# files to reoreder
+*/misc
+
+# do not push original data
 data/bikemi-original_data
 
-# for windows
-.ipynb_checkpoints
-.virtual_documents
-__pycache__
-
 # avoid personal and project specific IDE/programming language settings
-*.jupyterlab-workspace
-.vscode
-.code-workspace
 .idea
