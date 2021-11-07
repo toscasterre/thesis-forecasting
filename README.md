@@ -1,114 +1,37 @@
-# Deep Neural Networks for Time Series Forecasting: An Effort Worth Pursuing?
+# A Comparison of Forecasting Methods for Bike Sharing Services
 
 [![CodeFactor](https://www.codefactor.io/repository/github/baggiponte/thesis-forecasting/badge?s=15440e769166c9c9571f2d7b8d3c7fcdcf5c9ecb)](https://www.codefactor.io/repository/github/baggiponte/thesis-forecasting)
 
-This is the repository for my graduate thesis on neural forecasting, i.e. the application of deep learning to time series forecasting.
-
-* Capture correlation between series 
+This is the repository for my graduate thesis on time series forecasting, comparing the accuracy of canonical statistical models (such as ARIMA) with more recent approaches: Auto-ARIMA, Prophet by Meta (Facebook) and machine learning models (with ensemble techniques).
 
 ## Structure of the repo
 
-```bash
-.
+```bash.
+├── README.md
 ├── body
 ├── data
-│   ├── arpa
-│   ├── bikemi_csv
-│   ├── bikemi_metadata
-│   └── milan
-├── jupyter/kernels/bikemi
+│   ├── milan
+│   └── queries
+├── environment.yml
 ├── notebooks
-│   └── custom_functions/
-├── notebooks_r
-├── research_journal
-├── scripts
-├── environment_macos.yml
-├── environment_win.yml
-└── README.md
+│   ├── 01-introduction.ipynb
+│   ├── 02-bikesharing_and_bikemi.ipynb
+│   ├── 03-data_ingestion_and_spatial_operations.ipynb
+│   ├── 04-data_transform_and_stationarity.ipynb
+│   ├── 04-time_series_analysis.ipynb
+│   ├── 05-ARIMA.ipynb
+│   ├── 06-Prophet.ipynb
+│   ├── 07-extensions.ipynb
+│   ├── README.md
+│   └── custom_functions
+└── scripts
 ```
 
-* [`data`](https://github.com/baggiponte/thesis-forecasting/tree/main/body) contains the corpus of the thesis, created via the [Jupyter Book](https://jupyterbook.org/intro.html) project.
-* [`data`](https://github.com/baggiponte/thesis-forecasting/tree/main/data) contains:
-  * [`arpa`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/arpa) actually not needed
-    * Could be exploited with time series for weather data from each measuring station.
-  * [`bikemi_csv`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/bikemi_csv): data for time series analysis.
-  * [`bikemi_metadata`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/bikemi_metadata): stalls locations.
-  * [`milan`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/milan): districts (Municipi) and neighborhoods (NIL) coordinates.
-* [`jupyter/kernels/bikemi/`](https://github.com/baggiponte/thesis-forecasting/tree/main/jupyter/kernels/bikemi): take the `bikemi` folder and copy it to your `$(jupyter --data-dir)` to get a kernel specification file. This creates the option to select the environment as a kernel for your Notebooks.
-* [`notebooks`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks) contains the notebooks with the analysis.
-  * [`custom_functions`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks/custom_functions) contains the custom functions for the project.
-* [`research_journal`](https://github.com/baggiponte/thesis-forecasting/tree/main/research_journal) has some of my considerations I wrote down. Actually, most of my errands are stored in a local knowledge tree with [logseq](https://github.com/logseq/logseq).
-* [`scripts`](https://github.com/baggiponte/thesis-forecasting/tree/main/scripts) contains the custom shell scripts I have written to process the data.
-* [`environment_macos.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment_macos.yml) can be used to re-create the `conda` environment I am using via `conda create env --file environment_macos.yml`. Should work on Linux as well.
-* [`environment_win.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment_win.yml) is needed if you want to replicate the analysis on Windows OS.
-* [`README.md`](https://github.com/baggiponte/thesis-forecasting/tree/main/README.md) this file.
-
-# Plan
-
-## Technical Stuff:
-
-- [ ] VM for traning and CV @marco @manzi
-- [ ] Request data from beginning to 2020 (at least end of February) @manzi
-- [ ] `{bookdown}` tutorial @marco
-
-## 0 - Data
-
-### 0.1 - Data Ingestion
-
-- [x] Scripts to automate data import into the SQL database
-
-### 0.2 - External Data
-
-- [x] **Milan**
-  - [x] Municipi 
-  - [x] NIL
-- [ ] Weather
-  - Maybe too late
-
-### 0.3 - Preprocessing
-
-- [x] Clean multivariate data:
-  - [x] `NaN` to `0`.
-- [x] Match stalls with Milan Data using `geopandas`
-  - To obtain dummy/categoricals with NIL and Municipi to aggregate
-- [x] Functions to get holidays and time series features
-
-## 1 - Univariate Time Series
-
-### 1.1 - Milan Aggregated Data
-
-  - [ ] **Regression** with external data
-    - Maybe only for multivariate to exploit correlations
-    - Regularisation? @marco
-  - [ ] **ARIMA**
-    - [ ] Natural Level?
-    - [ ] Transformations: log/box-cox?
-    - [ ] First Diffences
-    - [ ] Seasonal Differences
-  - [ ] **SARIMA**
-  - [ ] **Prophet**
-  - [ ] **SARIMAX** only if time
-
-### 1.2 - Aggregated Station Level 
-
-* Analysing every single station may produce too much noise?
-  * Come up with a baseline model to use to choose whether to use each time series, or the aggregation at NIL/Municipio.
-  * **metrics**
-  * **PCA** if time?
-
-* Same as 1.1:
-
-- [ ] **Regression** with external data
-    - [ ] Regularisation to reduce dimensionality when using all TS
-  - [ ] **ARIMA**
-    - [ ] Natural Level?
-    - [ ] Transformations: log/box-cox?
-    - [ ] First Diffences
-    - [ ] Seasonal Differences
-  - [ ] **SARIMA**
-  - [ ] **Prophet**
-  - [ ] **SARIMAX** only if time
-
-## 2 - Deep Learning
-
-- [ ] Standardisation?
+* [`README.md`](https://github.com/baggiponte/thesis-forecasting/tree/main/README.md) is this file.
+* [`body`](https://github.com/baggiponte/thesis-forecasting/tree/main/body) contains the MyST (Markedly Structured Text) notebooks used to convert the Jupyter Notebooks into the PDF book.
+* [`data`](https://github.com/baggiponte/thesis-forecasting/tree/main/data) containst the data that could be disclosed. The private data is stored on a private database.
+  * [`milan`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/milan) contains the open data about Milan that I collected and manipulated
+  * [`queries`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/queries) contains the SQL queries to retrieve the data from the server and create materialised views.
+* [`environment.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment.yml) is the specification files to reproduce this project.
+* [`notebooks`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment.yml) are the notebooks for the analysis.
+* [`scripts`](https://github.com/baggiponte/thesis-forecasting/tree/main/scripts) are the bash scripts written for this project. Since these are symlinked in my script folder, you won't find them here. However, I put that scripts folder under version control, and has its own repo [here](https://github.com/baggiponte/scripts).
