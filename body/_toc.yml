@@ -2,10 +2,9 @@
 # Learn more at https://jupyterbook.org/customize/toc.html
 
 format: jb-book
-root: frontmatter
+root: 01-introduction
 defaults:
   numbered: true
 chapters:
-  - file: 01-introduction
   - file: 02-bikesharing_and_bikemi
   - file: 03-data_ingestion_and_spatial_operations

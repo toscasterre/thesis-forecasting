@@ -14,40 +14,23 @@ kernelspec:
 
 +++ {"incorrectly_encoded_metadata": "jp-MarkdownHeadingCollapsed=true", "tags": []}
 
-# Data Transformation and Stationarity
-
-+++
-
-The data clearly displays trend and seasonal components. We need to transform it and use statistical tests to obtain a stationary series to model.
-
-+++ {"tags": []}
-
-## Import Libraries and Load Data
+# Time Series Analysis
 
 ```{code-cell} ipython3
 :init_cell: true
-
-# Data visualisations
-import matplotlib.pyplot as plt
 
 # Base libraries
 import numpy as np
 import pandas as pd
 
-# More data viz
+# Data visualisations
 import plotly.express as px
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 # to use pandas dtypes in matplotlib plots
 from pandas.plotting import register_matplotlib_converters
 
-# rich
-from rich.console import Console
-
-# define rich console for formatted output
-console = Console()
-
-# have pandas types plotted with matplotlib
 register_matplotlib_converters()
 
 # set plotly as backend for plots wih pandas
@@ -63,7 +46,6 @@ plotly_styles = dict(
         "xanchor": "left",
     },
 )
-
 
 # set settings for seaborn
 sns.set_style(style="darkgrid", rc={"axes.facecolor": ".9", "grid.color": ".8"})

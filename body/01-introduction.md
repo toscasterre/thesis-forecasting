@@ -12,11 +12,7 @@ kernelspec:
   name: bikemi
 ---
 
-# Introduction
-
-+++
-
-## COVID-19 Effects and Mobility Habits in Italy
+# COVID-19 Effects and Mobility Habits in Italy
 
 +++ {"citation-manager": {"citations": {"1bsuh": [{"id": "7765261/DEQECBA8", "source": "zotero"}], "4f6tb": [{"id": "7765261/TR9F33KT", "source": "zotero"}], "6olep": [{"id": "7765261/X8PHHWUT", "source": "zotero"}], "807gt": [{"id": "7765261/LFVYWU5J", "source": "zotero"}], "9j0sv": [{"id": "7765261/WGNRECEM", "source": "zotero"}], "djsm8": [{"id": "7765261/J38UF9CZ", "source": "zotero"}], "g4m4o": [{"id": "7765261/WI4S5HHF", "source": "zotero"}], "g90ru": [{"id": "7765261/WGNRECEM", "source": "zotero"}], "hr98z": [{"id": "7765261/PCUNSAVD", "source": "zotero"}], "kwop4": [{"id": "7765261/GESPKNH7", "source": "zotero"}], "lt4yv": [{"id": "7765261/XWGXDX2Y", "source": "zotero"}], "mjryi": [{"id": "7765261/4S3SWW9Q", "source": "zotero"}], "mkd5v": [{"id": "7765261/92X93RNR", "source": "zotero"}], "on8qc": [{"id": "7765261/WGNRECEM", "source": "zotero"}], "rzzct": [{"id": "7765261/WGNRECEM", "source": "zotero"}], "sd11u": [{"id": "7765261/NBY9XZBV", "source": "zotero"}], "t5v2p": [{"id": "7765261/YUNHPBGP", "source": "zotero"}], "wk4a9": [{"id": "7765261/J38UF9CZ", "source": "zotero"}], "xenxi": [{"id": "7765261/LGNSP9HT", "source": "zotero"}], "yvkaq": [{"id": "7765261/I9Z56NKK", "source": "zotero"}]}}, "tags": []}
 
@@ -32,9 +28,9 @@ Unequal access to infrastructure (and, to a minor degree, air pollution) hinder 
 
 The 2019 report mentions two interesting statistics about commuting habits: "almost one in five [commuters] choose an 'active' mode of transport" - that is, walking or biking. However, most of the "active" commuters are actually walking to work (17,4%), whereas the bikers are only some 1,7%. In general, it is women, young and more educated people who use more public transportation means and bicycles, while private vehicles (the exclusive means of commuting for more than 73 percent of the employed) are spread among men between 25 to 44 and with an average level of education <cite id="djsm8">(<i>Spostamenti quotidiani e nuove forme di mobilità</i>, 2019)</cite>. Car pooling is chosen by some 12 percent of the employed and 14,5 percent of students aged 18-24, while only less than half a million used bike sharing services at least once during the year (i.e., less than 2 percent). Such services are more popular across the young and more educated people, while the incidence is almost double the national average in metropolitan cities <cite id="wk4a9">(<i>Spostamenti quotidiani e nuove forme di mobilità</i>, 2019)</cite>.
 
-+++
++++ {"tags": []}
 
-## Bike-Sharing Demand Determinants and the State of Public Transport Infrastructure in Italy
+# Bike-Sharing Demand Determinants and the State of Public Transport Infrastructure in Italy
 
 +++ {"citation-manager": {"citations": {"39eih": [{"id": "7765261/IDH58MVU", "source": "zotero"}], "86qnp": [{"id": "7765261/T48ESWUM", "source": "zotero"}], "bqkpr": [{"id": "7765261/4S3SWW9Q", "source": "zotero"}], "cj8ku": [{"id": "7765261/SBF8VTPD", "source": "zotero"}], "gsh0z": [{"id": "7765261/SBF8VTPD", "source": "zotero"}], "h0b16": [{"id": "7765261/SBF8VTPD", "source": "zotero"}], "itshm": [{"id": "7765261/T48ESWUM", "source": "zotero"}], "krceq": [{"id": "7765261/T48ESWUM", "source": "zotero"}], "lcdr4": [{"id": "7765261/SBF8VTPD", "source": "zotero"}], "sg3u9": [{"id": "7765261/FIMQIYXE", "source": "zotero"}], "wk5mm": [{"id": "7765261/J2DVJ8ZK", "source": "zotero"}]}}, "tags": []}
 
@@ -56,7 +52,7 @@ Restructuring the public transport will require extensive coordination between n
 
 +++
 
-## The Case for Promoting Bike Sharing
+# The Case for Promoting Bike Sharing
 
 +++ {"citation-manager": {"citations": {"039o5": [{"id": "7765261/RNCXQEAG", "source": "zotero"}], "0mmhf": [{"id": "7765261/LUCYT8NP", "source": "zotero"}], "4kg8r": [{"id": "7765261/FTM4CYUT", "source": "zotero"}], "601x8": [{"id": "7765261/EIMDTC6Q", "source": "zotero"}], "abpus": [{"id": "7765261/VMWQTQ76", "source": "zotero"}], "eq14m": [{"id": "7765261/FGMR4BME", "source": "zotero"}], "i5qrt": [{"id": "7765261/RNCXQEAG", "source": "zotero"}], "izohe": [{"id": "7765261/FGMR4BME", "source": "zotero"}], "ua2i7": [{"id": "7765261/N37UTVGB", "source": "zotero"}], "v4gkr": [{"id": "7765261/FGMR4BME", "source": "zotero"}], "wgl8a": [{"id": "7765261/VMWQTQ76", "source": "zotero"}], "yeski": [{"id": "7765261/4US9Q7KQ", "source": "zotero"}]}}, "tags": []}
 
@@ -77,9 +73,9 @@ This experiment has many drawbacks and limitations: as a starter, it does not in
 
 +++
 
-## The Open Source Stack, Transparency and Reproducibility
+# The Open Source Stack, Transparency and Reproducibility
 
-+++ {"citation-manager": {"citations": {"8zx6q": [{"id": "7765261/3H89U9U4", "source": "zotero"}], "yvvrd": [{"id": "7765261/G8QHY6EY", "source": "zotero"}], "xrhbz": [{"id": "7765261/WG5DS986", "source": "zotero"}], "dzp54": [{"id": "7765261/NL5V5ZU2", "source": "zotero"}], "62uvg": [{"id": "7765261/TETPEMAA", "source": "zotero"}], "faiu8": []}}, "tags": []}
++++ {"citation-manager": {"citations": {"8zx6q": [{"id": "7765261/3H89U9U4", "source": "zotero"}], "yvvrd": [{"id": "7765261/G8QHY6EY", "source": "zotero"}], "xrhbz": [{"id": "7765261/WG5DS986", "source": "zotero"}], "dzp54": [{"id": "7765261/NL5V5ZU2", "source": "zotero"}], "62uvg": [{"id": "7765261/TETPEMAA", "source": "zotero"}], "f4aji": [{"id": "7765261/G6AZZJAD", "source": "zotero"}]}}, "tags": []}
 
 This is one of the many (millions?) projects to benefit from the existence of the open source community. This project was developed end-to-end using open source tools, starting from PostgreSQL to store the data and many Python libraries to train the models. Jupyter Notebooks have been the main developing tool <cite id="8zx6q">(Perkel, 2018)</cite>, and Jupyter Books <cite id="yvvrd">(Executable Books Community, 2020)</cite> to convert the code into a $\LaTeX$ publication, thanks to `pandoc` working in the background <cite id="xrhbz">(<i>Pandoc - About Pandoc</i>, n.d.)</cite>. 
 
@@ -97,4 +93,4 @@ When Romer tried to work with Mathematica notebooks and share their results, it 
 
 > The tie-breaker [between Wolfram and Jupyter, as well as proprietary and open source] is social, not technical. The more I learn about the open source community, the more I trust its members. The more I learn about proprietary software, the more I worry that objective truth might perish from the earth.
 
-Jupyter Notebooks are being developed since 2001 and they are ever more popular. Perhaps they might even replace the scientific paper <cite id="faiu8">[NO_PRINTED_FORM]</cite>; what's sure is that they are ever more present. Indeed, Romer is not the only Nobel prize using open source software: Thomas Sargent, currently 78, uses Julia for his scientific research and launched a website, [QuantEcon](https://quantecon.org/) built with Jupyter Books, to teach computational economics in Python and Julia.
+Jupyter Notebooks are being developed since 2001 and they are ever more popular. Perhaps they might even replace the scientific paper <cite id="f4aji">(Somers, 2018)</cite>; what's sure is that they are ever more present. Indeed, Romer is not the only Nobel prize using open source software: Thomas Sargent, currently 78, uses Julia for his scientific research and launched a website, [QuantEcon](https://quantecon.org/) built with Jupyter Books, to teach computational economics in Python and Julia.

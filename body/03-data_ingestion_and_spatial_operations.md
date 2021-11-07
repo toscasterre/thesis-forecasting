@@ -12,8 +12,6 @@ kernelspec:
   name: bikemi
 ---
 
-# BikeMi Data
-
 ```{code-cell} ipython3
 # path manipulation
 from pathlib import Path
@@ -56,9 +54,9 @@ milan_data = Path(data_path / "milan")
 conn = psycopg2.connect("dbname=bikemi user=luca")
 ```
 
-+++ {"tags": [], "jp-MarkdownHeadingCollapsed": true}
++++ {"tags": []}
 
-## Data Ingestion
+# Data Ingestion
 
 +++
 
@@ -74,7 +72,7 @@ query = """
 pd.read_sql(sql=query, con=conn)
 ```
 
-+++ {"citation-manager": {"citations": {"tcloo": [{"id": "7765261/2TTUU9QV", "source": "zotero"}], "jf5wt": [{"id": "7765261/NQ8DBQNG", "source": "zotero"}], "ge16g": [{"id": "7765261/574YW5KY", "source": "zotero"}], "1xb31": [{"id": "7765261/NQ8DBQNG", "source": "zotero"}]}}, "tags": []}
++++ {"citation-manager": {"citations": {"1xb31": [{"id": "7765261/NQ8DBQNG", "source": "zotero"}], "ge16g": [{"id": "7765261/574YW5KY", "source": "zotero"}], "jf5wt": [{"id": "7765261/NQ8DBQNG", "source": "zotero"}], "tcloo": [{"id": "7765261/2TTUU9QV", "source": "zotero"}]}}, "tags": []}
 
 The data available ranges from the first of June, 2015, to the first of October, 2020, totalling to 15.842.891 observations. Data was made available in Excel spreadsheets, following the [Office Open XML SpreadsheetML File Format](https://docs.microsoft.com/en-us/openspecs/office_standards/ms-xlsx/f780b2d6-8252-4074-9fe3-5d7bc4830968) (the `.xlsx` file format). Python"s Pandas library has methods to read `.xlsx` files; however, given how big these files are, data manipulation would have proven unfeasible.
 
@@ -97,13 +95,13 @@ query = """
 pd.read_sql(sql=query, con=conn).astype("int")
 ```
 
-+++ {"tags": [], "jp-MarkdownHeadingCollapsed": true}
++++ {"jp-MarkdownHeadingCollapsed": true, "tags": []}
 
-## Data Analysis
+# Data Analysis
 
-+++ {"tags": [], "jp-MarkdownHeadingCollapsed": true}
++++ {"jp-MarkdownHeadingCollapsed": true, "tags": []}
 
-### Remove Outliers and Select the Time Span
+## Remove Outliers and Select the Time Span
 
 +++
 
@@ -130,9 +128,9 @@ query = """
 """
 ```
 
-+++ {"tags": [], "jp-MarkdownHeadingCollapsed": true}
++++ {"jp-MarkdownHeadingCollapsed": true, "tags": []}
 
-### Top Users and Commuting Habits
+## Top Users and Commuting Habits
 
 ```{code-cell} ipython3
 query = """
@@ -198,9 +196,9 @@ pd.read_sql(query, conn).astype({"anno": "int"}).head(10).set_index("cliente_ano
 
 As expected, there are more observations from the years 2016 and 2017 as these are complete years. The great number of usage translates to an average of almost 4 trips per day - i.e., to reach the first train station and then the workplace.
 
-+++ {"tags": [], "jp-MarkdownHeadingCollapsed": true}
++++ {"jp-MarkdownHeadingCollapsed": true, "tags": []}
 
-### Usage Patterns and Origin-Destination Matrix
+## Usage Patterns and Origin-Destination Matrix
 
 +++
 
@@ -328,7 +326,7 @@ This reinforces the conclusion that BikeMi is consistently used for commuting pu
 
 +++
 
-## Spatial Data Analysis
+# Spatial Data Analysis
 
 +++ {"citation-manager": {"citations": {"tfga6": [{"id": "7765261/RZW74C9X", "source": "zotero"}]}}, "tags": []}
 
@@ -372,7 +370,9 @@ plt.title("BikeMi Stalls (Red Dots) and Bike Lanes (Blue)", **title_font)
 plt.show()
 ```
 
-### Inspecting Stations with Zero Daily Rentals
++++ {"tags": []}
+
+## Inspecting Stations with Zero Daily Rentals
 
 +++ {"tags": []}
 
@@ -504,11 +504,13 @@ plt.title("Bikemi Stalls, by Null Values (Low Usage)", **title_font)
 plt.show()
 ```
 
-### Area of Analysis
++++ {"tags": []}
+
+## Area of Analysis
 
 +++ {"citation-manager": {"citations": {"sopwq": [{"id": "7765261/RZW74C9X", "source": "zotero"}], "srqoj": [{"id": "7765261/VTA4UCWW", "source": "zotero"}]}}, "tags": []}
 
-Besides dropping the "emptiest" stations, we should also come up with a way to narrow down the geographic area inside which we perform the analysis. Previously, authors have chosen to analyse just the area inside the Bastioni, or "Area C" <cite id="sopwq">(Saibene &#38; Manzi, 2015)</cite> or the whole set of stations <cite id="srqoj">(Toro et al., 2020)</cite>. This was mainly due to the different purpose of their analysis and the data availability (Saibene and Manzi analyse data from 2008 to 2012). For our goal, as well as the policymaker perspective, this choice seems restricting, as it leaves out most of the train stations. It is worth noting that analysing the bike sharing traffic inside of Area C can be appropriate: for example, since, the municipality publishes the number of daily accesses to the area, which could be used to evaluate the effect of sharing services on traffic. 
+Besides dropping the "emptiest" stations, we should also come up with a way to narrow down the geographic area inside which we perform the analysis. Previously, authors have chosen to analyse just the area inside the Bastioni, or "Area C" <cite id="sopwq">(Saibene &#38; Manzi, 2015)</cite> or the whole set of stations <cite id="srqoj">(Toro et al., 2020)</cite>. This was mainly due to the different purpose of their analysis and the data availability (Saibene and Manzi analyse data from 2008 to 2012). For our goal, as well as the policymaker perspective, this choice seems restricting, as it leaves out most of the train stations. It is worth noting that analysing the bike sharing traffic inside of Area C can be appropriate: for example, since, the municipality publishes the number of daily accesses to the area, which could be used to evaluate the effect of sharing services on traffic.
 
 ```{code-cell} ipython3
 area_c = (
@@ -596,15 +598,7 @@ plt.title("Train Stations (Blue) and Metro Stations (Orange) in Milan", **title_
 plt.show()
 ```
 
-This leaves us with the following stations: 
-
-```{code-cell} ipython3
-
-```
-
-```{code-cell} ipython3
-bikemi_stalls_nulls.head()
-```
+This leaves us with the following stations:
 
 ```{code-cell} ipython3
 train_stations_circ = (
