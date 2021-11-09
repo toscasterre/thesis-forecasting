@@ -12,6 +12,8 @@ kernelspec:
   name: bikemi
 ---
 
+# BikeMi Data
+
 ```{code-cell} ipython3
 # path manipulation
 from pathlib import Path
@@ -38,17 +40,13 @@ register_matplotlib_converters()
 sns.set_style(style="whitegrid", rc={"grid.color": ".9"})
 sns.set_palette(palette="deep")
 
-# store the palette
-sns_c = sns.color_palette(palette="deep")  # will be useful later
-
 # customise matplotlib and sns plot dimensions
 plt.rcParams["figure.figsize"] = [12, 6]
 plt.rcParams["figure.dpi"] = 100
 title_font = {"fontname": "DejaVu Sans Mono"}
 
 # create paths
-data_path = Path(Path.cwd().parents[0] / "data")
-milan_data = Path(data_path / "milan")
+milan_data = Path("../datai/milan")
 
 # establish connection with the database
 conn = psycopg2.connect("dbname=bikemi user=luca")
@@ -56,7 +54,7 @@ conn = psycopg2.connect("dbname=bikemi user=luca")
 
 +++ {"tags": []}
 
-# Data Ingestion
+## Data Ingestion
 
 +++
 
@@ -95,13 +93,13 @@ query = """
 pd.read_sql(sql=query, con=conn).astype("int")
 ```
 
-+++ {"jp-MarkdownHeadingCollapsed": true, "tags": []}
++++ {"tags": []}
 
-# Data Analysis
+## Data Analysis
 
-+++ {"jp-MarkdownHeadingCollapsed": true, "tags": []}
++++ {"tags": []}
 
-## Remove Outliers and Select the Time Span
+### Remove Outliers and Select the Time Span
 
 +++
 
@@ -128,9 +126,9 @@ query = """
 """
 ```
 
-+++ {"jp-MarkdownHeadingCollapsed": true, "tags": []}
++++ {"tags": []}
 
-## Top Users and Commuting Habits
+### Top Users and Commuting Habits
 
 ```{code-cell} ipython3
 query = """
@@ -196,9 +194,9 @@ pd.read_sql(query, conn).astype({"anno": "int"}).head(10).set_index("cliente_ano
 
 As expected, there are more observations from the years 2016 and 2017 as these are complete years. The great number of usage translates to an average of almost 4 trips per day - i.e., to reach the first train station and then the workplace.
 
-+++ {"jp-MarkdownHeadingCollapsed": true, "tags": []}
++++ {"tags": []}
 
-## Usage Patterns and Origin-Destination Matrix
+### Usage Patterns and Origin-Destination Matrix
 
 +++
 
@@ -324,9 +322,9 @@ trips_rankings_commuting_hours.head(10)
 
 This reinforces the conclusion that BikeMi is consistently used for commuting purposes. However, this data can be better explored including its spatial representation.
 
-+++
++++ {"tags": []}
 
-# Spatial Data Analysis
+## Spatial Data Analysis
 
 +++ {"citation-manager": {"citations": {"tfga6": [{"id": "7765261/RZW74C9X", "source": "zotero"}]}}, "tags": []}
 
@@ -372,7 +370,7 @@ plt.show()
 
 +++ {"tags": []}
 
-## Inspecting Stations with Zero Daily Rentals
+### Inspecting Stations with Zero Daily Rentals
 
 +++ {"tags": []}
 
@@ -506,7 +504,7 @@ plt.show()
 
 +++ {"tags": []}
 
-## Area of Analysis
+### Area of Analysis
 
 +++ {"citation-manager": {"citations": {"sopwq": [{"id": "7765261/RZW74C9X", "source": "zotero"}], "srqoj": [{"id": "7765261/VTA4UCWW", "source": "zotero"}]}}, "tags": []}
 
@@ -598,7 +596,7 @@ plt.title("Train Stations (Blue) and Metro Stations (Orange) in Milan", **title_
 plt.show()
 ```
 
-This leaves us with the following stations:
+This leaves us with the following stations, which we store as a `.csv` file and then upload into our local PostgreSQL database with a Bash script.
 
 ```{code-cell} ipython3
 train_stations_circ = (

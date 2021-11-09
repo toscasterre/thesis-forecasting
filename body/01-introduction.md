@@ -12,7 +12,11 @@ kernelspec:
   name: bikemi
 ---
 
-# COVID-19 Effects and Mobility Habits in Italy
+# Introduction
+
++++
+
+## COVID-19 Effects and Mobility Habits in Italy
 
 +++ {"citation-manager": {"citations": {"1bsuh": [{"id": "7765261/DEQECBA8", "source": "zotero"}], "4f6tb": [{"id": "7765261/TR9F33KT", "source": "zotero"}], "6olep": [{"id": "7765261/X8PHHWUT", "source": "zotero"}], "807gt": [{"id": "7765261/LFVYWU5J", "source": "zotero"}], "9j0sv": [{"id": "7765261/WGNRECEM", "source": "zotero"}], "djsm8": [{"id": "7765261/J38UF9CZ", "source": "zotero"}], "g4m4o": [{"id": "7765261/WI4S5HHF", "source": "zotero"}], "g90ru": [{"id": "7765261/WGNRECEM", "source": "zotero"}], "hr98z": [{"id": "7765261/PCUNSAVD", "source": "zotero"}], "kwop4": [{"id": "7765261/GESPKNH7", "source": "zotero"}], "lt4yv": [{"id": "7765261/XWGXDX2Y", "source": "zotero"}], "mjryi": [{"id": "7765261/4S3SWW9Q", "source": "zotero"}], "mkd5v": [{"id": "7765261/92X93RNR", "source": "zotero"}], "on8qc": [{"id": "7765261/WGNRECEM", "source": "zotero"}], "rzzct": [{"id": "7765261/WGNRECEM", "source": "zotero"}], "sd11u": [{"id": "7765261/NBY9XZBV", "source": "zotero"}], "t5v2p": [{"id": "7765261/YUNHPBGP", "source": "zotero"}], "wk4a9": [{"id": "7765261/J38UF9CZ", "source": "zotero"}], "xenxi": [{"id": "7765261/LGNSP9HT", "source": "zotero"}], "yvkaq": [{"id": "7765261/I9Z56NKK", "source": "zotero"}]}}, "tags": []}
 
@@ -30,7 +34,7 @@ The 2019 report mentions two interesting statistics about commuting habits: "alm
 
 +++ {"tags": []}
 
-# Bike-Sharing Demand Determinants and the State of Public Transport Infrastructure in Italy
+## Bike-Sharing Demand Determinants and the State of Public Transport Infrastructure in Italy
 
 +++ {"citation-manager": {"citations": {"39eih": [{"id": "7765261/IDH58MVU", "source": "zotero"}], "86qnp": [{"id": "7765261/T48ESWUM", "source": "zotero"}], "bqkpr": [{"id": "7765261/4S3SWW9Q", "source": "zotero"}], "cj8ku": [{"id": "7765261/SBF8VTPD", "source": "zotero"}], "gsh0z": [{"id": "7765261/SBF8VTPD", "source": "zotero"}], "h0b16": [{"id": "7765261/SBF8VTPD", "source": "zotero"}], "itshm": [{"id": "7765261/T48ESWUM", "source": "zotero"}], "krceq": [{"id": "7765261/T48ESWUM", "source": "zotero"}], "lcdr4": [{"id": "7765261/SBF8VTPD", "source": "zotero"}], "sg3u9": [{"id": "7765261/FIMQIYXE", "source": "zotero"}], "wk5mm": [{"id": "7765261/J2DVJ8ZK", "source": "zotero"}]}}, "tags": []}
 
@@ -52,7 +56,7 @@ Restructuring the public transport will require extensive coordination between n
 
 +++
 
-# The Case for Promoting Bike Sharing
+## The Case for Promoting Bike Sharing
 
 +++ {"citation-manager": {"citations": {"039o5": [{"id": "7765261/RNCXQEAG", "source": "zotero"}], "0mmhf": [{"id": "7765261/LUCYT8NP", "source": "zotero"}], "4kg8r": [{"id": "7765261/FTM4CYUT", "source": "zotero"}], "601x8": [{"id": "7765261/EIMDTC6Q", "source": "zotero"}], "abpus": [{"id": "7765261/VMWQTQ76", "source": "zotero"}], "eq14m": [{"id": "7765261/FGMR4BME", "source": "zotero"}], "i5qrt": [{"id": "7765261/RNCXQEAG", "source": "zotero"}], "izohe": [{"id": "7765261/FGMR4BME", "source": "zotero"}], "ua2i7": [{"id": "7765261/N37UTVGB", "source": "zotero"}], "v4gkr": [{"id": "7765261/FGMR4BME", "source": "zotero"}], "wgl8a": [{"id": "7765261/VMWQTQ76", "source": "zotero"}], "yeski": [{"id": "7765261/4US9Q7KQ", "source": "zotero"}]}}, "tags": []}
 
@@ -73,7 +77,7 @@ This experiment has many drawbacks and limitations: as a starter, it does not in
 
 +++
 
-# The Open Source Stack, Transparency and Reproducibility
+## The Open Source Stack, Transparency and Reproducibility
 
 +++ {"citation-manager": {"citations": {"8zx6q": [{"id": "7765261/3H89U9U4", "source": "zotero"}], "yvvrd": [{"id": "7765261/G8QHY6EY", "source": "zotero"}], "xrhbz": [{"id": "7765261/WG5DS986", "source": "zotero"}], "dzp54": [{"id": "7765261/NL5V5ZU2", "source": "zotero"}], "62uvg": [{"id": "7765261/TETPEMAA", "source": "zotero"}], "f4aji": [{"id": "7765261/G6AZZJAD", "source": "zotero"}]}}, "tags": []}
 

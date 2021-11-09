@@ -12,7 +12,11 @@ kernelspec:
   name: bikemi
 ---
 
-# A Brief History of Bike Sharing Services
+# Bike Sharing and BikeMi: A Literature Review
+
++++
+
+## A Brief History of Bike Sharing Services
 
 +++ {"citation-manager": {"citations": {"3uq48": [{"id": "7765261/A4AI5NIC", "source": "zotero"}], "55oq6": [{"id": "7765261/6TJJ379L", "source": "zotero"}], "6abvx": [{"id": "7765261/4I5Z53FF", "source": "zotero"}], "8c7qj": [{"id": "7765261/4I5Z53FF", "source": "zotero"}], "bfh5e": [{"id": "7765261/QE6IMJ5R", "source": "zotero"}], "ey3by": [{"id": "7765261/4I5Z53FF", "source": "zotero"}], "gln1o": [{"id": "7765261/QE6IMJ5R", "source": "zotero"}], "msclj": [{"id": "7765261/Q8QH45IB", "source": "zotero"}], "n45x6": [{"id": "7765261/A4AI5NIC", "source": "zotero"}], "o67sb": [{"id": "7765261/QE6IMJ5R", "source": "zotero"}], "so66j": [{"id": "7765261/QE6IMJ5R", "source": "zotero"}], "v2pjh": [{"id": "7765261/6TJJ379L", "source": "zotero"}]}}, "tags": []}
 
@@ -34,7 +38,7 @@ Today, according to the estimates on the website [Bike Sharing World Map](https:
 
 +++
 
-# The Challenges of Sharing Services and the Sharing Economy
+## The Challenges of Sharing Services and the Sharing Economy
 
 +++ {"citation-manager": {"citations": {"3i8f4": [{"id": "7765261/8H756937", "source": "zotero"}], "54bzf": [{"id": "7765261/B8QCV7ZD", "source": "zotero"}], "9eie8": [{"id": "7765261/G3F5S8ZS", "source": "zotero"}], "bpq75": [{"id": "7765261/SAYXS4UZ", "source": "zotero"}], "fe9vi": [{"id": "7765261/B8QCV7ZD", "source": "zotero"}], "ho2zc": [{"id": "7765261/6UNRCNC5", "source": "zotero"}], "i4jnr": [{"id": "7765261/Q2V3Z9K2", "source": "zotero"}], "kez08": [{"id": "7765261/B8QCV7ZD", "source": "zotero"}], "kqb9q": [{"id": "7765261/BUI6HN97", "source": "zotero"}], "l63qe": [{"id": "7765261/EPW29CK5", "source": "zotero"}], "lxnaw": [{"id": "7765261/B8QCV7ZD", "source": "zotero"}], "p5r77": [{"id": "7765261/B8QCV7ZD", "source": "zotero"}], "pwa9t": [{"id": "7765261/GVEPNMR5", "source": "zotero"}], "rx0ga": [{"id": "7765261/MS4XRQEP", "source": "zotero"}], "s8tbx": [{"id": "7765261/9IRMHVZB", "source": "zotero"}], "tutm7": [{"id": "7765261/B8QCV7ZD", "source": "zotero"}], "u97ak": [{"id": "7765261/MIHGC3RA", "source": "zotero"}], "xsga7": [{"id": "7765261/PHU24GMW", "source": "zotero"}], "yfxyc": [{"id": "7765261/B8QCV7ZD", "source": "zotero"}]}}, "tags": []}
 
@@ -50,7 +54,7 @@ The growth of Mobike was so fast that it also "exacerbated problems of user misb
 
 +++
 
-# The Elephant on the Sidewalk: Electric Scooters
+## The Elephant on the Sidewalk: Electric Scooters
 
 +++ {"citation-manager": {"citations": {"102m8": [{"id": "7765261/RL3FDK87", "source": "zotero"}], "2kwzr": [{"id": "7765261/MTDR28J4", "source": "zotero"}], "4vnes": [{"id": "7765261/RL3FDK87", "source": "zotero"}], "95klp": [{"id": "7765261/YBZB3FJS", "source": "zotero"}], "e6s5j": [{"id": "7765261/ZHG9MECZ", "source": "zotero"}], "ejl0m": [{"id": "7765261/NHQTQJTJ", "source": "zotero"}], "fkupf": [{"id": "7765261/WNLV8VB5", "source": "zotero"}], "gevdu": [{"id": "7765261/YBZB3FJS", "source": "zotero"}], "gxp1e": [{"id": "7765261/ZHG9MECZ", "source": "zotero"}], "hhq6r": [{"id": "7765261/RL3FDK87", "source": "zotero"}], "k1ux4": [{"id": "7765261/RL3FDK87", "source": "zotero"}], "m5i3g": [{"id": "7765261/YBZB3FJS", "source": "zotero"}], "mdp3r": [{"id": "7765261/YBZB3FJS", "source": "zotero"}], "mlma3": [{"id": "7765261/FT4RTIBS", "source": "zotero"}], "onki8": [{"id": "7765261/WNLV8VB5", "source": "zotero"}], "oz9pf": [{"id": "7765261/YBZB3FJS", "source": "zotero"}], "pdww8": [{"id": "7765261/ER5F483J", "source": "zotero"}], "s4hzn": [{"id": "7765261/ER5F483J", "source": "zotero"}], "s4mzd": [{"id": "7765261/NHQTQJTJ", "source": "zotero"}], "sc8qe": [{"id": "7765261/ER5F483J", "source": "zotero"}], "vgnkr": [{"id": "7765261/YL7HX3L5", "source": "zotero"}], "vq29h": [{"id": "7765261/ER5F483J", "source": "zotero"}], "weeoq": [{"id": "7765261/ER5F483J", "source": "zotero"}], "yrf8l": [{"id": "7765261/YN4FJZUM", "source": "zotero"}], "z45bm": [{"id": "7765261/YBZB3FJS", "source": "zotero"}]}}, "tags": []}
 
@@ -68,7 +72,7 @@ For one, it might be expected that adoption of e-scooters translates into a decl
 
 +++
 
-# Sharing Services in Milan: BikeMi and its Competitors
+## Sharing Services in Milan: BikeMi and its Competitors
 
 +++ {"citation-manager": {"citations": {"4d4r4": [{"id": "7765261/4EY7RBG7", "source": "zotero"}], "a0n1g": [{"id": "7765261/ZC4WFCHU", "source": "zotero"}], "f6v7w": [{"id": "7765261/U3B594Z7", "source": "zotero"}], "i9apb": [{"id": "7765261/ZC4WFCHU", "source": "zotero"}], "inw4k": [{"id": "7765261/U3B594Z7", "source": "zotero"}], "jkk29": [{"id": "7765261/U3B594Z7", "source": "zotero"}], "lrzjw": [{"id": "7765261/R7Y5BHCU", "source": "zotero"}], "rl7fh": [{"id": "7765261/KNCP7PMX", "source": "zotero"}], "t64e7": [{"id": "7765261/S824QY7N", "source": "zotero"}], "zjd7x": [{"id": "7765261/BWH3A26K", "source": "zotero"}]}}, "tags": []}
 
@@ -82,7 +86,7 @@ Electric-scooter sharing services arrived in Milan [only on February 2020](https
 
 +++
 
-# Competitors and Data in Our Analysis
+## Competitors and Data in Our Analysis
 
 +++ {"tags": []}
 
@@ -94,7 +98,7 @@ If we buy the "docked bikes services are less sensitive to dockless ones" assump
 
 +++
 
-# BikeMi: a Review of the Literature
+## BikeMi: a Review of the Literature
 
 +++ {"citation-manager": {"citations": {"0edrh": [{"id": "7765261/VTA4UCWW", "source": "zotero"}], "5umgb": [{"id": "7765261/VTA4UCWW", "source": "zotero"}], "610fa": [{"id": "7765261/3NWZZQIN", "source": "zotero"}], "65s28": [{"id": "7765261/VTA4UCWW", "source": "zotero"}], "l18go": [{"id": "7765261/3NWZZQIN", "source": "zotero"}], "mhp3u": [{"id": "7765261/7ISI6ZDA", "source": "zotero"}], "mt3ca": [{"id": "7765261/TWC6ELRH", "source": "zotero"}], "qf154": [{"id": "7765261/RZW74C9X", "source": "zotero"}], "rdkvx": [{"id": "7765261/VTA4UCWW", "source": "zotero"}], "sx8ho": [{"id": "7765261/VTA4UCWW", "source": "zotero"}]}}, "tags": []}
 
