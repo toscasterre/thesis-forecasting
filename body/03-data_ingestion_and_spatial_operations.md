@@ -5,11 +5,11 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.10.3
+    jupytext_version: 1.11.5
 kernelspec:
-  display_name: Bike Sharing Forecasting
+  display_name: PyCharm (tesi)
   language: python
-  name: bikemi
+  name: pycharm-dd017f2c
 ---
 
 # BikeMi Data
@@ -19,22 +19,22 @@ kernelspec:
 from pathlib import Path
 
 # data manipulation
+import numpy as np
 import pandas as pd
 import geopandas
-import numpy as np
+
+# plotting
+import matplotlib.pyplot as plt
+import contextily as cx
+import seaborn as sns
 
 # connecting to the local database with the data
 import psycopg2
 
-# plotting
-import matplotlib.pyplot as plt
-import seaborn as sns
-import contextily as cx
-
 # to use pandas dtypes in matplotlib plots
 from pandas.plotting import register_matplotlib_converters
+
 register_matplotlib_converters()
-%matplotlib inline
 
 # set settings for seaborn
 sns.set_style(style="whitegrid", rc={"grid.color": ".9"})
@@ -61,20 +61,24 @@ conn = psycopg2.connect("dbname=bikemi user=luca")
 The data was made available thanks to a partnership established by Prof. Giancarlo Manzi of the University of Milan and Clear Channel Italia, the provider of the service. The data is comprised of all the individual trips performed by each client (`cliente_anonimizzato`). This includes the bike type (which can either be a regular bike or an electric bike), the bike identifier, the station of departure and arrival with the time, the duration of the trip `durata_noleggio` plus the total travel distance. We do not know how the total travel distance `distanza_totale` is computed. Here are a selection of fields for the first five rows of the source data (time features are rounded to the daily level to fit into the page):
 
 ```{code-cell} ipython3
-query = """
-    SELECT
-        bici,
-        tipo_bici,
-        cliente_anonimizzato,
-        DATE_TRUNC('day', data_prelievo)::date AS giorno_prelievo,
-        nome_stazione_prelievo,
-        DATE_TRUNC('day', data_restituzione)::date AS giorno_restituzione,
-        nome_stazione_restituzione
-    FROM bikemi_source_data
-    LIMIT 5;
-"""
+def show_data_sample(connection) -> pd.DataFrame:
+    query = """
+        SELECT
+            bici,
+            tipo_bici,
+            cliente_anonimizzato,
+            DATE_TRUNC('day', data_prelievo)::date AS giorno_prelievo,
+            nome_stazione_prelievo,
+            DATE_TRUNC('day', data_restituzione)::date AS giorno_restituzione,
+            nome_stazione_restituzione
+        FROM bikemi_source_data
+        LIMIT 5;
+    """
 
-pd.read_sql(sql=query, con=conn)
+    return pd.read_sql(query, connection)
+
+
+show_data_sample(conn)
 ```
 
 +++ {"citation-manager": {"citations": {"1xb31": [{"id": "7765261/NQ8DBQNG", "source": "zotero"}], "ge16g": [{"id": "7765261/574YW5KY", "source": "zotero"}], "jf5wt": [{"id": "7765261/NQ8DBQNG", "source": "zotero"}], "tcloo": [{"id": "7765261/2TTUU9QV", "source": "zotero"}]}}, "tags": []}
@@ -88,16 +92,19 @@ The Rust port of `csvkit` is called [`xsv`](https://github.com/BurntSushi/xsv), 
 Finally, `psql` (PostgreSQL"s command line utility) was used to upload the "clean" data into a local database instance. PostgreSQL was also used to perform basic survey statistics, like computing the number of rows, and data aggregation (such as counting the number of observations by year). Looking at the frequency tables by year, there appears to be an oddly small number of observations from 2018. This is because there is indeed missing data from June 2018 until the end of the year. For this reason, we chose to work only with data from June 2015 to the end of May 2018.
 
 ```{code-cell} ipython3
-query = """
-    SELECT
-        EXTRACT("year" FROM b.data_prelievo) AS date,
-        COUNT(b.bici)
-    FROM bikemi_source_data b
-    -- WHERE EXTRACT("year" FROM b.data_prelievo) < 2019
-    GROUP BY EXTRACT("year" FROM b.data_prelievo);
-"""
+def count_users_by_year(connection) -> pd.DataFrame:
+    query = """
+        SELECT
+            EXTRACT("year" FROM b.data_prelievo) AS date,
+            COUNT(b.bici)
+        FROM bikemi_source_data b
+        GROUP BY EXTRACT("year" FROM b.data_prelievo);
+    """
 
-pd.read_sql(sql=query, con=conn).astype("int")
+    return pd.read_sql(query, connection).astype("int").set_index("date")
+
+
+count_users_by_year(conn)
 ```
 
 +++ {"tags": []}
@@ -113,7 +120,7 @@ pd.read_sql(sql=query, con=conn).astype("int")
 In addition to selecting only trips from June 2015 to June 2018, we also disregard all rentals whose duration is smaller than one minute - as previously done in the literature. This leaves us with more than 11,7 million observations. We store these in a [materialised view](https://www.postgresql.org/docs/current/sql-creatematerializedview.html):
 
 ```{code-cell} ipython3
-query = """
+materialized_view_query = """
     CREATE MATERIALIZED VIEW IF NOT EXISTS bikemi_rentals_before_2019 AS (
         SELECT
             b.tipo_bici,
@@ -138,27 +145,36 @@ query = """
 ### Top Users and Commuting Habits
 
 ```{code-cell} ipython3
-query = """
-    SELECT
-        COUNT(DISTINCT cliente_anonimizzato)
-    FROM bikemi_rentals_before_2019;
-    """
+def count_distinct_users(connection) -> pd.DataFrame:
+    query = """
+        SELECT
+            COUNT(DISTINCT cliente_anonimizzato)
+        FROM bikemi_rentals_before_2019;
+        """
 
-pd.read_sql(query, conn)
+    return pd.read_sql(query, connection)
+
+
+count_distinct_users(conn)
 ```
+
++++ {"pycharm": {"name": "#%% md\n"}}
 
 The service has almost 200 thousands unique subscribers in the time period. Then breakdown by year is the following:
 
 ```{code-cell} ipython3
-query = """
+def count_users_by_year(connection) -> pd.DataFrame:
+    query = """
     SELECT
         EXTRACT("year" FROM data_prelievo) AS anno,
         COUNT(DISTINCT cliente_anonimizzato)
     FROM bikemi_rentals_before_2019
     GROUP BY EXTRACT("year" FROM data_prelievo);
     """
+    return pd.read_sql(query, connection).astype({"anno": "int"}).set_index("anno")
 
-pd.read_sql(query, conn).astype({"anno": "int"}).set_index("anno")
+
+count_users_by_year(conn)
 ```
 
 The number of subscriptions is declining in 2015 and 2018, as there are observations for six months only. In particular, for the year 2018 the count is even lower because the autumn/winter months are missing.
@@ -166,37 +182,45 @@ The number of subscriptions is declining in 2015 and 2018, as there are observat
 It is also interesting to look at the top users:
 
 ```{code-cell} ipython3
-query = """
-    SELECT
-        cliente_anonimizzato,
-        COUNT(*) AS noleggi_totali
-    FROM bikemi_rentals_before_2019 b
-    GROUP BY
-        cliente_anonimizzato
-    ORDER BY noleggi_totali DESC
-"""
+def get_top_users(connection) -> pd.DataFrame:
+    query = """
+        SELECT
+            cliente_anonimizzato,
+            COUNT(*) AS noleggi_totali
+        FROM bikemi_rentals_before_2019 b
+        GROUP BY
+            cliente_anonimizzato
+        ORDER BY noleggi_totali DESC
+        LIMIT 10;
+    """
 
-users_ranking = pd.read_sql(query, conn).set_index("cliente_anonimizzato")
+    return pd.read_sql(query, connection).set_index("cliente_anonimizzato")
 
-users_ranking.head(10)
+
+get_top_users(conn)
 ```
 
 But it might be of greater interest to look at the distribution by year:
 
 ```{code-cell} ipython3
-query = """
-    SELECT
-        cliente_anonimizzato,
-        COUNT(*) AS noleggi_totali,
-        EXTRACT("year" FROM data_prelievo) AS anno
-    FROM bikemi_rentals_before_2019 b
-    GROUP BY
-        cliente_anonimizzato,
-        EXTRACT("year" FROM data_prelievo)
-    ORDER BY noleggi_totali DESC
-"""
+def get_top_users_by_year(connection) -> pd.DataFrame:
+    query = """
+        SELECT
+            cliente_anonimizzato,
+            COUNT(*) AS noleggi_totali,
+            EXTRACT("year" FROM data_prelievo) AS anno
+        FROM bikemi_rentals_before_2019 b
+        GROUP BY
+            cliente_anonimizzato,
+            EXTRACT("year" FROM data_prelievo)
+        ORDER BY noleggi_totali DESC
+        LIMIT 10;
+    """
 
-pd.read_sql(query, conn).astype({"anno": "int"}).head(10).set_index("cliente_anonimizzato")
+    return pd.read_sql(query, connection).astype({"anno": "int"}).set_index("cliente_anonimizzato")
+
+
+get_top_users_by_year(conn)
 ```
 
 As expected, there are more observations from the years 2016 and 2017 as these are complete years. The great number of usage translates to an average of almost 4 trips per day - i.e., to reach the first train station and then the workplace.
@@ -210,113 +234,93 @@ As expected, there are more observations from the years 2016 and 2017 as these a
 As a starter, it is useful to look at the origin-destination (OD) matrix, to see which are the most popular starting and departure points. On the aggregate level, the most popular points on the OD matrix are the train stations and sightseeing places such as Duomo.
 
 ```{code-cell} ipython3
-top_departure_stations_query = """
-    SELECT
-        nome_stazione_prelievo,
-        COUNT(*) AS numero_noleggi
-    FROM bikemi_rentals_before_2019
-    GROUP BY
-        nome_stazione_prelievo
-    ORDER BY numero_noleggi DESC;
-"""
+def get_top_stations(cols: list[str], connection, commuting_hours: bool = False) -> pd.DataFrame:
+    def _top_stations(colname: str, _connection, commuting: bool = commuting_hours) -> pd.DataFrame:
+        if commuting:
+            query = f"""
+            SELECT
+                {colname},
+                COUNT(*) AS numero_noleggi
+            FROM bikemi_rentals_before_2019
+            WHERE
+                EXTRACT("dow" FROM data_restituzione) BETWEEN 0 AND 4 AND
+                EXTRACT("hour" FROM data_restituzione) BETWEEN 7 AND 10 OR
+                EXTRACT("hour" FROM data_restituzione) BETWEEN 17 AND 20
+            GROUP BY
+                f{colname}
+            ORDER BY numero_noleggi DESC
+            LIMIT 10;
+            """
 
-top_departure_stations = pd.read_sql(top_departure_stations_query, conn)
+        query = f"""
+            SELECT
+                {colname},
+                COUNT(*) AS numero_noleggi
+            FROM bikemi_rentals_before_2019
+            GROUP BY
+                {colname}
+            ORDER BY numero_noleggi DESC
+            LIMIT 10;
+        """
+        return pd.read_sql(query, _connection)
 
-top_arrival_stations_query = """
-    SELECT
-        nome_stazione_restituzione,
-        COUNT(*) AS numero_noleggi
-    FROM bikemi_rentals_before_2019
-    GROUP BY
-        nome_stazione_restituzione
-    ORDER BY numero_noleggi DESC;
-"""
+    return pd.concat([_top_stations(col, connection) for col in cols], axis=1)
 
-top_arrival_stations = pd.read_sql(top_arrival_stations_query, conn)
 
-pd.concat([top_departure_stations, top_arrival_stations], axis=1).head(10)
+get_top_stations(["nome_stazione_prelievo", "nome_stazione_restituzione"], conn)
 ```
 
 The ranking is basically unchanged if we look only at data from Monday to Friday and within "core" commuting hours (say, from 7 to 10 and from 17 to 20). However, trips towards stations become more frequent and destinations such as Moscova are slightly less popular. Indeed, employees might straight bike to Moscova after work to take a sip from their Negroni.
 
 ```{code-cell} ipython3
-top_departure_stations_query = """
-    SELECT
-        nome_stazione_prelievo,
-        COUNT(*) AS numero_noleggi
-    FROM bikemi_rentals_before_2019
-    WHERE
-        EXTRACT("dow" FROM data_restituzione) BETWEEN 0 AND 4 AND
-        EXTRACT("hour" FROM data_restituzione) BETWEEN 7 AND 10 OR
-        EXTRACT("hour" FROM data_restituzione) BETWEEN 17 AND 20
-    GROUP BY
-        nome_stazione_prelievo
-    ORDER BY numero_noleggi DESC;
-"""
-
-top_departure_stations = pd.read_sql(top_departure_stations_query, conn)
-
-top_arrival_stations_query = """
-    SELECT
-        nome_stazione_restituzione,
-        COUNT(*) AS numero_noleggi
-    FROM bikemi_rentals_before_2019
-    WHERE
-        EXTRACT("dow" FROM data_restituzione) BETWEEN 0 AND 4 AND
-        EXTRACT("hour" FROM data_restituzione) BETWEEN 7 AND 10 OR
-        EXTRACT("hour" FROM data_restituzione) BETWEEN 17 AND 20
-    GROUP BY
-        nome_stazione_restituzione
-    ORDER BY numero_noleggi DESC;
-"""
-
-top_arrival_stations = pd.read_sql(top_arrival_stations_query, conn)
-
-pd.concat([top_departure_stations, top_arrival_stations], axis=1).head(10)
+get_top_stations(["nome_stazione_prelievo", "nome_stazione_restituzione"], conn, commuting_hours=True)
 ```
 
 The behaviour changes if we look ad the individual trips, i.e. if we `GROUP BY` both departure and destination stations (`nome_stazione_prelievo` and `nome_stazione_restituzione`). To be exact, `Coni Zugna Solari` is close to both the station in Porta Genova as well as the Navigli and Darsena, which partly explains its popularity.
 
 ```{code-cell} ipython3
-query = """
-    SELECT
-        nome_stazione_prelievo,
-        nome_stazione_restituzione,
-        COUNT(*) AS numero_noleggi
-    FROM bikemi_rentals_before_2019
-    GROUP BY
-        nome_stazione_prelievo,
-        nome_stazione_restituzione
-    ORDER BY numero_noleggi DESC;
-"""
+def get_top_od(connection, commuting_hours: bool = False) -> pd.DataFrame:
+    if commuting_hours:
+        query = """
+                SELECT
+                    nome_stazione_prelievo,
+                    nome_stazione_restituzione,
+                    COUNT(*) AS numero_noleggi
+                FROM bikemi_rentals_before_2019
+                WHERE
+                    EXTRACT("dow" FROM data_restituzione) BETWEEN 0 AND 4 AND
+                    EXTRACT("hour" FROM data_restituzione) BETWEEN 7 AND 10 OR
+                    EXTRACT("hour" FROM data_restituzione) BETWEEN 17 AND 20
+                GROUP BY
+                    nome_stazione_prelievo,
+                    nome_stazione_restituzione
+                ORDER BY numero_noleggi DESC
+                LIMIT 10;
+            """
 
-trips_rankings = pd.read_sql(query, conn)
+    query = """
+        SELECT
+            nome_stazione_prelievo,
+            nome_stazione_restituzione,
+            COUNT(*) AS numero_noleggi
+        FROM bikemi_rentals_before_2019
+        GROUP BY
+            nome_stazione_prelievo,
+            nome_stazione_restituzione
+        ORDER BY numero_noleggi DESC
+        LIMIT 10;
+    """
 
-trips_rankings.head(10)
+    return pd.read_sql(query, connection)
+
+
+get_top_od(conn)
 ```
 
 The same considerations apply when looking at the top trips only within the "core" commuting hours. This reinforces the conclusion that BikeMi is consistently used for commuting purposes.
 
 ```{code-cell} ipython3
-query = """
-    SELECT
-        nome_stazione_prelievo,
-        nome_stazione_restituzione,
-        COUNT(*) AS numero_noleggi
-    FROM bikemi_rentals_before_2019
-    WHERE
-        EXTRACT("dow" FROM data_restituzione) BETWEEN 0 AND 4 AND
-        EXTRACT("hour" FROM data_restituzione) BETWEEN 7 AND 10 OR
-        EXTRACT("hour" FROM data_restituzione) BETWEEN 17 AND 20
-    GROUP BY
-        nome_stazione_prelievo,
-        nome_stazione_restituzione
-    ORDER BY numero_noleggi DESC;
-"""
-
-trips_rankings_commuting_hours = pd.read_sql(query, conn)
-
-trips_rankings_commuting_hours.head(10)
+get_top_od(conn, commuting_hours=True)
 ```
 
 +++ {"tags": []}
@@ -330,16 +334,16 @@ On its open data portal, the Comune di Milano publishes all sorts of open data -
 ```{code-cell} ipython3
 bikemi_stalls = (
     geopandas.read_file(Path(milan_data / "bikemi-stalls.geo.json"))
-    .filter(["numero", "nome", "zd_attuale", "anno", "geometry"])
-    .rename(columns={
+        .filter(["numero", "nome", "zd_attuale", "anno", "geometry"])
+        .rename(columns={
         "numero": "numero_stazione",
         "zd_attuale": "municipio",
         "geometry": "stalls_geometry"
     })
-    .set_geometry("stalls_geometry")
-    .set_index("numero_stazione")
-    .query("anno < 2019")
-    .astype({"anno": "int"})
+        .set_geometry("stalls_geometry")
+        .set_index("numero_stazione")
+        .query("anno < 2019")
+        .astype({"anno": "int"})
 )
 
 bikemi_stalls.head()
@@ -350,19 +354,22 @@ The data is represented with the (geographic) coordinate reference system (CRS) 
 ```{code-cell} ipython3
 bike_lanes = geopandas.read_file(Path(milan_data / "transports-bike_lanes.geo.json"))
 
-fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-
 bikes_dict = {"color": "firebrick", "marker": "."}
 
-bikemi_stalls.to_crs(3857).plot(ax=ax, **bikes_dict)
-bike_lanes.to_crs(3857).plot(ax=ax)
-cx.add_basemap(ax)
+def plot_stalls_and_bikelanes():
+    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
 
-plt.axis("off")
+    bikemi_stalls.to_crs(3857).plot(ax=ax, **bikes_dict)
+    bike_lanes.to_crs(3857).plot(ax=ax)
+    cx.add_basemap(ax)
 
-plt.title("BikeMi Stalls (Red Dots) and Bike Lanes (Blue)", **title_font)
+    plt.axis("off")
 
-plt.show()
+    plt.title("BikeMi Stalls (Red Dots) and Bike Lanes (Blue)", **title_font)
+
+    plt.show()
+
+plot_stalls_and_bikelanes()
 ```
 
 +++ {"tags": []}
@@ -412,11 +419,13 @@ materialised_view_daily_rentals = """
     );
 """
 
-retrieve_daily_rentals = """
-    SELECT * FROM daily_rentals_all;
-"""
+def retrieve_daily_rentals(connection) -> pd.DataFrame:
+    query = """
+        SELECT * FROM daily_rentals_all;
+    """
+    return pd.read_sql(query, connection).set_index("data_partenza")
 
-daily_rentals = pd.read_sql(retrieve_daily_rentals, conn).set_index("data_partenza")
+daily_rentals = retrieve_daily_rentals(conn)
 ```
 
 Then, we compute the number of null values in the data (`null_obs`), pivot the table to wider format and compute the percentage of missing values in each station (`null_obs`). Using Pandas"`cut()` method, we can convert this numerical column into a categorical variable (`null_obs_ranking`) and choose the number of levels - five, in our case - to split the column into even intervals with.
@@ -426,16 +435,16 @@ obs_number = daily_rentals.index.unique().shape[0]
 
 stations_missing_obs = (
     daily_rentals[[col for col in daily_rentals.columns if "numero_stazione" not in col]]
-    .pivot(columns="stazione_partenza")
-    .replace(0, np.nan)
-    .isna().sum()
-    .sort_values(ascending=False)
-    .pipe(pd.DataFrame)
-    # drop the redundant index
-    .droplevel(0)
-    .rename({0: "null_obs"}, axis=1)
-    # create the % by dividing the number of null values by the length of the datetime idnex
-    .assign(pct_null=lambda x: x.null_obs / obs_number)
+        .pivot(columns="stazione_partenza")
+        .replace(0, np.nan)
+        .isna().sum()
+        .sort_values(ascending=False)
+        .pipe(pd.DataFrame)
+        # drop the redundant index
+        .droplevel(0)
+        .rename({0: "null_obs"}, axis=1)
+        # create the % by dividing the number of null values by the length of the datetime idnex
+        .assign(pct_null=lambda x: x.null_obs / obs_number)
 )
 
 # labels for the categorical variable, assumed to be ascending order
@@ -479,29 +488,33 @@ We can also join this data with the station spatial data to plot them. While thi
 ```{code-cell} ipython3
 bikemi_stalls_nulls = (
     bikemi_stalls
-    .merge(stations_missing_obs, left_on="nome", right_index=True)
+        .merge(stations_missing_obs, left_on="nome", right_index=True)
 )
 
-fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+def plot_stalls_missing_values() -> None:
+    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
 
-(
-    bikemi_stalls_nulls
-    .to_crs(3857)
-    .plot(
-        column="null_obs_ranking",
-        cmap="coolwarm",
-        marker=".",
-        legend=True,
-        ax=ax)
-)
+    (
+        bikemi_stalls_nulls
+            .to_crs(3857)
+            .plot(
+                column="null_obs_ranking",
+                cmap="coolwarm",
+                marker=".",
+                legend=True,
+                ax=ax
+        )
+    )
 
-cx.add_basemap(ax)
+    cx.add_basemap(ax)
 
-plt.axis("off")
+    plt.axis("off")
 
-plt.title("Bikemi Stalls, by Null Values (Low Usage)", **title_font)
+    plt.title("Bikemi Stalls, by Null Values (Low Usage)", **title_font)
 
-plt.show()
+    plt.show()
+
+plot_stalls_missing_values()
 ```
 
 +++ {"tags": []}
@@ -515,22 +528,25 @@ Besides dropping the "emptiest" stations, we should also come up with a way to n
 ```{code-cell} ipython3
 area_c = (
     geopandas
-    .read_file(Path(milan_data / "administrative-area_c.geo.json"))
-    .filter(["tipo", "geometry"])
-    .query("tipo == 'AREA_C'")
+        .read_file(Path(milan_data / "administrative-area_c.geo.json"))
+        .filter(["tipo", "geometry"])
+        .query("tipo == 'AREA_C'")
 )
 
-fig, ax = plt.subplots(figsize=(10, 10))
+def plot_area_c() -> None:
+    fig, ax = plt.subplots(figsize=(10, 10))
 
-area_c.to_crs(3857).plot(ax=ax, cmap="Pastel1", alpha=0.6)
-bikemi_stalls.to_crs(3857).plot(ax=ax, **bikes_dict)
-cx.add_basemap(ax)
+    area_c.to_crs(3857).plot(ax=ax, cmap="Pastel1", alpha=0.6)
+    bikemi_stalls.to_crs(3857).plot(ax=ax, **bikes_dict)
+    cx.add_basemap(ax)
 
-plt.axis("off")
+    plt.axis("off")
 
-plt.title("BikeMi Stalls (dots) and Area C (red)", **title_font)
+    plt.title("BikeMi Stalls (dots) and Area C (red)", **title_font)
 
-plt.show()
+    plt.show()
+
+plot_area_c()
 ```
 
 +++ {"tags": []}
@@ -547,28 +563,28 @@ metro_stations = geopandas.read_file(Path(milan_data / "transports-metro_stops.g
 
 train_stations = (
     geopandas
-    .read_file(Path(milan_data / "transports-train_stations.geo.json"))
-    .rename(str.lower, axis=1)
-    .rename({"geometry": "train_geometry"}, axis=1)
-    .set_geometry("train_geometry")
+        .read_file(Path(milan_data / "transports-train_stations.geo.json"))
+        .rename(str.lower, axis=1)
+        .rename({"geometry": "train_geometry"}, axis=1)
+        .set_geometry("train_geometry")
 )
 
 municipi = (
     geopandas
-    .read_file(Path(milan_data / "administrative-municipi.geo.json"))
-    .rename(str.lower, axis=1)
-    .filter(["geometry", "municipio"])
-    .rename({"geometry": "municipi_geometry"}, axis=1)
-    .set_geometry("municipi_geometry")
+        .read_file(Path(milan_data / "administrative-municipi.geo.json"))
+        .rename(str.lower, axis=1)
+        .filter(["geometry", "municipio"])
+        .rename({"geometry": "municipi_geometry"}, axis=1)
+        .set_geometry("municipi_geometry")
 )
 
 nil = (
     geopandas
-    .read_file(Path(milan_data / "administrative-nil.geo.json"))
-    .rename(str.lower, axis=1)
-    .filter(["id_nil", "nil", "geometry"])
-    .rename({"geometry": "nil_geometry"}, axis=1)
-    .set_geometry("nil_geometry")
+        .read_file(Path(milan_data / "administrative-nil.geo.json"))
+        .rename(str.lower, axis=1)
+        .filter(["id_nil", "nil", "geometry"])
+        .rename({"geometry": "nil_geometry"}, axis=1)
+        .set_geometry("nil_geometry")
 )
 
 milan = municipi.dissolve().rename({"municipio": "milano"}, axis=1)
@@ -580,90 +596,101 @@ milan_metro_stations = metro_stations.sjoin(milan)
 
 area_circonvallazione = geopandas.read_file(Path(milan_data / "custom-area_circonvallazione.geo.json"))
 
-fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-
 trains_dict = {"color": "tab:blue", "marker": "X"}
 metro_dict = {"color": "rebeccapurple", "marker": "^"}
 
-nil.to_crs(3857).plot(ax=ax, alpha=0.2)
-area_circonvallazione.to_crs(3857).plot(ax=ax, color="mediumseagreen", alpha=0.4)
-milan_train_stations.to_crs(3857).plot(ax=ax, **trains_dict)
-milan_metro_stations.to_crs(3857).plot(ax=ax, **metro_dict)
-cx.add_basemap(ax)
+def plot_stations() -> None:
 
-plt.axis("off")
+    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+    nil.to_crs(3857).plot(ax=ax, alpha=0.2)
+    area_circonvallazione.to_crs(3857).plot(ax=ax, color="mediumseagreen", alpha=0.4)
+    milan_train_stations.to_crs(3857).plot(ax=ax, **trains_dict)
+    milan_metro_stations.to_crs(3857).plot(ax=ax, **metro_dict)
+    cx.add_basemap(ax)
 
-plt.title("Train Stations (Blue) and Metro Stations (Orange) in Milan", **title_font)
+    plt.axis("off")
 
-plt.show()
+    plt.title("Train Stations (Blue) and Metro Stations (Orange) in Milan", **title_font)
+
+    plt.show()
+
+plot_stations()
 ```
 
 This leaves us with the following stations, which we store as a `.csv` file and then upload into our local PostgreSQL database with a Bash script.
 
 ```{code-cell} ipython3
-train_stations_circ = (
-    train_stations
-    .to_crs(4326)
-    .sjoin(area_circonvallazione)
-    .drop("index_right", axis=1)
-)
-
-metro_stations_circ = (
-    metro_stations
-    .sjoin(area_circonvallazione)
-    .drop("index_right", axis=1)
-)
-
-bikemi_stalls_circ = (
+all_stalls: geopandas.GeoDataFrame = (
     bikemi_stalls_nulls
-    # select only the stations with low null values
-    .query("null_obs_ranking == 'very_low'")
-    .sjoin(area_circonvallazione)
+    .sjoin(nil)
+    .sort_values("numero_stazione")
     .drop("index_right", axis=1)
+    .filter(["nome", "stalls_geometry", "anno", "null_obs_ranking", "nil", "id_nil", "municipio"])
+    .rename(columns={"nome": "nome_stazione"})
 )
 
-# plot the resulting data
-fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-
-train_stations_circ.to_crs(3857).plot(ax=ax, **trains_dict)
-metro_stations_circ.to_crs(3857).plot(ax=ax, **metro_dict)
-bikemi_stalls_circ.to_crs(3857).plot(ax=ax, **bikes_dict)
-cx.add_basemap(ax)
-
-plt.axis("off")
-
-plt.title("BikeMi Stalls and Stations Inside the Circonvallazione", **title_font)
-
-plt.show()
+selected_stalls: geopandas.GeoDataFrame = (
+    all_stalls
+        .query("null_obs_ranking == 'very_low'")
+        .sjoin(area_circonvallazione)
+        .drop("index_right", axis=1)
+)
 ```
 
 ```{code-cell} ipython3
-bikemi_stalls_circ.geometry.x
+---
+pycharm:
+  name: '#%%
+
+    '
+---
+train_stations_circ: geopandas.GeoDataFrame = (
+    train_stations
+        .to_crs(4326)
+        .sjoin(area_circonvallazione)
+        .drop("index_right", axis=1)
+)
+
+metro_stations_circ: geopandas.GeoDataFrame = (
+    metro_stations
+        .sjoin(area_circonvallazione)
+        .drop("index_right", axis=1)
+)
+
+
+
+def plot_final_data() -> None:
+    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+
+    train_stations_circ.to_crs(3857).plot(ax=ax, **trains_dict)
+    metro_stations_circ.to_crs(3857).plot(ax=ax, **metro_dict)
+    selected_stalls.to_crs(3857).plot(ax=ax, **bikes_dict)
+    cx.add_basemap(ax)
+
+    plt.axis("off")
+
+    plt.title("BikeMi Stalls and Stations Inside the Circonvallazione", **title_font)
+
+    plt.show()
+
+plot_final_data()
 ```
 
 ```{code-cell} ipython3
+---
+pycharm:
+  name: '#%%
+
+    '
+---
 def unpack_geometry(data: geopandas.GeoDataFrame) -> pd.DataFrame:
-    
     df = data.copy()
-    
+
     df["longitudine"] = df.geometry.x
     df["latitudine"] = df.geometry.y
-    
-    df[[col for col in df.columns if col not in df.geometry]]
-    
-    return df
 
-# nils_circ = nil.sjoin(area_circonvallazione)
-bikemi_stalls_final = (
-    bikemi_stalls_circ
-    .sjoin(nil, how="left")
-    .sort_values("numero_stazione")
-    .pipe(unpack_geometry)
-    .rename(columns={"nome": "nome_stazione"})
-    .filter(["nome_stazione", "longitudine", "latitudine", "anno", "nil", "id_nil", "municipio"])
-)
+    return df[[col for col in df.columns if col not in "stalls_geometry"]]
 
-bikemi_stalls_final.head()
-
-bikemi_stalls_final.to_csv(Path(milan_data / "bikemi-selected_stalls.csv"))
+all_stalls.pipe(unpack_geometry).to_csv(milan_data / "bikemi-stalls-with_nils.csv")
+selected_stalls.pipe(unpack_geometry).to_csv(milan_data / "bikemi-selected_stalls-with_nils.csv")
 ```

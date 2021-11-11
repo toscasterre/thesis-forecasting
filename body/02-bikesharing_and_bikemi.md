@@ -5,11 +5,11 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.10.3
+    jupytext_version: 1.11.5
 kernelspec:
-  display_name: Bike Sharing Forecasting
+  display_name: PyCharm (tesi)
   language: python
-  name: bikemi
+  name: pycharm-dd017f2c
 ---
 
 # Bike Sharing and BikeMi: A Literature Review
