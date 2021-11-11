@@ -46,7 +46,7 @@ plt.rcParams["figure.dpi"] = 100
 title_font = {"fontname": "DejaVu Sans Mono"}
 
 # create paths
-milan_data = Path("../datai/milan")
+milan_data = Path("../data/milan")
 
 # establish connection with the database
 conn = psycopg2.connect("dbname=bikemi user=luca")
@@ -58,11 +58,18 @@ conn = psycopg2.connect("dbname=bikemi user=luca")
 
 +++
 
-The data was made available thanks to a partnership established by Prof. Giancarlo Manzi of the University of Milan and Clear Channel Italia, the provider of the service. The data is comprised of all the individual trips performed by each client (`cliente_anonimizzato`). This includes the bike type (which can either be a regular bike or an electric bike), the bike identifier, the station of departure and arrival with the time, the duration of the trip `durata_noleggio` plus the total travel distance. We do not know how the total travel distance `distanza_totale` is computed.
+The data was made available thanks to a partnership established by Prof. Giancarlo Manzi of the University of Milan and Clear Channel Italia, the provider of the service. The data is comprised of all the individual trips performed by each client (`cliente_anonimizzato`). This includes the bike type (which can either be a regular bike or an electric bike), the bike identifier, the station of departure and arrival with the time, the duration of the trip `durata_noleggio` plus the total travel distance. We do not know how the total travel distance `distanza_totale` is computed. Here are a selection of fields for the first five rows of the source data (time features are rounded to the daily level to fit into the page):
 
 ```{code-cell} ipython3
 query = """
-    SELECT *
+    SELECT
+        bici,
+        tipo_bici,
+        cliente_anonimizzato,
+        DATE_TRUNC('day', data_prelievo)::date AS giorno_prelievo,
+        nome_stazione_prelievo,
+        DATE_TRUNC('day', data_restituzione)::date AS giorno_restituzione,
+        nome_stazione_restituzione
     FROM bikemi_source_data
     LIMIT 5;
 """
@@ -107,7 +114,7 @@ In addition to selecting only trips from June 2015 to June 2018, we also disrega
 
 ```{code-cell} ipython3
 query = """
-    CREATE MATERIALIZED VIEW IF NOT EXISTS bikemi_rentals AS (
+    CREATE MATERIALIZED VIEW IF NOT EXISTS bikemi_rentals_before_2019 AS (
         SELECT
             b.tipo_bici,
             b.cliente_anonimizzato,
@@ -134,7 +141,7 @@ query = """
 query = """
     SELECT
         COUNT(DISTINCT cliente_anonimizzato)
-    FROM bikemi_rentals;
+    FROM bikemi_rentals_before_2019;
     """
 
 pd.read_sql(query, conn)
@@ -147,7 +154,7 @@ query = """
     SELECT
         EXTRACT("year" FROM data_prelievo) AS anno,
         COUNT(DISTINCT cliente_anonimizzato)
-    FROM bikemi_rentals
+    FROM bikemi_rentals_before_2019
     GROUP BY EXTRACT("year" FROM data_prelievo);
     """
 
@@ -163,7 +170,7 @@ query = """
     SELECT
         cliente_anonimizzato,
         COUNT(*) AS noleggi_totali
-    FROM bikemi_rentals b
+    FROM bikemi_rentals_before_2019 b
     GROUP BY
         cliente_anonimizzato
     ORDER BY noleggi_totali DESC
@@ -182,7 +189,7 @@ query = """
         cliente_anonimizzato,
         COUNT(*) AS noleggi_totali,
         EXTRACT("year" FROM data_prelievo) AS anno
-    FROM bikemi_rentals b
+    FROM bikemi_rentals_before_2019 b
     GROUP BY
         cliente_anonimizzato,
         EXTRACT("year" FROM data_prelievo)
@@ -207,7 +214,7 @@ top_departure_stations_query = """
     SELECT
         nome_stazione_prelievo,
         COUNT(*) AS numero_noleggi
-    FROM bikemi_rentals
+    FROM bikemi_rentals_before_2019
     GROUP BY
         nome_stazione_prelievo
     ORDER BY numero_noleggi DESC;
@@ -219,7 +226,7 @@ top_arrival_stations_query = """
     SELECT
         nome_stazione_restituzione,
         COUNT(*) AS numero_noleggi
-    FROM bikemi_rentals
+    FROM bikemi_rentals_before_2019
     GROUP BY
         nome_stazione_restituzione
     ORDER BY numero_noleggi DESC;
@@ -237,7 +244,7 @@ top_departure_stations_query = """
     SELECT
         nome_stazione_prelievo,
         COUNT(*) AS numero_noleggi
-    FROM bikemi_rentals
+    FROM bikemi_rentals_before_2019
     WHERE
         EXTRACT("dow" FROM data_restituzione) BETWEEN 0 AND 4 AND
         EXTRACT("hour" FROM data_restituzione) BETWEEN 7 AND 10 OR
@@ -253,7 +260,7 @@ top_arrival_stations_query = """
     SELECT
         nome_stazione_restituzione,
         COUNT(*) AS numero_noleggi
-    FROM bikemi_rentals
+    FROM bikemi_rentals_before_2019
     WHERE
         EXTRACT("dow" FROM data_restituzione) BETWEEN 0 AND 4 AND
         EXTRACT("hour" FROM data_restituzione) BETWEEN 7 AND 10 OR
@@ -274,16 +281,12 @@ The behaviour changes if we look ad the individual trips, i.e. if we `GROUP BY` 
 query = """
     SELECT
         nome_stazione_prelievo,
-        numero_stazione_prelievo,
         nome_stazione_restituzione,
-        numero_stazione_restituzione,
         COUNT(*) AS numero_noleggi
-    FROM bikemi_rentals
+    FROM bikemi_rentals_before_2019
     GROUP BY
         nome_stazione_prelievo,
-        numero_stazione_prelievo,
-        nome_stazione_restituzione,
-        numero_stazione_restituzione
+        nome_stazione_restituzione
     ORDER BY numero_noleggi DESC;
 """
 
@@ -292,26 +295,22 @@ trips_rankings = pd.read_sql(query, conn)
 trips_rankings.head(10)
 ```
 
-The same considerations apply when looking at the commuting hours:
+The same considerations apply when looking at the top trips only within the "core" commuting hours. This reinforces the conclusion that BikeMi is consistently used for commuting purposes.
 
 ```{code-cell} ipython3
 query = """
     SELECT
         nome_stazione_prelievo,
-        numero_stazione_prelievo,
         nome_stazione_restituzione,
-        numero_stazione_restituzione,
         COUNT(*) AS numero_noleggi
-    FROM bikemi_rentals
+    FROM bikemi_rentals_before_2019
     WHERE
         EXTRACT("dow" FROM data_restituzione) BETWEEN 0 AND 4 AND
         EXTRACT("hour" FROM data_restituzione) BETWEEN 7 AND 10 OR
         EXTRACT("hour" FROM data_restituzione) BETWEEN 17 AND 20
     GROUP BY
         nome_stazione_prelievo,
-        numero_stazione_prelievo,
-        nome_stazione_restituzione,
-        numero_stazione_restituzione
+        nome_stazione_restituzione
     ORDER BY numero_noleggi DESC;
 """
 
@@ -319,8 +318,6 @@ trips_rankings_commuting_hours = pd.read_sql(query, conn)
 
 trips_rankings_commuting_hours.head(10)
 ```
-
-This reinforces the conclusion that BikeMi is consistently used for commuting purposes. However, this data can be better explored including its spatial representation.
 
 +++ {"tags": []}
 
@@ -382,36 +379,41 @@ We start by creating another two `materialised views` with the daily and hourly 
 # query with cross join used to create the second materialised view
 # another similar one is used to create the view for hourly observations
 materialised_view_daily_rentals = """
-    WITH cross_table AS (SELECT
-        d.date AS data_partenza,
-        s.nome AS stazione_partenza,
-        s.numero_stazione
-    FROM bikemi_stalls s
-    CROSS JOIN (
-       SELECT generate_series (timestamp "2015-06-01"
-                             , timestamp "2018-06-01"
-                             , interval  "1 day")::date
-       ) d(date)
-    ORDER BY nome, date ASC)
+    DROP TABLE IF EXISTS daily_rentals_all;
+    
+    CREATE MATERIALIZED VIEW IF NOT EXISTS daily_rentals_before_2019 AS (
+    
+        WITH cross_table AS (SELECT
+            d.date AS data_partenza,
+            s.nome AS stazione_partenza,
+            s.numero_stazione
+        FROM bikemi_stalls s
+        CROSS JOIN (
+           SELECT generate_series (timestamp "2015-06-01"
+                                 , timestamp "2018-06-01"
+                                 , interval  "1 day")::date
+           ) d(date)
+        ORDER BY nome, date ASC)
 
-    SELECT
-        c.data_partenza,
-        c.stazione_partenza,
-        c.numero_stazione,
-        COUNT(b.*) AS noleggi_giornalieri
-    FROM cross_table c
-    LEFT JOIN bikemi_rentals b
-        ON b.numero_stazione_prelievo = c.numero_stazione
-        AND DATE_TRUNC("day", b.data_prelievo)::date = c.data_partenza
-    GROUP BY
-        c.data_partenza,
-        c.stazione_partenza,
-        c.numero_stazione
-    ORDER BY stazione_partenza, data_partenza ASC;
+        SELECT
+            c.data_partenza,
+            c.stazione_partenza,
+            c.numero_stazione,
+            COUNT(b.*) AS noleggi_giornalieri
+        FROM cross_table c
+        LEFT JOIN bikemi_rentals_before_2019 b
+            ON b.numero_stazione_prelievo = c.numero_stazione
+            AND DATE_TRUNC("day", b.data_prelievo)::date = c.data_partenza
+        GROUP BY
+            c.data_partenza,
+            c.stazione_partenza,
+            c.numero_stazione
+        ORDER BY stazione_partenza, data_partenza ASC
+    );
 """
 
 retrieve_daily_rentals = """
-    SELECT * FROM daily_rentals;
+    SELECT * FROM daily_rentals_all;
 """
 
 daily_rentals = pd.read_sql(retrieve_daily_rentals, conn).set_index("data_partenza")
@@ -636,13 +638,32 @@ plt.show()
 ```
 
 ```{code-cell} ipython3
+bikemi_stalls_circ.geometry.x
+```
+
+```{code-cell} ipython3
+def unpack_geometry(data: geopandas.GeoDataFrame) -> pd.DataFrame:
+    
+    df = data.copy()
+    
+    df["longitudine"] = df.geometry.x
+    df["latitudine"] = df.geometry.y
+    
+    df[[col for col in df.columns if col not in df.geometry]]
+    
+    return df
+
 # nils_circ = nil.sjoin(area_circonvallazione)
 bikemi_stalls_final = (
     bikemi_stalls_circ
     .sjoin(nil, how="left")
     .sort_values("numero_stazione")
-    [["nome", "stalls_geometry", "anno", "nil", "id_nil", "municipio"]]
+    .pipe(unpack_geometry)
+    .rename(columns={"nome": "nome_stazione"})
+    .filter(["nome_stazione", "longitudine", "latitudine", "anno", "nil", "id_nil", "municipio"])
 )
+
+bikemi_stalls_final.head()
 
 bikemi_stalls_final.to_csv(Path(milan_data / "bikemi-selected_stalls.csv"))
 ```
