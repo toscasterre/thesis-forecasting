@@ -84,7 +84,7 @@
         
 
 \title{A Comparison of Forecasting Techniques in Bike Sharing Services}
-\date{Nov 11, 2021}
+\date{Nov 12, 2021}
 \release{}
 \author{Luca Baggi}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -329,48 +329,6 @@ Through spatial analysis, the researchers confirm that traffic flows from the pe
 
 \chapter{BikeMi Data}
 \label{\detokenize{03-data_ingestion_and_spatial_operations:bikemi-data}}\label{\detokenize{03-data_ingestion_and_spatial_operations::doc}}
-\begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{} path manipulation}
-\PYG{k+kn}{from} \PYG{n+nn}{pathlib} \PYG{k+kn}{import} \PYG{n}{Path}
-
-\PYG{c+c1}{\PYGZsh{} data manipulation}
-\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
-\PYG{k+kn}{import} \PYG{n+nn}{pandas} \PYG{k}{as} \PYG{n+nn}{pd}
-\PYG{k+kn}{import} \PYG{n+nn}{geopandas}
-
-\PYG{c+c1}{\PYGZsh{} plotting}
-\PYG{k+kn}{import} \PYG{n+nn}{matplotlib}\PYG{n+nn}{.}\PYG{n+nn}{pyplot} \PYG{k}{as} \PYG{n+nn}{plt}
-\PYG{k+kn}{import} \PYG{n+nn}{contextily} \PYG{k}{as} \PYG{n+nn}{cx}
-\PYG{k+kn}{import} \PYG{n+nn}{seaborn} \PYG{k}{as} \PYG{n+nn}{sns}
-
-\PYG{c+c1}{\PYGZsh{} connecting to the local database with the data}
-\PYG{k+kn}{import} \PYG{n+nn}{psycopg2}
-
-\PYG{c+c1}{\PYGZsh{} to use pandas dtypes in matplotlib plots}
-\PYG{k+kn}{from} \PYG{n+nn}{pandas}\PYG{n+nn}{.}\PYG{n+nn}{plotting} \PYG{k+kn}{import} \PYG{n}{register\PYGZus{}matplotlib\PYGZus{}converters}
-
-\PYG{n}{register\PYGZus{}matplotlib\PYGZus{}converters}\PYG{p}{(}\PYG{p}{)}
-
-\PYG{c+c1}{\PYGZsh{} set settings for seaborn}
-\PYG{n}{sns}\PYG{o}{.}\PYG{n}{set\PYGZus{}style}\PYG{p}{(}\PYG{n}{style}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{whitegrid}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{rc}\PYG{o}{=}\PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{grid.color}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{.9}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}
-\PYG{n}{sns}\PYG{o}{.}\PYG{n}{set\PYGZus{}palette}\PYG{p}{(}\PYG{n}{palette}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{deep}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-\PYG{c+c1}{\PYGZsh{} customise matplotlib and sns plot dimensions}
-\PYG{n}{plt}\PYG{o}{.}\PYG{n}{rcParams}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{figure.figsize}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{12}\PYG{p}{,} \PYG{l+m+mi}{6}\PYG{p}{]}
-\PYG{n}{plt}\PYG{o}{.}\PYG{n}{rcParams}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{figure.dpi}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{100}
-\PYG{n}{title\PYGZus{}font} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fontname}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{DejaVu Sans Mono}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}
-
-\PYG{c+c1}{\PYGZsh{} create paths}
-\PYG{n}{milan\PYGZus{}data} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{../data/milan}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-\PYG{c+c1}{\PYGZsh{} establish connection with the database}
-\PYG{n}{conn} \PYG{o}{=} \PYG{n}{psycopg2}\PYG{o}{.}\PYG{n}{connect}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{dbname=bikemi user=luca}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{sphinxuseclass}
-\end{sphinxuseclass}
 
 \section{Data Ingestion}
 \label{\detokenize{03-data_ingestion_and_spatial_operations:data-ingestion}}
@@ -378,29 +336,7 @@ Through spatial analysis, the researchers confirm that traffic flows from the pe
 The data was made available thanks to a partnership established by Prof. Giancarlo Manzi of the University of Milan and Clear Channel Italia, the provider of the service. The data is comprised of all the individual trips performed by each client (\sphinxcode{\sphinxupquote{cliente\_anonimizzato}}). This includes the bike type (which can either be a regular bike or an electric bike), the bike identifier, the station of departure and arrival with the time, the duration of the trip \sphinxcode{\sphinxupquote{durata\_noleggio}} plus the total travel distance. We do not know how the total travel distance \sphinxcode{\sphinxupquote{distanza\_totale}} is computed. Here are a selection of fields for the first five rows of the source data (time features are rounded to the daily level to fit into the page):
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k}{def} \PYG{n+nf}{show\PYGZus{}data\PYGZus{}sample}\PYG{p}{(}\PYG{n}{connection}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{:}
-    \PYG{n}{query} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{        SELECT}
-\PYG{l+s+s2}{            bici,}
-\PYG{l+s+s2}{            tipo\PYGZus{}bici,}
-\PYG{l+s+s2}{            cliente\PYGZus{}anonimizzato,}
-\PYG{l+s+s2}{            DATE\PYGZus{}TRUNC(}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{day}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{, data\PYGZus{}prelievo)::date AS giorno\PYGZus{}prelievo,}
-\PYG{l+s+s2}{            nome\PYGZus{}stazione\PYGZus{}prelievo,}
-\PYG{l+s+s2}{            DATE\PYGZus{}TRUNC(}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{day}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{, data\PYGZus{}restituzione)::date AS giorno\PYGZus{}restituzione,}
-\PYG{l+s+s2}{            nome\PYGZus{}stazione\PYGZus{}restituzione}
-\PYG{l+s+s2}{        FROM bikemi\PYGZus{}source\PYGZus{}data}
-\PYG{l+s+s2}{        LIMIT 5;}
-\PYG{l+s+s2}{    }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-
-    \PYG{k}{return} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}sql}\PYG{p}{(}\PYG{n}{query}\PYG{p}{,} \PYG{n}{connection}\PYG{p}{)}
-
-
-\PYG{n}{show\PYGZus{}data\PYGZus{}sample}\PYG{p}{(}\PYG{n}{conn}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{sphinxuseclass}
+\begin{sphinxuseclass}{tag_hide-input}
 \begin{sphinxuseclass}{cell_output}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
     bici tipo\PYGZus{}bici  cliente\PYGZus{}anonimizzato giorno\PYGZus{}prelievo  \PYGZbs{}
@@ -420,6 +356,7 @@ The data was made available thanks to a partnership established by Prof. Giancar
 
 \end{sphinxuseclass}
 \end{sphinxuseclass}
+\end{sphinxuseclass}
 \sphinxAtStartPar
 The data available ranges from the first of June, 2015, to the first of October, 2020, totalling to 15.842.891 observations. Data was made available in Excel spreadsheets, following the \sphinxhref{https://docs.microsoft.com/en-us/openspecs/office\_standards/ms-xlsx/f780b2d6-8252-4074-9fe3-5d7bc4830968}{Office Open XML SpreadsheetML File Format} (the \sphinxcode{\sphinxupquote{.xlsx}} file format). Python”s Pandas library has methods to read \sphinxcode{\sphinxupquote{.xlsx}} files; however, given how big these files are, data manipulation would have proven unfeasible.
 
@@ -433,24 +370,7 @@ The Rust port of \sphinxcode{\sphinxupquote{csvkit}} is called \sphinxhref{https
 Finally, \sphinxcode{\sphinxupquote{psql}} (PostgreSQL”s command line utility) was used to upload the “clean” data into a local database instance. PostgreSQL was also used to perform basic survey statistics, like computing the number of rows, and data aggregation (such as counting the number of observations by year). Looking at the frequency tables by year, there appears to be an oddly small number of observations from 2018. This is because there is indeed missing data from June 2018 until the end of the year. For this reason, we chose to work only with data from June 2015 to the end of May 2018.
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k}{def} \PYG{n+nf}{count\PYGZus{}users\PYGZus{}by\PYGZus{}year}\PYG{p}{(}\PYG{n}{connection}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{:}
-    \PYG{n}{query} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{        SELECT}
-\PYG{l+s+s2}{            EXTRACT(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{year}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ FROM b.data\PYGZus{}prelievo) AS date,}
-\PYG{l+s+s2}{            COUNT(b.bici)}
-\PYG{l+s+s2}{        FROM bikemi\PYGZus{}source\PYGZus{}data b}
-\PYG{l+s+s2}{        GROUP BY EXTRACT(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{year}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ FROM b.data\PYGZus{}prelievo);}
-\PYG{l+s+s2}{    }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-
-    \PYG{k}{return} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}sql}\PYG{p}{(}\PYG{n}{query}\PYG{p}{,} \PYG{n}{connection}\PYG{p}{)}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{int}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{set\PYGZus{}index}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{date}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-
-\PYG{n}{count\PYGZus{}users\PYGZus{}by\PYGZus{}year}\PYG{p}{(}\PYG{n}{conn}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{sphinxuseclass}
+\begin{sphinxuseclass}{tag_hide-input}
 \begin{sphinxuseclass}{cell_output}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
         count
@@ -465,60 +385,48 @@ date
 
 \end{sphinxuseclass}
 \end{sphinxuseclass}
+\end{sphinxuseclass}
 
 \section{Data Analysis}
 \label{\detokenize{03-data_ingestion_and_spatial_operations:data-analysis}}
-
-\subsection{Remove Outliers and Select the Time Span}
-\label{\detokenize{03-data_ingestion_and_spatial_operations:remove-outliers-and-select-the-time-span}}
 \sphinxAtStartPar
-In addition to selecting only trips from June 2015 to June 2018, we also disregard all rentals whose duration is smaller than one minute \sphinxhyphen{} as previously done in the literature. This leaves us with more than 11,7 million observations. We store these in a \sphinxhref{https://www.postgresql.org/docs/current/sql-creatematerializedview.html}{materialised view}:
+In addition to selecting only trips from June 2015 to June 2018, we also disregard all rentals whose duration is smaller than one minute (around 4000) \sphinxhyphen{} as previously done in the literature (Toro et al., 2020). This leaves us with more than 11,7 million observations. We will temporarily store these in a \sphinxhref{https://www.postgresql.org/docs/current/sql-creatematerializedview.html}{materialised view}, that we will drop at the end of the data analysis.
 
-\begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{materialized\PYGZus{}view\PYGZus{}query} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{    CREATE MATERIALIZED VIEW IF NOT EXISTS bikemi\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019 AS (}
-\PYG{l+s+s2}{        SELECT}
-\PYG{l+s+s2}{            b.tipo\PYGZus{}bici,}
-\PYG{l+s+s2}{            b.cliente\PYGZus{}anonimizzato,}
-\PYG{l+s+s2}{            DATE\PYGZus{}TRUNC(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{second}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{, b.data\PYGZus{}prelievo) AS data\PYGZus{}prelievo,}
-\PYG{l+s+s2}{            b.numero\PYGZus{}stazione\PYGZus{}prelievo,}
-\PYG{l+s+s2}{            b.nome\PYGZus{}stazione\PYGZus{}prelievo,}
-\PYG{l+s+s2}{            DATE\PYGZus{}TRUNC(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{second}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{, b.data\PYGZus{}restituzione) AS data\PYGZus{}restituzione,}
-\PYG{l+s+s2}{            b.numero\PYGZus{}stazione\PYGZus{}restituzione,}
-\PYG{l+s+s2}{            b.nome\PYGZus{}stazione\PYGZus{}restituzione,}
-\PYG{l+s+s2}{            b.durata\PYGZus{}noleggio}
-\PYG{l+s+s2}{        FROM bikemi\PYGZus{}source\PYGZus{}data b}
-\PYG{l+s+s2}{        WHERE}
-\PYG{l+s+s2}{            EXTRACT(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{year}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ FROM b.data\PYGZus{}restituzione) \PYGZlt{} 2019 AND}
-\PYG{l+s+s2}{            durata\PYGZus{}noleggio \PYGZgt{} interval }\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{1 minute}\PYG{l+s+s2}{\PYGZdq{}}
-\PYG{l+s+s2}{    );}
-\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{k}{def} \PYG{n+nf}{create\PYGZus{}materialised\PYGZus{}view}\PYG{p}{(}\PYG{n}{connection}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{k+kc}{None}\PYG{p}{:}
+
+    \PYG{n}{query\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019}\PYG{p}{:} \PYG{n+nb}{str} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+s2}{        CREATE MATERIALIZED VIEW IF NOT EXISTS bikemi\PYGZus{}rentals.bikemi\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019 AS}
+\PYG{l+s+s2}{        (}
+\PYG{l+s+s2}{        SELECT b.bici,}
+\PYG{l+s+s2}{               b.tipo\PYGZus{}bici,}
+\PYG{l+s+s2}{               b.cliente\PYGZus{}anonimizzato,}
+\PYG{l+s+s2}{               DATE\PYGZus{}TRUNC(}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{second}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{, b.data\PYGZus{}prelievo)     AS data\PYGZus{}prelievo,}
+\PYG{l+s+s2}{               b.numero\PYGZus{}stazione\PYGZus{}prelievo,}
+\PYG{l+s+s2}{               b.nome\PYGZus{}stazione\PYGZus{}prelievo,}
+\PYG{l+s+s2}{               DATE\PYGZus{}TRUNC(}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{second}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{, b.data\PYGZus{}restituzione) AS data\PYGZus{}restituzione,}
+\PYG{l+s+s2}{               b.numero\PYGZus{}stazione\PYGZus{}restituzione,}
+\PYG{l+s+s2}{               b.nome\PYGZus{}stazione\PYGZus{}restituzione,}
+\PYG{l+s+s2}{               b.durata\PYGZus{}noleggio}
+\PYG{l+s+s2}{        FROM bikemi\PYGZus{}rentals.bikemi\PYGZus{}source\PYGZus{}data b}
+\PYG{l+s+s2}{        WHERE EXTRACT(}
+\PYG{l+s+s2}{                      }\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{year}\PYG{l+s+s2}{\PYGZsq{}}
+\PYG{l+s+s2}{                      FROM b.data\PYGZus{}restituzione}
+\PYG{l+s+s2}{                  ) \PYGZlt{} 2019}
+\PYG{l+s+s2}{          AND durata\PYGZus{}noleggio \PYGZgt{} interval }\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{1 minute}\PYG{l+s+s2}{\PYGZsq{}}
+\PYG{l+s+s2}{            );}
+\PYG{l+s+s2}{    }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+
+    \PYG{k}{with} \PYG{n}{connection}\PYG{p}{:}
+        \PYG{k}{with} \PYG{n}{connection}\PYG{o}{.}\PYG{n}{cursor}\PYG{p}{(}\PYG{p}{)} \PYG{k}{as} \PYG{n}{cursor}\PYG{p}{:}
+            \PYG{n}{cursor}\PYG{o}{.}\PYG{n}{execute}\PYG{p}{(}\PYG{n}{query\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019}\PYG{p}{)}
 \end{sphinxVerbatim}
 
-\end{sphinxuseclass}
-\end{sphinxuseclass}
+\sphinxAtStartPar
+The service has almost two\sphinxhyphen{}hundred thousands unique subscribers in the time period. For the years 2016 and 2017, the only ones for which we have complete data, the number of subscribers is almost a hundred thousand. By lookind at the unique subscribers for the other two years, it might seem that the number of subscribers in the second half of the year is higher.
 
-\subsection{Top Users and Commuting Habits}
-\label{\detokenize{03-data_ingestion_and_spatial_operations:top-users-and-commuting-habits}}
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k}{def} \PYG{n+nf}{count\PYGZus{}distinct\PYGZus{}users}\PYG{p}{(}\PYG{n}{connection}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{:}
-    \PYG{n}{query} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{        SELECT}
-\PYG{l+s+s2}{            COUNT(DISTINCT cliente\PYGZus{}anonimizzato)}
-\PYG{l+s+s2}{        FROM bikemi\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019;}
-\PYG{l+s+s2}{        }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-
-    \PYG{k}{return} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}sql}\PYG{p}{(}\PYG{n}{query}\PYG{p}{,} \PYG{n}{connection}\PYG{p}{)}
-
-
-\PYG{n}{count\PYGZus{}distinct\PYGZus{}users}\PYG{p}{(}\PYG{n}{conn}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{sphinxuseclass}
+\begin{sphinxuseclass}{tag_hide-input}
 \begin{sphinxuseclass}{cell_output}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
     count
@@ -527,27 +435,9 @@ In addition to selecting only trips from June 2015 to June 2018, we also disrega
 
 \end{sphinxuseclass}
 \end{sphinxuseclass}
-\sphinxAtStartPar
-The service has almost 200 thousands unique subscribers in the time period. Then breakdown by year is the following:
-
-\begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k}{def} \PYG{n+nf}{count\PYGZus{}users\PYGZus{}by\PYGZus{}year}\PYG{p}{(}\PYG{n}{connection}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{:}
-    \PYG{n}{query} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{    SELECT}
-\PYG{l+s+s2}{        EXTRACT(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{year}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ FROM data\PYGZus{}prelievo) AS anno,}
-\PYG{l+s+s2}{        COUNT(DISTINCT cliente\PYGZus{}anonimizzato)}
-\PYG{l+s+s2}{    FROM bikemi\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019}
-\PYG{l+s+s2}{    GROUP BY EXTRACT(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{year}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ FROM data\PYGZus{}prelievo);}
-\PYG{l+s+s2}{    }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-    \PYG{k}{return} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}sql}\PYG{p}{(}\PYG{n}{query}\PYG{p}{,} \PYG{n}{connection}\PYG{p}{)}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{anno}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{int}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{set\PYGZus{}index}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{anno}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-
-\PYG{n}{count\PYGZus{}users\PYGZus{}by\PYGZus{}year}\PYG{p}{(}\PYG{n}{conn}\PYG{p}{)}
-\end{sphinxVerbatim}
-
 \end{sphinxuseclass}
+\begin{sphinxuseclass}{cell}
+\begin{sphinxuseclass}{tag_hide-input}
 \begin{sphinxuseclass}{cell_output}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
       count
@@ -560,79 +450,12 @@ anno
 
 \end{sphinxuseclass}
 \end{sphinxuseclass}
+\end{sphinxuseclass}
 \sphinxAtStartPar
-The number of subscriptions is declining in 2015 and 2018, as there are observations for six months only. In particular, for the year 2018 the count is even lower because the autumn/winter months are missing.
-
-\sphinxAtStartPar
-It is also interesting to look at the top users:
+It is also of interest to look at the number of rentals of each user, broken down by year. As expected, there are more observations from the years 2016 and 2017 as these are complete years. The great number of usage translates to an average of almost 4 trips per day \sphinxhyphen{} i.e., to reach the first train station and then the workplace.
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k}{def} \PYG{n+nf}{get\PYGZus{}top\PYGZus{}users}\PYG{p}{(}\PYG{n}{connection}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{:}
-    \PYG{n}{query} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{        SELECT}
-\PYG{l+s+s2}{            cliente\PYGZus{}anonimizzato,}
-\PYG{l+s+s2}{            COUNT(*) AS noleggi\PYGZus{}totali}
-\PYG{l+s+s2}{        FROM bikemi\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019 b}
-\PYG{l+s+s2}{        GROUP BY}
-\PYG{l+s+s2}{            cliente\PYGZus{}anonimizzato}
-\PYG{l+s+s2}{        ORDER BY noleggi\PYGZus{}totali DESC}
-\PYG{l+s+s2}{        LIMIT 10;}
-\PYG{l+s+s2}{    }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-
-    \PYG{k}{return} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}sql}\PYG{p}{(}\PYG{n}{query}\PYG{p}{,} \PYG{n}{connection}\PYG{p}{)}\PYG{o}{.}\PYG{n}{set\PYGZus{}index}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{cliente\PYGZus{}anonimizzato}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-
-\PYG{n}{get\PYGZus{}top\PYGZus{}users}\PYG{p}{(}\PYG{n}{conn}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{sphinxuseclass}
-\begin{sphinxuseclass}{cell_output}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-                      noleggi\PYGZus{}totali
-cliente\PYGZus{}anonimizzato                
-40585                           3689
-19515                           2859
-38603                           2747
-43969                           2736
-23891                           2636
-15912                           2565
-56496                           2456
-42815                           2451
-17683                           2451
-146640                          2417
-\end{sphinxVerbatim}
-
-\end{sphinxuseclass}
-\end{sphinxuseclass}
-\sphinxAtStartPar
-But it might be of greater interest to look at the distribution by year:
-
-\begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k}{def} \PYG{n+nf}{get\PYGZus{}top\PYGZus{}users\PYGZus{}by\PYGZus{}year}\PYG{p}{(}\PYG{n}{connection}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{:}
-    \PYG{n}{query} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{        SELECT}
-\PYG{l+s+s2}{            cliente\PYGZus{}anonimizzato,}
-\PYG{l+s+s2}{            COUNT(*) AS noleggi\PYGZus{}totali,}
-\PYG{l+s+s2}{            EXTRACT(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{year}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ FROM data\PYGZus{}prelievo) AS anno}
-\PYG{l+s+s2}{        FROM bikemi\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019 b}
-\PYG{l+s+s2}{        GROUP BY}
-\PYG{l+s+s2}{            cliente\PYGZus{}anonimizzato,}
-\PYG{l+s+s2}{            EXTRACT(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{year}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ FROM data\PYGZus{}prelievo)}
-\PYG{l+s+s2}{        ORDER BY noleggi\PYGZus{}totali DESC}
-\PYG{l+s+s2}{        LIMIT 10;}
-\PYG{l+s+s2}{    }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-
-    \PYG{k}{return} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}sql}\PYG{p}{(}\PYG{n}{query}\PYG{p}{,} \PYG{n}{connection}\PYG{p}{)}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{anno}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{int}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{set\PYGZus{}index}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{cliente\PYGZus{}anonimizzato}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-
-\PYG{n}{get\PYGZus{}top\PYGZus{}users\PYGZus{}by\PYGZus{}year}\PYG{p}{(}\PYG{n}{conn}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{sphinxuseclass}
+\begin{sphinxuseclass}{tag_hide-input}
 \begin{sphinxuseclass}{cell_output}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
                       noleggi\PYGZus{}totali  anno
@@ -651,9 +474,7 @@ cliente\PYGZus{}anonimizzato
 
 \end{sphinxuseclass}
 \end{sphinxuseclass}
-\sphinxAtStartPar
-As expected, there are more observations from the years 2016 and 2017 as these are complete years. The great number of usage translates to an average of almost 4 trips per day \sphinxhyphen{} i.e., to reach the first train station and then the workplace.
-
+\end{sphinxuseclass}
 
 \subsection{Usage Patterns and Origin\sphinxhyphen{}Destination Matrix}
 \label{\detokenize{03-data_ingestion_and_spatial_operations:usage-patterns-and-origin-destination-matrix}}
@@ -661,58 +482,20 @@ As expected, there are more observations from the years 2016 and 2017 as these a
 As a starter, it is useful to look at the origin\sphinxhyphen{}destination (OD) matrix, to see which are the most popular starting and departure points. On the aggregate level, the most popular points on the OD matrix are the train stations and sightseeing places such as Duomo.
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k}{def} \PYG{n+nf}{get\PYGZus{}top\PYGZus{}stations}\PYG{p}{(}\PYG{n}{cols}\PYG{p}{:} \PYG{n+nb}{list}\PYG{p}{[}\PYG{n+nb}{str}\PYG{p}{]}\PYG{p}{,} \PYG{n}{connection}\PYG{p}{,} \PYG{n}{commuting\PYGZus{}hours}\PYG{p}{:} \PYG{n+nb}{bool} \PYG{o}{=} \PYG{k+kc}{False}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{:}
-    \PYG{k}{def} \PYG{n+nf}{\PYGZus{}top\PYGZus{}stations}\PYG{p}{(}\PYG{n}{colname}\PYG{p}{:} \PYG{n+nb}{str}\PYG{p}{,} \PYG{n}{\PYGZus{}connection}\PYG{p}{,} \PYG{n}{commuting}\PYG{p}{:} \PYG{n+nb}{bool} \PYG{o}{=} \PYG{n}{commuting\PYGZus{}hours}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{:}
-        \PYG{k}{if} \PYG{n}{commuting}\PYG{p}{:}
-            \PYG{n}{query} \PYG{o}{=} \PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{            SELECT}
-\PYG{l+s+s2}{                }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{colname}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{,}
-\PYG{l+s+s2}{                COUNT(*) AS numero\PYGZus{}noleggi}
-\PYG{l+s+s2}{            FROM bikemi\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019}
-\PYG{l+s+s2}{            WHERE}
-\PYG{l+s+s2}{                EXTRACT(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{dow}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ FROM data\PYGZus{}restituzione) BETWEEN 0 AND 4 AND}
-\PYG{l+s+s2}{                EXTRACT(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{hour}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ FROM data\PYGZus{}restituzione) BETWEEN 7 AND 10 OR}
-\PYG{l+s+s2}{                EXTRACT(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{hour}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ FROM data\PYGZus{}restituzione) BETWEEN 17 AND 20}
-\PYG{l+s+s2}{            GROUP BY}
-\PYG{l+s+s2}{                f}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{colname}\PYG{l+s+si}{\PYGZcb{}}
-\PYG{l+s+s2}{            ORDER BY numero\PYGZus{}noleggi DESC}
-\PYG{l+s+s2}{            LIMIT 10;}
-\PYG{l+s+s2}{            }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-
-        \PYG{n}{query} \PYG{o}{=} \PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{            SELECT}
-\PYG{l+s+s2}{                }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{colname}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{,}
-\PYG{l+s+s2}{                COUNT(*) AS numero\PYGZus{}noleggi}
-\PYG{l+s+s2}{            FROM bikemi\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019}
-\PYG{l+s+s2}{            GROUP BY}
-\PYG{l+s+s2}{                }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{colname}\PYG{l+s+si}{\PYGZcb{}}
-\PYG{l+s+s2}{            ORDER BY numero\PYGZus{}noleggi DESC}
-\PYG{l+s+s2}{            LIMIT 10;}
-\PYG{l+s+s2}{        }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-        \PYG{k}{return} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}sql}\PYG{p}{(}\PYG{n}{query}\PYG{p}{,} \PYG{n}{\PYGZus{}connection}\PYG{p}{)}
-
-    \PYG{k}{return} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{concat}\PYG{p}{(}\PYG{p}{[}\PYG{n}{\PYGZus{}top\PYGZus{}stations}\PYG{p}{(}\PYG{n}{col}\PYG{p}{,} \PYG{n}{connection}\PYG{p}{)} \PYG{k}{for} \PYG{n}{col} \PYG{o+ow}{in} \PYG{n}{cols}\PYG{p}{]}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
-
-
-\PYG{n}{get\PYGZus{}top\PYGZus{}stations}\PYG{p}{(}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nome\PYGZus{}stazione\PYGZus{}prelievo}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nome\PYGZus{}stazione\PYGZus{}restituzione}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{,} \PYG{n}{conn}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{sphinxuseclass}
+\begin{sphinxuseclass}{tag_hide-input}
 \begin{sphinxuseclass}{cell_output}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-  nome\PYGZus{}stazione\PYGZus{}prelievo  numero\PYGZus{}noleggi nome\PYGZus{}stazione\PYGZus{}restituzione  \PYGZbs{}
-0              Cadorna 3          234694                  Cadorna 3   
-1                  Duomo          197573                      Duomo   
-2                Moscova          139561                    Moscova   
-3     Garibaldi \PYGZhy{} Sturzo          134243         Garibaldi \PYGZhy{} Sturzo   
-4  San Babila \PYGZhy{} RIMOSSA\PYGZhy{}          128261                 XXV Aprile   
-5             XXV Aprile          127804      San Babila \PYGZhy{} RIMOSSA\PYGZhy{}   
-6              Cadorna 1          118692                    Cairoli   
-7                Cairoli          108717             Palazzo Marino   
-8             Centrale 1          107864                  Cadorna 1   
-9      Coni Zugna Solari           99152                     Cavour   
+       stazione\PYGZus{}prelievo  numero\PYGZus{}noleggi  stazione\PYGZus{}restituzione  \PYGZbs{}
+0              Cadorna 3          234694              Cadorna 3   
+1                  Duomo          197573                  Duomo   
+2                Moscova          139561                Moscova   
+3     Garibaldi \PYGZhy{} Sturzo          134243     Garibaldi \PYGZhy{} Sturzo   
+4  San Babila \PYGZhy{} RIMOSSA\PYGZhy{}          128261             XXV Aprile   
+5             XXV Aprile          127804  San Babila \PYGZhy{} RIMOSSA\PYGZhy{}   
+6              Cadorna 1          118692                Cairoli   
+7                Cairoli          108717         Palazzo Marino   
+8             Centrale 1          107864              Cadorna 1   
+9      Coni Zugna Solari           99152                 Cavour   
 
    numero\PYGZus{}noleggi  
 0          234349  
@@ -727,31 +510,27 @@ As a starter, it is useful to look at the origin\sphinxhyphen{}destination (OD) 
 9           98083  
 \end{sphinxVerbatim}
 
+\end{sphinxuseclass}
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 \sphinxAtStartPar
 The ranking is basically unchanged if we look only at data from Monday to Friday and within “core” commuting hours (say, from 7 to 10 and from 17 to 20). However, trips towards stations become more frequent and destinations such as Moscova are slightly less popular. Indeed, employees might straight bike to Moscova after work to take a sip from their Negroni.
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{get\PYGZus{}top\PYGZus{}stations}\PYG{p}{(}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nome\PYGZus{}stazione\PYGZus{}prelievo}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nome\PYGZus{}stazione\PYGZus{}restituzione}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{,} \PYG{n}{conn}\PYG{p}{,} \PYG{n}{commuting\PYGZus{}hours}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{sphinxuseclass}
+\begin{sphinxuseclass}{tag_hide-input}
 \begin{sphinxuseclass}{cell_output}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-  nome\PYGZus{}stazione\PYGZus{}prelievo  numero\PYGZus{}noleggi nome\PYGZus{}stazione\PYGZus{}restituzione  \PYGZbs{}
-0              Cadorna 3          234694                  Cadorna 3   
-1                  Duomo          197573                      Duomo   
-2                Moscova          139561                    Moscova   
-3     Garibaldi \PYGZhy{} Sturzo          134243         Garibaldi \PYGZhy{} Sturzo   
-4  San Babila \PYGZhy{} RIMOSSA\PYGZhy{}          128261                 XXV Aprile   
-5             XXV Aprile          127804      San Babila \PYGZhy{} RIMOSSA\PYGZhy{}   
-6              Cadorna 1          118692                    Cairoli   
-7                Cairoli          108717             Palazzo Marino   
-8             Centrale 1          107864                  Cadorna 1   
-9      Coni Zugna Solari           99152                     Cavour   
+       stazione\PYGZus{}prelievo  numero\PYGZus{}noleggi  stazione\PYGZus{}restituzione  \PYGZbs{}
+0              Cadorna 3          234694              Cadorna 3   
+1                  Duomo          197573                  Duomo   
+2                Moscova          139561                Moscova   
+3     Garibaldi \PYGZhy{} Sturzo          134243     Garibaldi \PYGZhy{} Sturzo   
+4  San Babila \PYGZhy{} RIMOSSA\PYGZhy{}          128261             XXV Aprile   
+5             XXV Aprile          127804  San Babila \PYGZhy{} RIMOSSA\PYGZhy{}   
+6              Cadorna 1          118692                Cairoli   
+7                Cairoli          108717         Palazzo Marino   
+8             Centrale 1          107864              Cadorna 1   
+9      Coni Zugna Solari           99152                 Cavour   
 
    numero\PYGZus{}noleggi  
 0          234349  
@@ -768,93 +547,51 @@ The ranking is basically unchanged if we look only at data from Monday to Friday
 
 \end{sphinxuseclass}
 \end{sphinxuseclass}
+\end{sphinxuseclass}
 \sphinxAtStartPar
 The behaviour changes if we look ad the individual trips, i.e. if we \sphinxcode{\sphinxupquote{GROUP BY}} both departure and destination stations (\sphinxcode{\sphinxupquote{nome\_stazione\_prelievo}} and \sphinxcode{\sphinxupquote{nome\_stazione\_restituzione}}). To be exact, \sphinxcode{\sphinxupquote{Coni Zugna Solari}} is close to both the station in Porta Genova as well as the Navigli and Darsena, which partly explains its popularity.
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
+\begin{sphinxuseclass}{tag_hide-input}
+\begin{sphinxuseclass}{cell_output}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k}{def} \PYG{n+nf}{get\PYGZus{}top\PYGZus{}od}\PYG{p}{(}\PYG{n}{connection}\PYG{p}{,} \PYG{n}{commuting\PYGZus{}hours}\PYG{p}{:} \PYG{n+nb}{bool} \PYG{o}{=} \PYG{k+kc}{False}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{:}
-    \PYG{k}{if} \PYG{n}{commuting\PYGZus{}hours}\PYG{p}{:}
-        \PYG{n}{query} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{                SELECT}
-\PYG{l+s+s2}{                    nome\PYGZus{}stazione\PYGZus{}prelievo,}
-\PYG{l+s+s2}{                    nome\PYGZus{}stazione\PYGZus{}restituzione,}
-\PYG{l+s+s2}{                    COUNT(*) AS numero\PYGZus{}noleggi}
-\PYG{l+s+s2}{                FROM bikemi\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019}
-\PYG{l+s+s2}{                WHERE}
-\PYG{l+s+s2}{                    EXTRACT(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{dow}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ FROM data\PYGZus{}restituzione) BETWEEN 0 AND 4 AND}
-\PYG{l+s+s2}{                    EXTRACT(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{hour}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ FROM data\PYGZus{}restituzione) BETWEEN 7 AND 10 OR}
-\PYG{l+s+s2}{                    EXTRACT(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{hour}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ FROM data\PYGZus{}restituzione) BETWEEN 17 AND 20}
-\PYG{l+s+s2}{                GROUP BY}
-\PYG{l+s+s2}{                    nome\PYGZus{}stazione\PYGZus{}prelievo,}
-\PYG{l+s+s2}{                    nome\PYGZus{}stazione\PYGZus{}restituzione}
-\PYG{l+s+s2}{                ORDER BY numero\PYGZus{}noleggi DESC}
-\PYG{l+s+s2}{                LIMIT 10;}
-\PYG{l+s+s2}{            }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-
-    \PYG{n}{query} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{        SELECT}
-\PYG{l+s+s2}{            nome\PYGZus{}stazione\PYGZus{}prelievo,}
-\PYG{l+s+s2}{            nome\PYGZus{}stazione\PYGZus{}restituzione,}
-\PYG{l+s+s2}{            COUNT(*) AS numero\PYGZus{}noleggi}
-\PYG{l+s+s2}{        FROM bikemi\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019}
-\PYG{l+s+s2}{        GROUP BY}
-\PYG{l+s+s2}{            nome\PYGZus{}stazione\PYGZus{}prelievo,}
-\PYG{l+s+s2}{            nome\PYGZus{}stazione\PYGZus{}restituzione}
-\PYG{l+s+s2}{        ORDER BY numero\PYGZus{}noleggi DESC}
-\PYG{l+s+s2}{        LIMIT 10;}
-\PYG{l+s+s2}{    }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-
-    \PYG{k}{return} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}sql}\PYG{p}{(}\PYG{n}{query}\PYG{p}{,} \PYG{n}{connection}\PYG{p}{)}
-
-
-\PYG{n}{get\PYGZus{}top\PYGZus{}od}\PYG{p}{(}\PYG{n}{conn}\PYG{p}{)}
+     stazione\PYGZus{}prelievo   stazione\PYGZus{}destinazione  numero\PYGZus{}noleggi
+0    Coni Zugna Solari     Napoli \PYGZhy{} Washington           14144
+1  Napoli \PYGZhy{} Washington       Coni Zugna Solari           13256
+2            Cadorna 3                   Duomo            9363
+3                Duomo               Cadorna 3            8903
+4    Coni Zugna Solari        Savona \PYGZhy{} Tolstoj            8217
+5       Palazzo Marino               Cadorna 3            7436
+6           Bertarelli               Cadorna 3            6967
+7  Vercelli \PYGZhy{} Piemonte  Roncaglia \PYGZhy{} Washington            6373
+8                Piola       Gorini \PYGZhy{} Strambio            6336
+9            Cadorna 3           Arcivescovado            6197
 \end{sphinxVerbatim}
 
 \end{sphinxuseclass}
-\begin{sphinxuseclass}{cell_output}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-  nome\PYGZus{}stazione\PYGZus{}prelievo nome\PYGZus{}stazione\PYGZus{}restituzione  numero\PYGZus{}noleggi
-0      Coni Zugna Solari        Napoli \PYGZhy{} Washington           14144
-1    Napoli \PYGZhy{} Washington          Coni Zugna Solari           13256
-2              Cadorna 3                      Duomo            9363
-3                  Duomo                  Cadorna 3            8903
-4      Coni Zugna Solari           Savona \PYGZhy{} Tolstoj            8217
-5         Palazzo Marino                  Cadorna 3            7436
-6             Bertarelli                  Cadorna 3            6967
-7    Vercelli \PYGZhy{} Piemonte     Roncaglia \PYGZhy{} Washington            6373
-8                  Piola          Gorini \PYGZhy{} Strambio            6336
-9              Cadorna 3              Arcivescovado            6197
-\end{sphinxVerbatim}
-
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 \sphinxAtStartPar
 The same considerations apply when looking at the top trips only within the “core” commuting hours. This reinforces the conclusion that BikeMi is consistently used for commuting purposes.
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
+\begin{sphinxuseclass}{tag_hide-input}
+\begin{sphinxuseclass}{cell_output}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{get\PYGZus{}top\PYGZus{}od}\PYG{p}{(}\PYG{n}{conn}\PYG{p}{,} \PYG{n}{commuting\PYGZus{}hours}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+     stazione\PYGZus{}prelievo   stazione\PYGZus{}destinazione  numero\PYGZus{}noleggi
+0    Coni Zugna Solari     Napoli \PYGZhy{} Washington           14144
+1  Napoli \PYGZhy{} Washington       Coni Zugna Solari           13256
+2            Cadorna 3                   Duomo            9363
+3                Duomo               Cadorna 3            8903
+4    Coni Zugna Solari        Savona \PYGZhy{} Tolstoj            8217
+5       Palazzo Marino               Cadorna 3            7436
+6           Bertarelli               Cadorna 3            6967
+7  Vercelli \PYGZhy{} Piemonte  Roncaglia \PYGZhy{} Washington            6373
+8                Piola       Gorini \PYGZhy{} Strambio            6336
+9            Cadorna 3           Arcivescovado            6197
 \end{sphinxVerbatim}
 
 \end{sphinxuseclass}
-\begin{sphinxuseclass}{cell_output}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-  nome\PYGZus{}stazione\PYGZus{}prelievo nome\PYGZus{}stazione\PYGZus{}restituzione  numero\PYGZus{}noleggi
-0      Coni Zugna Solari        Napoli \PYGZhy{} Washington           14144
-1    Napoli \PYGZhy{} Washington          Coni Zugna Solari           13256
-2              Cadorna 3                      Duomo            9363
-3                  Duomo                  Cadorna 3            8903
-4      Coni Zugna Solari           Savona \PYGZhy{} Tolstoj            8217
-5         Palazzo Marino                  Cadorna 3            7436
-6             Bertarelli                  Cadorna 3            6967
-7    Vercelli \PYGZhy{} Piemonte     Roncaglia \PYGZhy{} Washington            6373
-8                  Piola          Gorini \PYGZhy{} Strambio            6336
-9              Cadorna 3              Arcivescovado            6197
-\end{sphinxVerbatim}
-
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 
@@ -864,26 +601,7 @@ The same considerations apply when looking at the top trips only within the “c
 On its open data portal, the Comune di Milano publishes all sorts of open data \sphinxhyphen{} like the daily entrances in the so\sphinxhyphen{}called Area C, where access to private cars is limited. On this treasure trove of data, we can also find things like the location of column fountains and newsstands, but also the geo\sphinxhyphen{}referenced data of bike tracks and the location of \sphinxhref{https://dati.comune.milano.it/it/dataset/ds65\_infogeo\_aree\_sosta\_bike\_sharing\_localizzazione\_}{BikeMi Stations}. As noted previously, the service has some 320 stations, spread unevenly across the town, as it was outlined by previous studies (Saibene \& Manzi, 2015). As a starter, we filter out all stations that have been introduced after 2019. This leaves us with 281 official stations, versus 279 in the historic data.
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{bikemi\PYGZus{}stalls} \PYG{o}{=} \PYG{p}{(}
-    \PYG{n}{geopandas}\PYG{o}{.}\PYG{n}{read\PYGZus{}file}\PYG{p}{(}\PYG{n}{Path}\PYG{p}{(}\PYG{n}{milan\PYGZus{}data} \PYG{o}{/} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{bikemi\PYGZhy{}stalls.geo.json}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{numero}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nome}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{zd\PYGZus{}attuale}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{anno}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{rename}\PYG{p}{(}\PYG{n}{columns}\PYG{o}{=}\PYG{p}{\PYGZob{}}
-        \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{numero}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{numero\PYGZus{}stazione}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}
-        \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{zd\PYGZus{}attuale}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{municipio}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}
-        \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{stalls\PYGZus{}geometry}\PYG{l+s+s2}{\PYGZdq{}}
-    \PYG{p}{\PYGZcb{}}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{set\PYGZus{}geometry}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{stalls\PYGZus{}geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{set\PYGZus{}index}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{numero\PYGZus{}stazione}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{query}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{anno \PYGZlt{} 2019}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{anno}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{int}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}
-\PYG{p}{)}
-
-\PYG{n}{bikemi\PYGZus{}stalls}\PYG{o}{.}\PYG{n}{head}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{sphinxuseclass}
+\begin{sphinxuseclass}{tag_hide-input}
 \begin{sphinxuseclass}{cell_output}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
                                   nome  municipio  anno  \PYGZbs{}
@@ -905,36 +623,16 @@ numero\PYGZus{}stazione
 
 \end{sphinxuseclass}
 \end{sphinxuseclass}
+\end{sphinxuseclass}
 \sphinxAtStartPar
 The data is represented with the (geographic) coordinate reference system (CRS) \sphinxcode{\sphinxupquote{EPSG:4326}}, but in order to use the \sphinxcode{\sphinxupquote{contextily}} library we need to cast it to the (projected) reference system \sphinxcode{\sphinxupquote{EPSG:3587}}. As the map shows, the stalls stretch to the North, towards Bicocca and Sesto San Giovanni. We can already see that the stalls distribution outside the city centre follows bike lanes (in blue).
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{bike\PYGZus{}lanes} \PYG{o}{=} \PYG{n}{geopandas}\PYG{o}{.}\PYG{n}{read\PYGZus{}file}\PYG{p}{(}\PYG{n}{Path}\PYG{p}{(}\PYG{n}{milan\PYGZus{}data} \PYG{o}{/} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{transports\PYGZhy{}bike\PYGZus{}lanes.geo.json}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}
-
-\PYG{n}{bikes\PYGZus{}dict} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{color}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{firebrick}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{marker}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{.}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}
-
-\PYG{k}{def} \PYG{n+nf}{plot\PYGZus{}stalls\PYGZus{}and\PYGZus{}bikelanes}\PYG{p}{(}\PYG{p}{)}\PYG{p}{:}
-    \PYG{n}{fig}\PYG{p}{,} \PYG{n}{ax} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mi}{10}\PYG{p}{)}\PYG{p}{)}
-
-    \PYG{n}{bikemi\PYGZus{}stalls}\PYG{o}{.}\PYG{n}{to\PYGZus{}crs}\PYG{p}{(}\PYG{l+m+mi}{3857}\PYG{p}{)}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{ax}\PYG{o}{=}\PYG{n}{ax}\PYG{p}{,} \PYG{o}{*}\PYG{o}{*}\PYG{n}{bikes\PYGZus{}dict}\PYG{p}{)}
-    \PYG{n}{bike\PYGZus{}lanes}\PYG{o}{.}\PYG{n}{to\PYGZus{}crs}\PYG{p}{(}\PYG{l+m+mi}{3857}\PYG{p}{)}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{ax}\PYG{o}{=}\PYG{n}{ax}\PYG{p}{)}
-    \PYG{n}{cx}\PYG{o}{.}\PYG{n}{add\PYGZus{}basemap}\PYG{p}{(}\PYG{n}{ax}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{axis}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{off}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{BikeMi Stalls (Red Dots) and Bike Lanes (Blue)}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{o}{*}\PYG{o}{*}\PYG{n}{title\PYGZus{}font}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-
-\PYG{n}{plot\PYGZus{}stalls\PYGZus{}and\PYGZus{}bikelanes}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
+\begin{sphinxuseclass}{tag_hide-input}
+\begin{sphinxuseclass}{cell_output}
+\noindent\sphinxincludegraphics{{03-data_ingestion_and_spatial_operations_28_0}.png}
 
 \end{sphinxuseclass}
-\begin{sphinxuseclass}{cell_output}
-\noindent\sphinxincludegraphics{{03-data_ingestion_and_spatial_operations_33_0}.png}
-
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 
@@ -946,48 +644,99 @@ The stalls in the outer stations are not as used as the ones in the city centre,
 \sphinxAtStartPar
 We start by creating another two \sphinxcode{\sphinxupquote{materialised views}} with the daily and hourly rentals, by station. Since the service is only active between 7 and 24, we just keep hourly observations within that time span. If we simply were to \sphinxcode{\sphinxupquote{GROUP BY}} station names and time units, we would obtain series with gaps in the time index. We first create a table with all possible combinations of stations and dates using a \sphinxcode{\sphinxupquote{CROSS JOIN}} and a common table expression (or \sphinxcode{\sphinxupquote{CTE}}), then left join on this table the values obtained via the \sphinxcode{\sphinxupquote{GROUP BY}} on the reference table. A similar query is used to obtain the hourly rentals, with hourly time intervals instead of daily ones.
 
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{create\PYGZus{}rentals\PYGZus{}materialized\PYGZus{}views}\PYG{p}{(}\PYG{n}{connection}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{k+kc}{None}\PYG{p}{:}
+    
+    \PYG{n}{query\PYGZus{}daily\PYGZus{}rentals}\PYG{p}{:} \PYG{n+nb}{str} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+s2}{        CREATE MATERIALIZED VIEW IF NOT EXISTS bikemi\PYGZus{}rentals.daily\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019 AS}
+\PYG{l+s+s2}{        (}
+\PYG{l+s+s2}{        WITH cross\PYGZus{}table AS (}
+\PYG{l+s+s2}{            SELECT d.date AS data\PYGZus{}partenza,}
+\PYG{l+s+s2}{                   s.nome AS stazione\PYGZus{}partenza,}
+\PYG{l+s+s2}{                   s.numero\PYGZus{}stazione}
+\PYG{l+s+s2}{            FROM (}
+\PYG{l+s+s2}{                     SELECT *}
+\PYG{l+s+s2}{                     FROM bikemi\PYGZus{}rentals.bikemi\PYGZus{}stations}
+\PYG{l+s+s2}{                     WHERE anno \PYGZlt{} 2019}
+\PYG{l+s+s2}{                 ) s}
+\PYG{l+s+s2}{                     CROSS JOIN (}
+\PYG{l+s+s2}{                SELECT generate\PYGZus{}series(}
+\PYG{l+s+s2}{                               timestamp }\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{2015\PYGZhy{}06\PYGZhy{}01}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{,}
+\PYG{l+s+s2}{                               timestamp }\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{2018\PYGZhy{}06\PYGZhy{}01}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{,}
+\PYG{l+s+s2}{                               interval }\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{1 day}\PYG{l+s+s2}{\PYGZsq{}}
+\PYG{l+s+s2}{                           )::date}
+\PYG{l+s+s2}{            ) d(date)}
+\PYG{l+s+s2}{            ORDER BY nome,}
+\PYG{l+s+s2}{                     date}
+\PYG{l+s+s2}{        )}
+\PYG{l+s+s2}{        SELECT c.data\PYGZus{}partenza,}
+\PYG{l+s+s2}{               c.stazione\PYGZus{}partenza,}
+\PYG{l+s+s2}{               c.numero\PYGZus{}stazione,}
+\PYG{l+s+s2}{               COUNT(b.*)::smallint AS noleggi\PYGZus{}giornalieri}
+\PYG{l+s+s2}{        FROM cross\PYGZus{}table c}
+\PYG{l+s+s2}{                 LEFT JOIN bikemi\PYGZus{}rentals.bikemi\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019 b ON b.numero\PYGZus{}stazione\PYGZus{}prelievo = c.numero\PYGZus{}stazione}
+\PYG{l+s+s2}{            AND DATE\PYGZus{}TRUNC(}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{day}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{, b.data\PYGZus{}prelievo)::date = c.data\PYGZus{}partenza}
+\PYG{l+s+s2}{        GROUP BY c.data\PYGZus{}partenza,}
+\PYG{l+s+s2}{                 c.stazione\PYGZus{}partenza,}
+\PYG{l+s+s2}{                 c.numero\PYGZus{}stazione}
+\PYG{l+s+s2}{        ORDER BY stazione\PYGZus{}partenza,}
+\PYG{l+s+s2}{                 data\PYGZus{}partenza}
+\PYG{l+s+s2}{            );}
+\PYG{l+s+s2}{    }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    
+    \PYG{n}{query\PYGZus{}hourly\PYGZus{}rentals}\PYG{p}{:} \PYG{n+nb}{str} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+s2}{    CREATE MATERIALIZED VIEW IF NOT EXISTS bikemi\PYGZus{}rentals.hourly\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019 AS}
+\PYG{l+s+s2}{    (}
+\PYG{l+s+s2}{    WITH cross\PYGZus{}table AS (}
+\PYG{l+s+s2}{        SELECT d.date\PYGZus{}time AS data\PYGZus{}partenza,}
+\PYG{l+s+s2}{               s.nome      AS stazione\PYGZus{}partenza,}
+\PYG{l+s+s2}{               s.numero\PYGZus{}stazione}
+\PYG{l+s+s2}{        FROM (}
+\PYG{l+s+s2}{                 SELECT *}
+\PYG{l+s+s2}{                 FROM bikemi\PYGZus{}rentals.bikemi\PYGZus{}stations}
+\PYG{l+s+s2}{                 WHERE anno \PYGZlt{} 2019}
+\PYG{l+s+s2}{             ) s}
+\PYG{l+s+s2}{                 CROSS JOIN (}
+\PYG{l+s+s2}{            SELECT generate\PYGZus{}series(}
+\PYG{l+s+s2}{                           timestamp }\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{2015\PYGZhy{}06\PYGZhy{}01}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{,}
+\PYG{l+s+s2}{                           timestamp }\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{2018\PYGZhy{}06\PYGZhy{}01}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{,}
+\PYG{l+s+s2}{                           interval }\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{1 hour}\PYG{l+s+s2}{\PYGZsq{}}
+\PYG{l+s+s2}{                       )::timestamp}
+\PYG{l+s+s2}{        ) d(date\PYGZus{}time)}
+\PYG{l+s+s2}{        WHERE EXTRACT(}
+\PYG{l+s+s2}{                      }\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{hour}\PYG{l+s+s2}{\PYGZsq{}}
+\PYG{l+s+s2}{                      FROM d.date\PYGZus{}time}
+\PYG{l+s+s2}{                  ) BETWEEN 7 and 24}
+\PYG{l+s+s2}{        ORDER BY nome,}
+\PYG{l+s+s2}{                 date\PYGZus{}time}
+\PYG{l+s+s2}{    )}
+\PYG{l+s+s2}{    SELECT c.data\PYGZus{}partenza,}
+\PYG{l+s+s2}{           c.stazione\PYGZus{}partenza,}
+\PYG{l+s+s2}{           c.numero\PYGZus{}stazione,}
+\PYG{l+s+s2}{           COUNT(b.*)::smallint AS noleggi\PYGZus{}per\PYGZus{}ora}
+\PYG{l+s+s2}{    FROM cross\PYGZus{}table c}
+\PYG{l+s+s2}{             LEFT JOIN bikemi\PYGZus{}rentals.bikemi\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019 b ON b.numero\PYGZus{}stazione\PYGZus{}prelievo = c.numero\PYGZus{}stazione}
+\PYG{l+s+s2}{        AND DATE\PYGZus{}TRUNC(}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{hour}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{, b.data\PYGZus{}prelievo)::timestamp = c.data\PYGZus{}partenza}
+\PYG{l+s+s2}{    GROUP BY c.data\PYGZus{}partenza,}
+\PYG{l+s+s2}{             c.stazione\PYGZus{}partenza,}
+\PYG{l+s+s2}{             c.numero\PYGZus{}stazione}
+\PYG{l+s+s2}{    ORDER BY stazione\PYGZus{}partenza,}
+\PYG{l+s+s2}{             data\PYGZus{}partenza}
+\PYG{l+s+s2}{        );}
+\PYG{l+s+s2}{    }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    
+    \PYG{k}{with} \PYG{n}{connection}\PYG{p}{:}
+        \PYG{k}{with} \PYG{n}{connection}\PYG{o}{.}\PYG{n}{cursor}\PYG{p}{(}\PYG{p}{)} \PYG{k}{as} \PYG{n}{cursor}\PYG{p}{:}
+            \PYG{n}{cursor}\PYG{o}{.}\PYG{n}{execute}\PYG{p}{(}\PYG{n}{query\PYGZus{}daily\PYGZus{}rentals}\PYG{p}{)}
+            \PYG{n}{cursor}\PYG{o}{.}\PYG{n}{execute}\PYG{p}{(}\PYG{n}{query\PYGZus{}hourly\PYGZus{}rentals}\PYG{p}{)}
+\end{sphinxVerbatim}
+
 \begin{sphinxuseclass}{cell}
 \begin{sphinxuseclass}{cell_input}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{} query with cross join used to create the second materialised view}
-\PYG{c+c1}{\PYGZsh{} another similar one is used to create the view for hourly observations}
-\PYG{n}{materialised\PYGZus{}view\PYGZus{}daily\PYGZus{}rentals} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{    DROP TABLE IF EXISTS daily\PYGZus{}rentals\PYGZus{}all;}
-\PYG{l+s+s2}{    }
-\PYG{l+s+s2}{    CREATE MATERIALIZED VIEW IF NOT EXISTS daily\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019 AS (}
-\PYG{l+s+s2}{    }
-\PYG{l+s+s2}{        WITH cross\PYGZus{}table AS (SELECT}
-\PYG{l+s+s2}{            d.date AS data\PYGZus{}partenza,}
-\PYG{l+s+s2}{            s.nome AS stazione\PYGZus{}partenza,}
-\PYG{l+s+s2}{            s.numero\PYGZus{}stazione}
-\PYG{l+s+s2}{        FROM bikemi\PYGZus{}stalls s}
-\PYG{l+s+s2}{        CROSS JOIN (}
-\PYG{l+s+s2}{           SELECT generate\PYGZus{}series (timestamp }\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{2015\PYGZhy{}06\PYGZhy{}01}\PYG{l+s+s2}{\PYGZdq{}}
-\PYG{l+s+s2}{                                 , timestamp }\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{2018\PYGZhy{}06\PYGZhy{}01}\PYG{l+s+s2}{\PYGZdq{}}
-\PYG{l+s+s2}{                                 , interval  }\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{1 day}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{)::date}
-\PYG{l+s+s2}{           ) d(date)}
-\PYG{l+s+s2}{        ORDER BY nome, date ASC)}
-
-\PYG{l+s+s2}{        SELECT}
-\PYG{l+s+s2}{            c.data\PYGZus{}partenza,}
-\PYG{l+s+s2}{            c.stazione\PYGZus{}partenza,}
-\PYG{l+s+s2}{            c.numero\PYGZus{}stazione,}
-\PYG{l+s+s2}{            COUNT(b.*) AS noleggi\PYGZus{}giornalieri}
-\PYG{l+s+s2}{        FROM cross\PYGZus{}table c}
-\PYG{l+s+s2}{        LEFT JOIN bikemi\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019 b}
-\PYG{l+s+s2}{            ON b.numero\PYGZus{}stazione\PYGZus{}prelievo = c.numero\PYGZus{}stazione}
-\PYG{l+s+s2}{            AND DATE\PYGZus{}TRUNC(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{day}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{, b.data\PYGZus{}prelievo)::date = c.data\PYGZus{}partenza}
-\PYG{l+s+s2}{        GROUP BY}
-\PYG{l+s+s2}{            c.data\PYGZus{}partenza,}
-\PYG{l+s+s2}{            c.stazione\PYGZus{}partenza,}
-\PYG{l+s+s2}{            c.numero\PYGZus{}stazione}
-\PYG{l+s+s2}{        ORDER BY stazione\PYGZus{}partenza, data\PYGZus{}partenza ASC}
-\PYG{l+s+s2}{    );}
-\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-
 \PYG{k}{def} \PYG{n+nf}{retrieve\PYGZus{}daily\PYGZus{}rentals}\PYG{p}{(}\PYG{n}{connection}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{:}
     \PYG{n}{query} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{        SELECT * FROM daily\PYGZus{}rentals\PYGZus{}all;}
+\PYG{l+s+s2}{        SELECT * FROM daily\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019;}
 \PYG{l+s+s2}{    }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
     \PYG{k}{return} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}sql}\PYG{p}{(}\PYG{n}{query}\PYG{p}{,} \PYG{n}{connection}\PYG{p}{)}\PYG{o}{.}\PYG{n}{set\PYGZus{}index}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{data\PYGZus{}partenza}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
 
@@ -1032,89 +781,33 @@ Then, we compute the number of null values in the data (\sphinxcode{\sphinxupquo
 In this way, we can see that the number of stations with an “unacceptable” number of missing values is smaller than thirty.
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{sns}\PYG{o}{.}\PYG{n}{histplot}\PYG{p}{(}\PYG{n}{stations\PYGZus{}missing\PYGZus{}obs}\PYG{p}{,} \PYG{n}{x}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{null\PYGZus{}obs\PYGZus{}ranking}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-\PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Percentage of null values}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Frequency Distribution of Null Values Across Bikemi Stations}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{o}{*}\PYG{o}{*}\PYG{n}{title\PYGZus{}font}\PYG{p}{)}
-
-\PYG{n}{sns}\PYG{o}{.}\PYG{n}{despine}\PYG{p}{(}\PYG{p}{)}
-
-\PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
+\begin{sphinxuseclass}{tag_hide-input}
+\begin{sphinxuseclass}{cell_output}
+\noindent\sphinxincludegraphics{{03-data_ingestion_and_spatial_operations_36_0}.png}
 
 \end{sphinxuseclass}
-\begin{sphinxuseclass}{cell_output}
-\noindent\sphinxincludegraphics{{03-data_ingestion_and_spatial_operations_40_0}.png}
-
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 \sphinxAtStartPar
 More than 80 percent of the stations display a count of null observations inferior to 20 percent.
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{sns}\PYG{o}{.}\PYG{n}{ecdfplot}\PYG{p}{(}\PYG{n}{stations\PYGZus{}missing\PYGZus{}obs}\PYG{p}{,} \PYG{n}{x}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{pct\PYGZus{}null}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-\PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Percentage of null values}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Empirical Cumulative Distribution of Null Values Across BikeMi Stations}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{o}{*}\PYG{o}{*}\PYG{n}{title\PYGZus{}font}\PYG{p}{)}
-
-\PYG{n}{sns}\PYG{o}{.}\PYG{n}{despine}\PYG{p}{(}\PYG{p}{)}
-
-\PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
+\begin{sphinxuseclass}{tag_hide-input}
+\begin{sphinxuseclass}{cell_output}
+\noindent\sphinxincludegraphics{{03-data_ingestion_and_spatial_operations_38_0}.png}
 
 \end{sphinxuseclass}
-\begin{sphinxuseclass}{cell_output}
-\noindent\sphinxincludegraphics{{03-data_ingestion_and_spatial_operations_42_0}.png}
-
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 \sphinxAtStartPar
 We can also join this data with the station spatial data to plot them. While this does not expose patterns that could be used to reduce the dimensionality of the data, it shows that there are some stations that need to be dropped off even from the most crowded areas in the city. This could not be spotted before as, to the best of our knowledge, no one in the BikeMi literature has ever found a way to take into account of how public work on roads and infrastructure had effects on the bike sharing service.
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{bikemi\PYGZus{}stalls\PYGZus{}nulls} \PYG{o}{=} \PYG{p}{(}
-    \PYG{n}{bikemi\PYGZus{}stalls}
-        \PYG{o}{.}\PYG{n}{merge}\PYG{p}{(}\PYG{n}{stations\PYGZus{}missing\PYGZus{}obs}\PYG{p}{,} \PYG{n}{left\PYGZus{}on}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nome}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{right\PYGZus{}index}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
-\PYG{p}{)}
-
-\PYG{k}{def} \PYG{n+nf}{plot\PYGZus{}stalls\PYGZus{}missing\PYGZus{}values}\PYG{p}{(}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{k+kc}{None}\PYG{p}{:}
-    \PYG{n}{fig}\PYG{p}{,} \PYG{n}{ax} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mi}{10}\PYG{p}{)}\PYG{p}{)}
-
-    \PYG{p}{(}
-        \PYG{n}{bikemi\PYGZus{}stalls\PYGZus{}nulls}
-            \PYG{o}{.}\PYG{n}{to\PYGZus{}crs}\PYG{p}{(}\PYG{l+m+mi}{3857}\PYG{p}{)}
-            \PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}
-                \PYG{n}{column}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{null\PYGZus{}obs\PYGZus{}ranking}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}
-                \PYG{n}{cmap}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{coolwarm}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}
-                \PYG{n}{marker}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{.}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}
-                \PYG{n}{legend}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{,}
-                \PYG{n}{ax}\PYG{o}{=}\PYG{n}{ax}
-        \PYG{p}{)}
-    \PYG{p}{)}
-
-    \PYG{n}{cx}\PYG{o}{.}\PYG{n}{add\PYGZus{}basemap}\PYG{p}{(}\PYG{n}{ax}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{axis}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{off}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Bikemi Stalls, by Null Values (Low Usage)}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{o}{*}\PYG{o}{*}\PYG{n}{title\PYGZus{}font}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-
-\PYG{n}{plot\PYGZus{}stalls\PYGZus{}missing\PYGZus{}values}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
+\begin{sphinxuseclass}{tag_hide-input}
+\begin{sphinxuseclass}{cell_output}
+\noindent\sphinxincludegraphics{{03-data_ingestion_and_spatial_operations_40_0}.png}
 
 \end{sphinxuseclass}
-\begin{sphinxuseclass}{cell_output}
-\noindent\sphinxincludegraphics{{03-data_ingestion_and_spatial_operations_44_0}.png}
-
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 
@@ -1124,35 +817,11 @@ We can also join this data with the station spatial data to plot them. While thi
 Besides dropping the “emptiest” stations, we should also come up with a way to narrow down the geographic area inside which we perform the analysis. Previously, authors have chosen to analyse just the area inside the Bastioni, or “Area C” (Saibene \& Manzi, 2015) or the whole set of stations (Toro et al., 2020). This was mainly due to the different purpose of their analysis and the data availability (Saibene and Manzi analyse data from 2008 to 2012). For our goal, as well as the policymaker perspective, this choice seems restricting, as it leaves out most of the train stations. It is worth noting that analysing the bike sharing traffic inside of Area C can be appropriate: for example, since, the municipality publishes the number of daily accesses to the area, which could be used to evaluate the effect of sharing services on traffic.
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{area\PYGZus{}c} \PYG{o}{=} \PYG{p}{(}
-    \PYG{n}{geopandas}
-        \PYG{o}{.}\PYG{n}{read\PYGZus{}file}\PYG{p}{(}\PYG{n}{Path}\PYG{p}{(}\PYG{n}{milan\PYGZus{}data} \PYG{o}{/} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{administrative\PYGZhy{}area\PYGZus{}c.geo.json}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{tipo}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{query}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{tipo == }\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{AREA\PYGZus{}C}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{p}{)}
-
-\PYG{k}{def} \PYG{n+nf}{plot\PYGZus{}area\PYGZus{}c}\PYG{p}{(}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{k+kc}{None}\PYG{p}{:}
-    \PYG{n}{fig}\PYG{p}{,} \PYG{n}{ax} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{(}\PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mi}{10}\PYG{p}{)}\PYG{p}{)}
-
-    \PYG{n}{area\PYGZus{}c}\PYG{o}{.}\PYG{n}{to\PYGZus{}crs}\PYG{p}{(}\PYG{l+m+mi}{3857}\PYG{p}{)}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{ax}\PYG{o}{=}\PYG{n}{ax}\PYG{p}{,} \PYG{n}{cmap}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Pastel1}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.6}\PYG{p}{)}
-    \PYG{n}{bikemi\PYGZus{}stalls}\PYG{o}{.}\PYG{n}{to\PYGZus{}crs}\PYG{p}{(}\PYG{l+m+mi}{3857}\PYG{p}{)}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{ax}\PYG{o}{=}\PYG{n}{ax}\PYG{p}{,} \PYG{o}{*}\PYG{o}{*}\PYG{n}{bikes\PYGZus{}dict}\PYG{p}{)}
-    \PYG{n}{cx}\PYG{o}{.}\PYG{n}{add\PYGZus{}basemap}\PYG{p}{(}\PYG{n}{ax}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{axis}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{off}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{BikeMi Stalls (dots) and Area C (red)}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{o}{*}\PYG{o}{*}\PYG{n}{title\PYGZus{}font}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-
-\PYG{n}{plot\PYGZus{}area\PYGZus{}c}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
+\begin{sphinxuseclass}{tag_hide-input}
+\begin{sphinxuseclass}{cell_output}
+\noindent\sphinxincludegraphics{{03-data_ingestion_and_spatial_operations_43_0}.png}
 
 \end{sphinxuseclass}
-\begin{sphinxuseclass}{cell_output}
-\noindent\sphinxincludegraphics{{03-data_ingestion_and_spatial_operations_47_0}.png}
-
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 \sphinxAtStartPar
@@ -1162,217 +831,35 @@ The area we propose is the road ring across Milan, informally referred to as Cir
 This approach might just reinforce the bias towards the centre of the city, but given the technical constraints seems to be the more viable option. However, as a comparison, the Area C would only contain one train station, whereas this area contains all of the top rentals stalls from the origin\sphinxhyphen{}destination (OD) matrix.
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{metro\PYGZus{}stations} \PYG{o}{=} \PYG{n}{geopandas}\PYG{o}{.}\PYG{n}{read\PYGZus{}file}\PYG{p}{(}\PYG{n}{Path}\PYG{p}{(}\PYG{n}{milan\PYGZus{}data} \PYG{o}{/} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{transports\PYGZhy{}metro\PYGZus{}stops.geo.json}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}
-
-\PYG{c+c1}{\PYGZsh{} train\PYGZus{}stations = geopandas.read\PYGZus{}file(Path(milan\PYGZus{}data / \PYGZdq{}transports\PYGZhy{}train\PYGZus{}stations.zip\PYGZdq{}))}
-\PYG{c+c1}{\PYGZsh{} train\PYGZus{}stations.to\PYGZus{}file(\PYGZdq{}../data/milan/milan\PYGZhy{}transports\PYGZhy{}train\PYGZus{}stations.geo.json\PYGZdq{}, driver=\PYGZdq{}GeoJSON\PYGZdq{})}
-
-\PYG{n}{train\PYGZus{}stations} \PYG{o}{=} \PYG{p}{(}
-    \PYG{n}{geopandas}
-        \PYG{o}{.}\PYG{n}{read\PYGZus{}file}\PYG{p}{(}\PYG{n}{Path}\PYG{p}{(}\PYG{n}{milan\PYGZus{}data} \PYG{o}{/} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{transports\PYGZhy{}train\PYGZus{}stations.geo.json}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{rename}\PYG{p}{(}\PYG{n+nb}{str}\PYG{o}{.}\PYG{n}{lower}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{rename}\PYG{p}{(}\PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{train\PYGZus{}geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{set\PYGZus{}geometry}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{train\PYGZus{}geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{p}{)}
-
-\PYG{n}{municipi} \PYG{o}{=} \PYG{p}{(}
-    \PYG{n}{geopandas}
-        \PYG{o}{.}\PYG{n}{read\PYGZus{}file}\PYG{p}{(}\PYG{n}{Path}\PYG{p}{(}\PYG{n}{milan\PYGZus{}data} \PYG{o}{/} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{administrative\PYGZhy{}municipi.geo.json}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{rename}\PYG{p}{(}\PYG{n+nb}{str}\PYG{o}{.}\PYG{n}{lower}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{municipio}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{rename}\PYG{p}{(}\PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{municipi\PYGZus{}geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{set\PYGZus{}geometry}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{municipi\PYGZus{}geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{p}{)}
-
-\PYG{n}{nil} \PYG{o}{=} \PYG{p}{(}
-    \PYG{n}{geopandas}
-        \PYG{o}{.}\PYG{n}{read\PYGZus{}file}\PYG{p}{(}\PYG{n}{Path}\PYG{p}{(}\PYG{n}{milan\PYGZus{}data} \PYG{o}{/} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{administrative\PYGZhy{}nil.geo.json}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{rename}\PYG{p}{(}\PYG{n+nb}{str}\PYG{o}{.}\PYG{n}{lower}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{id\PYGZus{}nil}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nil}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{rename}\PYG{p}{(}\PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nil\PYGZus{}geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{set\PYGZus{}geometry}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nil\PYGZus{}geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{p}{)}
-
-\PYG{n}{milan} \PYG{o}{=} \PYG{n}{municipi}\PYG{o}{.}\PYG{n}{dissolve}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{rename}\PYG{p}{(}\PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{municipio}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{milano}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
-\end{sphinxVerbatim}
-
+\begin{sphinxuseclass}{tag_hide-input}
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{milan\PYGZus{}train\PYGZus{}stations} \PYG{o}{=} \PYG{n}{train\PYGZus{}stations}\PYG{o}{.}\PYG{n}{to\PYGZus{}crs}\PYG{p}{(}\PYG{l+m+mi}{4326}\PYG{p}{)}\PYG{o}{.}\PYG{n}{sjoin}\PYG{p}{(}\PYG{n}{milan}\PYG{p}{)}
-\PYG{n}{milan\PYGZus{}metro\PYGZus{}stations} \PYG{o}{=} \PYG{n}{metro\PYGZus{}stations}\PYG{o}{.}\PYG{n}{sjoin}\PYG{p}{(}\PYG{n}{milan}\PYG{p}{)}
-
-\PYG{n}{area\PYGZus{}circonvallazione} \PYG{o}{=} \PYG{n}{geopandas}\PYG{o}{.}\PYG{n}{read\PYGZus{}file}\PYG{p}{(}\PYG{n}{Path}\PYG{p}{(}\PYG{n}{milan\PYGZus{}data} \PYG{o}{/} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{custom\PYGZhy{}area\PYGZus{}circonvallazione.geo.json}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}
-
-\PYG{n}{trains\PYGZus{}dict} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{color}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{tab:blue}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{marker}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{X}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}
-\PYG{n}{metro\PYGZus{}dict} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{color}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{rebeccapurple}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{marker}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZca{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}
-
-\PYG{k}{def} \PYG{n+nf}{plot\PYGZus{}stations}\PYG{p}{(}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{k+kc}{None}\PYG{p}{:}
-
-    \PYG{n}{fig}\PYG{p}{,} \PYG{n}{ax} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mi}{10}\PYG{p}{)}\PYG{p}{)}
-    \PYG{n}{nil}\PYG{o}{.}\PYG{n}{to\PYGZus{}crs}\PYG{p}{(}\PYG{l+m+mi}{3857}\PYG{p}{)}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{ax}\PYG{o}{=}\PYG{n}{ax}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.2}\PYG{p}{)}
-    \PYG{n}{area\PYGZus{}circonvallazione}\PYG{o}{.}\PYG{n}{to\PYGZus{}crs}\PYG{p}{(}\PYG{l+m+mi}{3857}\PYG{p}{)}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{ax}\PYG{o}{=}\PYG{n}{ax}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{mediumseagreen}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.4}\PYG{p}{)}
-    \PYG{n}{milan\PYGZus{}train\PYGZus{}stations}\PYG{o}{.}\PYG{n}{to\PYGZus{}crs}\PYG{p}{(}\PYG{l+m+mi}{3857}\PYG{p}{)}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{ax}\PYG{o}{=}\PYG{n}{ax}\PYG{p}{,} \PYG{o}{*}\PYG{o}{*}\PYG{n}{trains\PYGZus{}dict}\PYG{p}{)}
-    \PYG{n}{milan\PYGZus{}metro\PYGZus{}stations}\PYG{o}{.}\PYG{n}{to\PYGZus{}crs}\PYG{p}{(}\PYG{l+m+mi}{3857}\PYG{p}{)}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{ax}\PYG{o}{=}\PYG{n}{ax}\PYG{p}{,} \PYG{o}{*}\PYG{o}{*}\PYG{n}{metro\PYGZus{}dict}\PYG{p}{)}
-    \PYG{n}{cx}\PYG{o}{.}\PYG{n}{add\PYGZus{}basemap}\PYG{p}{(}\PYG{n}{ax}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{axis}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{off}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Train Stations (Blue) and Metro Stations (Orange) in Milan}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{o}{*}\PYG{o}{*}\PYG{n}{title\PYGZus{}font}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-
-\PYG{n}{plot\PYGZus{}stations}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
+\begin{sphinxuseclass}{tag_hide-input}
+\begin{sphinxuseclass}{cell_output}
+\noindent\sphinxincludegraphics{{03-data_ingestion_and_spatial_operations_46_0}.png}
 
 \end{sphinxuseclass}
-\begin{sphinxuseclass}{cell_output}
-\noindent\sphinxincludegraphics{{03-data_ingestion_and_spatial_operations_50_0}.png}
-
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 \sphinxAtStartPar
 This leaves us with the following stations, which we store as a \sphinxcode{\sphinxupquote{.csv}} file and then upload into our local PostgreSQL database with a Bash script.
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{all\PYGZus{}stalls}\PYG{p}{:} \PYG{n}{geopandas}\PYG{o}{.}\PYG{n}{GeoDataFrame} \PYG{o}{=} \PYG{p}{(}
-    \PYG{n}{bikemi\PYGZus{}stalls\PYGZus{}nulls}
-    \PYG{o}{.}\PYG{n}{sjoin}\PYG{p}{(}\PYG{n}{nil}\PYG{p}{)}
-    \PYG{o}{.}\PYG{n}{sort\PYGZus{}values}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{numero\PYGZus{}stazione}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-    \PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{index\PYGZus{}right}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
-    \PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nome}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{stalls\PYGZus{}geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{anno}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{null\PYGZus{}obs\PYGZus{}ranking}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nil}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{id\PYGZus{}nil}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{municipio}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{)}
-    \PYG{o}{.}\PYG{n}{rename}\PYG{p}{(}\PYG{n}{columns}\PYG{o}{=}\PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nome}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nome\PYGZus{}stazione}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}
-\PYG{p}{)}
-
-\PYG{n}{selected\PYGZus{}stalls}\PYG{p}{:} \PYG{n}{geopandas}\PYG{o}{.}\PYG{n}{GeoDataFrame} \PYG{o}{=} \PYG{p}{(}
-    \PYG{n}{all\PYGZus{}stalls}
-        \PYG{o}{.}\PYG{n}{query}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{null\PYGZus{}obs\PYGZus{}ranking == }\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{very\PYGZus{}low}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{sjoin}\PYG{p}{(}\PYG{n}{area\PYGZus{}circonvallazione}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{index\PYGZus{}right}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
-\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{sphinxuseclass}
-\end{sphinxuseclass}
-\begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{train\PYGZus{}stations\PYGZus{}circ}\PYG{p}{:} \PYG{n}{geopandas}\PYG{o}{.}\PYG{n}{GeoDataFrame} \PYG{o}{=} \PYG{p}{(}
-    \PYG{n}{train\PYGZus{}stations}
-        \PYG{o}{.}\PYG{n}{to\PYGZus{}crs}\PYG{p}{(}\PYG{l+m+mi}{4326}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{sjoin}\PYG{p}{(}\PYG{n}{area\PYGZus{}circonvallazione}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{index\PYGZus{}right}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
-\PYG{p}{)}
-
-\PYG{n}{metro\PYGZus{}stations\PYGZus{}circ}\PYG{p}{:} \PYG{n}{geopandas}\PYG{o}{.}\PYG{n}{GeoDataFrame} \PYG{o}{=} \PYG{p}{(}
-    \PYG{n}{metro\PYGZus{}stations}
-        \PYG{o}{.}\PYG{n}{sjoin}\PYG{p}{(}\PYG{n}{area\PYGZus{}circonvallazione}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{index\PYGZus{}right}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
-\PYG{p}{)}
-
-
-
-\PYG{k}{def} \PYG{n+nf}{plot\PYGZus{}final\PYGZus{}data}\PYG{p}{(}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{k+kc}{None}\PYG{p}{:}
-    \PYG{n}{fig}\PYG{p}{,} \PYG{n}{ax} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mi}{10}\PYG{p}{)}\PYG{p}{)}
-
-    \PYG{n}{train\PYGZus{}stations\PYGZus{}circ}\PYG{o}{.}\PYG{n}{to\PYGZus{}crs}\PYG{p}{(}\PYG{l+m+mi}{3857}\PYG{p}{)}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{ax}\PYG{o}{=}\PYG{n}{ax}\PYG{p}{,} \PYG{o}{*}\PYG{o}{*}\PYG{n}{trains\PYGZus{}dict}\PYG{p}{)}
-    \PYG{n}{metro\PYGZus{}stations\PYGZus{}circ}\PYG{o}{.}\PYG{n}{to\PYGZus{}crs}\PYG{p}{(}\PYG{l+m+mi}{3857}\PYG{p}{)}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{ax}\PYG{o}{=}\PYG{n}{ax}\PYG{p}{,} \PYG{o}{*}\PYG{o}{*}\PYG{n}{metro\PYGZus{}dict}\PYG{p}{)}
-    \PYG{n}{selected\PYGZus{}stalls}\PYG{o}{.}\PYG{n}{to\PYGZus{}crs}\PYG{p}{(}\PYG{l+m+mi}{3857}\PYG{p}{)}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{ax}\PYG{o}{=}\PYG{n}{ax}\PYG{p}{,} \PYG{o}{*}\PYG{o}{*}\PYG{n}{bikes\PYGZus{}dict}\PYG{p}{)}
-    \PYG{n}{cx}\PYG{o}{.}\PYG{n}{add\PYGZus{}basemap}\PYG{p}{(}\PYG{n}{ax}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{axis}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{off}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{BikeMi Stalls and Stations Inside the Circonvallazione}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{o}{*}\PYG{o}{*}\PYG{n}{title\PYGZus{}font}\PYG{p}{)}
-
-    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-
-\PYG{n}{plot\PYGZus{}final\PYGZus{}data}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{sphinxuseclass}
+\begin{sphinxuseclass}{tag_hide-input}
 \begin{sphinxuseclass}{cell_output}
-\noindent\sphinxincludegraphics{{03-data_ingestion_and_spatial_operations_53_0}.png}
+\noindent\sphinxincludegraphics{{03-data_ingestion_and_spatial_operations_48_0}.png}
 
+\end{sphinxuseclass}
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k}{def} \PYG{n+nf}{unpack\PYGZus{}geometry}\PYG{p}{(}\PYG{n}{data}\PYG{p}{:} \PYG{n}{geopandas}\PYG{o}{.}\PYG{n}{GeoDataFrame}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{:}
-    \PYG{n}{df} \PYG{o}{=} \PYG{n}{data}\PYG{o}{.}\PYG{n}{copy}\PYG{p}{(}\PYG{p}{)}
-
-    \PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{longitudine}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{geometry}\PYG{o}{.}\PYG{n}{x}
-    \PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{latitudine}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{geometry}\PYG{o}{.}\PYG{n}{y}
-
-    \PYG{k}{return} \PYG{n}{df}\PYG{p}{[}\PYG{p}{[}\PYG{n}{col} \PYG{k}{for} \PYG{n}{col} \PYG{o+ow}{in} \PYG{n}{df}\PYG{o}{.}\PYG{n}{columns} \PYG{k}{if} \PYG{n}{col} \PYG{o+ow}{not} \PYG{o+ow}{in} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{stalls\PYGZus{}geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{]}
-
-\PYG{n}{all\PYGZus{}stalls}\PYG{o}{.}\PYG{n}{pipe}\PYG{p}{(}\PYG{n}{unpack\PYGZus{}geometry}\PYG{p}{)}\PYG{o}{.}\PYG{n}{to\PYGZus{}csv}\PYG{p}{(}\PYG{n}{milan\PYGZus{}data} \PYG{o}{/} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{bikemi\PYGZhy{}stalls\PYGZhy{}with\PYGZus{}nils.csv}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{n}{selected\PYGZus{}stalls}\PYG{o}{.}\PYG{n}{pipe}\PYG{p}{(}\PYG{n}{unpack\PYGZus{}geometry}\PYG{p}{)}\PYG{o}{.}\PYG{n}{to\PYGZus{}csv}\PYG{p}{(}\PYG{n}{milan\PYGZus{}data} \PYG{o}{/} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{bikemi\PYGZhy{}selected\PYGZus{}stalls\PYGZhy{}with\PYGZus{}nils.csv}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\end{sphinxVerbatim}
-
+\begin{sphinxuseclass}{tag_hide-input}
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 
 \chapter{BikeMi Stalls \sphinxstyleemphasis{k}\sphinxhyphen{}Means Clustering}
 \label{\detokenize{04-stations_kmeans:bikemi-stalls-k-means-clustering}}\label{\detokenize{04-stations_kmeans::doc}}
-\begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{} path manipulation}
-\PYG{k+kn}{from} \PYG{n+nn}{pathlib} \PYG{k+kn}{import} \PYG{n}{Path}
-\PYG{k+kn}{from} \PYG{n+nn}{typing} \PYG{k+kn}{import} \PYG{n}{Union}
-
-\PYG{c+c1}{\PYGZsh{} data manipulation}
-\PYG{k+kn}{import} \PYG{n+nn}{pandas} \PYG{k}{as} \PYG{n+nn}{pd}
-\PYG{k+kn}{import} \PYG{n+nn}{geopandas}
-
-\PYG{c+c1}{\PYGZsh{} plotting}
-\PYG{k+kn}{import} \PYG{n+nn}{matplotlib}\PYG{n+nn}{.}\PYG{n+nn}{pyplot} \PYG{k}{as} \PYG{n+nn}{plt}
-\PYG{k+kn}{import} \PYG{n+nn}{contextily} \PYG{k}{as} \PYG{n+nn}{cx}
-\PYG{k+kn}{import} \PYG{n+nn}{seaborn} \PYG{k}{as} \PYG{n+nn}{sns}
-
-\PYG{c+c1}{\PYGZsh{} connecting to a database}
-\PYG{k+kn}{import} \PYG{n+nn}{psycopg2}
-
-\PYG{k+kn}{from} \PYG{n+nn}{pandas}\PYG{n+nn}{.}\PYG{n+nn}{plotting} \PYG{k+kn}{import} \PYG{n}{register\PYGZus{}matplotlib\PYGZus{}converters}
-
-\PYG{n}{register\PYGZus{}matplotlib\PYGZus{}converters}\PYG{p}{(}\PYG{p}{)}
-
-\PYG{c+c1}{\PYGZsh{} set settings for seaborn}
-\PYG{n}{sns}\PYG{o}{.}\PYG{n}{set\PYGZus{}style}\PYG{p}{(}\PYG{n}{style}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{whitegrid}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{rc}\PYG{o}{=}\PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{grid.color}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{.9}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}
-\PYG{n}{sns}\PYG{o}{.}\PYG{n}{set\PYGZus{}palette}\PYG{p}{(}\PYG{n}{palette}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{deep}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-\PYG{c+c1}{\PYGZsh{} customise matplotlib and sns plot dimensions}
-\PYG{n}{plt}\PYG{o}{.}\PYG{n}{rcParams}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{figure.figsize}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{12}\PYG{p}{,} \PYG{l+m+mi}{6}\PYG{p}{]}
-\PYG{n}{plt}\PYG{o}{.}\PYG{n}{rcParams}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{figure.dpi}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{100}
-\PYG{n}{title\PYGZus{}font}\PYG{p}{:} \PYG{n+nb}{dict}\PYG{p}{[}\PYG{n+nb}{str}\PYG{p}{]} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fontname}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{DejaVu Sans Mono}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}
-
-\PYG{c+c1}{\PYGZsh{} create paths}
-\PYG{n}{milan\PYGZus{}data}\PYG{p}{:} \PYG{n}{Path} \PYG{o}{=} \PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{../data/milan}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-\PYG{c+c1}{\PYGZsh{} establish connection with the database}
-\PYG{n}{conn} \PYG{o}{=} \PYG{n}{psycopg2}\PYG{o}{.}\PYG{n}{connect}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{dbname=bikemi user=luca}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-\PYG{c+c1}{\PYGZsh{} load stalls data}
-\PYG{n}{bikemi\PYGZus{}selected\PYGZus{}stalls}\PYG{p}{:} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}sql}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{SELECT * FROM bikemi\PYGZus{}selected\PYGZus{}stalls}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{conn}\PYG{p}{)}\PYG{o}{.}\PYG{n}{set\PYGZus{}index}\PYG{p}{(}
-    \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{numero\PYGZus{}stazione}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-\PYG{n}{nils}\PYG{p}{:} \PYG{n}{geopandas}\PYG{o}{.}\PYG{n}{GeoDataFrame} \PYG{o}{=} \PYG{p}{(}
-    \PYG{n}{geopandas}\PYG{o}{.}\PYG{n}{read\PYGZus{}file}\PYG{p}{(}\PYG{n}{milan\PYGZus{}data} \PYG{o}{/} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{administrative\PYGZhy{}nil.geo.json}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{rename}\PYG{p}{(}\PYG{n+nb}{str}\PYG{o}{.}\PYG{n}{lower}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{set\PYGZus{}index}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{id\PYGZus{}nil}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nil}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{)}
-\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{sphinxuseclass}
-\end{sphinxuseclass}
 
 \section{\sphinxstyleemphasis{k}\sphinxhyphen{}Means Clustering Review}
 \label{\detokenize{04-stations_kmeans:k-means-clustering-review}}
@@ -1394,7 +881,7 @@ The algorithm begins with randomly choosing clusters centres and, with each iter
 \sphinxstyleemphasis{k}\sphinxhyphen{}Means clustering scales well with the number of samples \(n\), but assumes convex shapes (i.e., has worse performances where the “true” clusters have elongated or irregular shapes) (Clustering, n.d.). Besides, since the initial position of the cluster is random, it might take some attempt for the algorithm to converge. More importantly, however, \sphinxstyleemphasis{k}\sphinxhyphen{}Means is sensitive to the scales of the variables in the data, so normalising the feature matrix is a crucial step. Finally, \sphinxstyleemphasis{k}\sphinxhyphen{}Means assumes continuous data and is not designed to handle categorical features: “{[}T{]}he \sphinxstyleemphasis{k}\sphinxhyphen{}means algorithm only works on numerical data, i.e. variables that are measured on a ratio scale {[}…{]}, because it minimises a cost function by changing the means of clusters. This prohibits it from being used in applications where categorical data are involved” (Huang, 1998).
 
 \sphinxAtStartPar
-Some workarounds have long been studied in the literature: as an example, by changing the distance metrics from the Euclidean distance to the Gower distance, which is a measure of similarity (Gower, 1971), \sphinxstyleemphasis{k}\sphinxhyphen{}Means can be adjusted to cluster categorical variables. More recently, new methods have been developed, such as the \sphinxstyleemphasis{k}\sphinxhyphen{}Modes (Huang, 1998). These alternative methods rose in popularity because the “quadratic computational costs” of similarity\sphinxhyphen{}based algorithms are not suited for the larger and larger datasets we have been dealing with, especially in the past years.
+Some workarounds have long been studied in the literature: as an example, by changing the distance metrics from the Euclidean distance to the Gower distance, which is a measure of similarity (Gower, 1971), \sphinxstyleemphasis{k}\sphinxhyphen{}Means can be adjusted to cluster categorical variables. As an alternative, new methods have been developed, such as the \sphinxstyleemphasis{k}\sphinxhyphen{}Modes (Huang, 1998). These alternative methods rose in popularity because the “quadratic computational costs” of similarity\sphinxhyphen{}based algorithms are not suited for the larger and larger datasets we have been dealing with, especially in the past years.
 
 \sphinxAtStartPar
 Our context does not warrant new, sophisticated clustering algorithms. The sample size of the spatial distribution of stalls would even be small enough to justify an attempt with similarity scores. Yet, to the best of our knowledge, this procedure has not been tried yet in the literature, and there are plenty of good reasons for doing so.
@@ -1435,13 +922,13 @@ The first metric to look at is indeed the inertia, or \sphinxstyleemphasis{withi
 \end{split}
 \end{equation*}
 \sphinxAtStartPar
-Other norms can be used; however, some other performance metrics can only be calculated with the Euclidean distance. While clustering is usually presented as an unsupervised machine\sphinxhyphen{}learning technique, a first set of metrics is actually computed comparing the clustering with the ground truths. This is necessary because the evaluation metrics should not take into account the absolute number of clusters, yet if this clustering defines “separations of the data similar to some ground truth set of classes” \sphinxstylestrong{SKLEARN}.
+Other norms can be used; however, some other performance metrics can only be calculated with the Euclidean distance. While clustering is usually presented as an unsupervised machine\sphinxhyphen{}learning technique, a first set of metrics is actually computed comparing the clustering with the ground truths. This is necessary because the evaluation metrics should not take into account the absolute number of clusters, yet if this clustering defines “separations of the data similar to some ground truth set of classes” (Clustering, n.d.).
 
 \sphinxAtStartPar
 Among these metrics there are the \sphinxstyleemphasis{Rand index}, mutual information\sphinxhyphen{}based scores, measures of completeness and homogeneity (or both, such as the \sphinxstyleemphasis{V\sphinxhyphen{}measure}) and Fowlkes\sphinxhyphen{}Mallows scores. There is, however, another category of metrics that does not require a comparison with the ground\sphinxhyphen{}truth: the \sphinxstyleemphasis{silhouette coefficients}, the \sphinxstyleemphasis{Calinski\sphinxhyphen{}Harabasz index}, computed as  and  the \sphinxstyleemphasis{Davies\sphinxhyphen{}Bouldin index}. The dowside of these evaluation metrics is that they are not robust against “unconventional” shapes and tend to display “better” values when the clusters are convex.
 
 \sphinxAtStartPar
-These measures are computed for each set of data points and the labels assigned with the \sphinxstyleemphasis{k}\sphinxhyphen{}means. The silhouette score is computed as \(s = \frac{b - a}{max(a, b)}\), where \(a\) is the mean distance between a sample and all points in the same class and \(b\) is the average distance between the sample and the points in the \sphinxstyleemphasis{next nearest} cluster. The silhouette coefficients for all samples are averaged and a higher silhouette coefficient relates to a model with better defined clusters \sphinxstylestrong{SKLEARN}. For this reason, the silhouette score is defined within \([-1;1]\), and scores closer to \(-1\) denote incorrect clustering and values near \(0\) indicate overlapping data points.
+These measures are computed for each set of data points and the labels assigned with the \sphinxstyleemphasis{k}\sphinxhyphen{}means. The silhouette score is computed as \(s = \frac{b - a}{max(a, b)}\), where \(a\) is the mean distance between a sample and all points in the same class and \(b\) is the average distance between the sample and the points in the \sphinxstyleemphasis{next nearest} cluster. The silhouette coefficients for all samples are averaged and a higher silhouette coefficient relates to a model with better defined clusters (Clustering, n.d.). For this reason, the silhouette score is defined within \([-1;1]\), and scores closer to \(-1\) denote incorrect clustering and values near \(0\) indicate overlapping data points.
 
 \sphinxAtStartPar
 The Calinski\sphinxhyphen{}Harabasz Index is defined as:
@@ -1524,7 +1011,7 @@ DB = \frac{1}{k} \sum_{i=1}^k \max_{i \neq j} R_{ij}
 The \(WSS\) or inertia is not really indicative of a significant value of \(K\). The silhouette coefficient is greatest for a quite small number of clusters (smaller than 5) and in general not greater than 20. This appears to be the case for the Calinski\sphinxhyphen{}Harabasz index too and, while the same cannot be said of the Davies\sphinxhyphen{}Bouldin index, beyond said threshold the index is bound to improve. Our final choice should fall on 18, as we believe that clustering the whole set of stations into three great clusters bears no practical utility for the purpose of the policymaker \sphinxhyphen{} forecasting the bikes demand in Milan.
 
 \sphinxAtStartPar
-However, as mentioned above, the total number of neighbourhoods inside our area of analysis is 25: at this point, the policymaker might just be better off aggregating the data by neighbourhood, without going through the hassle of computing the \sphinxstyleemphasis{k}\sphinxhyphen{}means. Indeed, the purpose of fitting a \sphinxstyleemphasis{k}\sphinxhyphen{}means should be to isolate a small amount of clusters inside of each neighbourhood, to aggregate together stations that are quite close to each other and that cannot all be used at once as independent variables for the forecasting models without injecting error in the estimates via multicollinearity.
+However, as mentioned above, the total number of neighbourhoods inside our area of analysis is 25: at this point, the policymaker might just be better off aggregating the data by neighbourhood, without going through the hassle of computing the \sphinxstyleemphasis{k}\sphinxhyphen{}means. Indeed, in this context the purpose of fitting a \sphinxstyleemphasis{k}\sphinxhyphen{}means should be to isolate a small amount of clusters inside of each neighbourhood, in order to be able to aggregate together stations that are quite close to each other and that cannot all be used at once as independent variables for the forecasting models without injecting error in the estimates via multicollinearity. In this way, it would also be possible to include neighbourhood fixed effects \sphinxhyphen{} which would otherwise be impossible to add to the regression if data was aggregated ad that level.
 
 \begin{sphinxuseclass}{cell}
 \begin{sphinxuseclass}{cell_input}
@@ -1692,21 +1179,6 @@ After choosing the value for \(K\), stall data is aggregated to compute the coor
 \end{sphinxuseclass}
 \begin{sphinxuseclass}{cell_output}
 \noindent\sphinxincludegraphics{{04-stations_kmeans_16_0}.png}
-
-\end{sphinxuseclass}
-\end{sphinxuseclass}
-\begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{clustered\PYGZus{}selected\PYGZus{}stalls}\PYG{p}{:} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame} \PYG{o}{=} \PYG{p}{(}
-    \PYG{n}{bikemi\PYGZus{}selected\PYGZus{}stalls}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nome\PYGZus{}stazione}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{selected\PYGZus{}stalls\PYGZus{}46k}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{n}{columns}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{virtual\PYGZus{}stalls}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{n}{columns}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{geometry}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{,} \PYG{n}{on}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{cluster}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-        \PYG{o}{.}\PYG{n}{rename}\PYG{p}{(}\PYG{n}{columns}\PYG{o}{=}\PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{id\PYGZus{}nil}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{cluster\PYGZus{}id\PYGZus{}nil}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{nil}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{cluster\PYGZus{}nil}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}
-\PYG{p}{)}
-
-\PYG{n}{clustered\PYGZus{}selected\PYGZus{}stalls}\PYG{o}{.}\PYG{n}{to\PYGZus{}csv}\PYG{p}{(}\PYG{n}{milan\PYGZus{}data} \PYG{o}{/} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{bikemi\PYGZhy{}selected\PYGZus{}stalls\PYGZhy{}clusters.csv}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{index}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
-\end{sphinxVerbatim}
 
 \end{sphinxuseclass}
 \end{sphinxuseclass}

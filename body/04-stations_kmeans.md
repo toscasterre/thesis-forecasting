@@ -15,6 +15,8 @@ kernelspec:
 # BikeMi Stalls *k*-Means Clustering
 
 ```{code-cell} ipython3
+:tags: [hide-cell]
+
 # path manipulation
 from pathlib import Path
 from typing import Union
@@ -27,9 +29,6 @@ import geopandas
 import matplotlib.pyplot as plt
 import contextily as cx
 import seaborn as sns
-
-# connecting to a database
-import psycopg2
 
 from pandas.plotting import register_matplotlib_converters
 
@@ -47,12 +46,11 @@ title_font: dict[str] = {"fontname": "DejaVu Sans Mono"}
 # create paths
 milan_data: Path = Path("../data/milan")
 
-# establish connection with the database
-conn = psycopg2.connect("dbname=bikemi user=luca")
-
 # load stalls data
-bikemi_selected_stalls: pd.DataFrame = pd.read_sql("SELECT * FROM bikemi_selected_stalls", conn).set_index(
-    "numero_stazione")
+bikemi_selected_stalls: pd.DataFrame = pd.read_csv(
+    milan_data / "bikemi-selected_stalls-with_nils.csv",
+    index_col="numero_stazione"
+)
 
 nils: geopandas.GeoDataFrame = (
     geopandas.read_file(milan_data / "administrative-nil.geo.json")
@@ -64,21 +62,21 @@ nils: geopandas.GeoDataFrame = (
 
 ## *k*-Means Clustering Review
 
-+++
++++ {"citation-manager": {"citations": {"1bw6w": [{"id": "7765261/LUZJK6SS", "source": "zotero"}], "4rpc6": [{"id": "7765261/LPG37F27", "source": "zotero"}], "5wuoa": [{"id": "7765261/4YI56CGW", "source": "zotero"}], "acr6r": [{"id": "7765261/HLLRYBIK", "source": "zotero"}], "bh87a": [{"id": "7765261/LPG37F27", "source": "zotero"}], "d9fnm": [{"id": "7765261/HLLRYBIK", "source": "zotero"}], "nt8nm": [{"id": "7765261/QKQH3PKJ", "source": "zotero"}], "oc9xp": [{"id": "7765261/LPG37F27", "source": "zotero"}], "sfr96": [{"id": "7765261/B8QCV7ZD", "source": "zotero"}], "xpmoo": [{"id": "7765261/QKQH3PKJ", "source": "zotero"}]}}, "tags": []}
 
 After our first data selection to remove outliers and restrict the spatial area in which we are conducting our analysis,
 we are still left with more than 200 stations, spread across 25 neighbourhoods out of 88 - identified by the acronym NIL, i.e. *nuclei d'identità locale*. This figure might still be too high, especially as far as multivariate models are concerned: indeed, shrinkage will be necessary in order to avoid highly correlated features (*multicollinearity*).
 However, it is still in our interests to reduce the number of series to model even for the univariate forecasting: fitting twenty or two-hundred series is a different task. Even inspecting the correlation across series becomes a daunting task with such a great number of features.
 
-To do so, we will use *k*-means clustering - a popular method widely used in the sharing-services literature, especially to identify "virtual stations" in free-float services <cite id="54l2o">(Ma et al., 2018)</cite> or to "visualize the spatial distribution of DBS [Dockless Bike Sharing] and taxis around metro stations" <cite id="ai9ag">(Li et al., 2019)</cite>.
+To do so, we will use *k*-means clustering - a popular method widely used in the sharing-services literature, especially to identify "virtual stations" in free-float services <cite id="sfr96">(Ma et al., 2018)</cite> or to "visualize the spatial distribution of DBS [Dockless Bike Sharing] and taxis around metro stations" <cite id="bh87a">(Li et al., 2019)</cite>.
 
-In a few words, with *k*-means clustering  we "want to partition the observations into $K$ clusters such that the total within-cluster variation [also known as  *inertia*], summed over all $K$ clusters, is as small as possible" <cite id="is7ue">(Sohil et al., 2021)</cite>. The objective function to optimise is usually the squared Euclidean distance. Simply put, *k*-means "aims to partition n observations into $K$ clusters, represented by their centres or means. The centre of each cluster is calculated as the mean of all the instances belonging to that cluster" <cite id="z2z8d">(Li et al., 2019)</cite> and "is extremely efficient and concise for the classification of equivalent multidimensional data" such as sharing services data <cite id="ter8l">(Li et al., 2019)</cite>.
+In a few words, with *k*-means clustering  we "want to partition the observations into $K$ clusters such that the total within-cluster variation [also known as  *inertia*], summed over all $K$ clusters, is as small as possible" <cite id="5wuoa">(Sohil et al., 2021)</cite>. The objective function to optimise is usually the squared Euclidean distance. Simply put, *k*-means "aims to partition n observations into $K$ clusters, represented by their centres or means. The centre of each cluster is calculated as the mean of all the instances belonging to that cluster" <cite id="oc9xp">(Li et al., 2019)</cite> and "is extremely efficient and concise for the classification of equivalent multidimensional data" such as sharing services data <cite id="4rpc6">(Li et al., 2019)</cite>.
 
-The algorithm begins with randomly choosing clusters centres and, with each iteration, the centres are re-calculated to reduce the partitioning error - which decreases monotonically, as $K$ increases. Basically, in this second step the algorithm "creates new centroids by taking the mean value of all of the samples assigned to each previous centroid [...] until the centroids do not move significantly" <cite id="wx6bz">(<i>Clustering</i>, n.d.)</cite>. However, despite similarity always increasing, values of $K$ that are too great defy the purpose of this classification algorithm. For this reasons, practitioners and researchers have come up with more or less sophisticated ways to assess the optimal number of clusters, the most common of which is the so-called "Elbow method". In a few words, a chosen performance metric is computed for each number of clusters and the optimum is represented by the point at which the performance improvements start to marginally decline.
+The algorithm begins with randomly choosing clusters centres and, with each iteration, the centres are re-calculated to reduce the partitioning error - which decreases monotonically, as $K$ increases. Basically, in this second step the algorithm "creates new centroids by taking the mean value of all of the samples assigned to each previous centroid [...] until the centroids do not move significantly" <cite id="nt8nm">(<i>Clustering</i>, n.d.)</cite>. However, despite similarity always increasing, values of $K$ that are too great defy the purpose of this classification algorithm. For this reasons, practitioners and researchers have come up with more or less sophisticated ways to assess the optimal number of clusters, the most common of which is the so-called "Elbow method". In a few words, a chosen performance metric is computed for each number of clusters and the optimum is represented by the point at which the performance improvements start to marginally decline.
 
-*k*-Means clustering scales well with the number of samples $n$, but assumes convex shapes (i.e., has worse performances where the "true" clusters have elongated or irregular shapes) <cite id="hqe2q">(<i>Clustering</i>, n.d.)</cite>. Besides, since the initial position of the cluster is random, it might take some attempt for the algorithm to converge. More importantly, however, *k*-Means is sensitive to the scales of the variables in the data, so normalising the feature matrix is a crucial step. Finally, *k*-Means assumes continuous data and is not designed to handle categorical features: "[T]he *k*-means algorithm only works on numerical data, i.e. variables that are measured on a ratio scale [...], because it minimises a cost function by changing the means of clusters. This prohibits it from being used in applications where categorical data are involved" <cite id="qio8u">(Huang, 1998)</cite>.
+*k*-Means clustering scales well with the number of samples $n$, but assumes convex shapes (i.e., has worse performances where the "true" clusters have elongated or irregular shapes) <cite id="xpmoo">(<i>Clustering</i>, n.d.)</cite>. Besides, since the initial position of the cluster is random, it might take some attempt for the algorithm to converge. More importantly, however, *k*-Means is sensitive to the scales of the variables in the data, so normalising the feature matrix is a crucial step. Finally, *k*-Means assumes continuous data and is not designed to handle categorical features: "[T]he *k*-means algorithm only works on numerical data, i.e. variables that are measured on a ratio scale [...], because it minimises a cost function by changing the means of clusters. This prohibits it from being used in applications where categorical data are involved" <cite id="acr6r">(Huang, 1998)</cite>.
 
-Some workarounds have long been studied in the literature: as an example, by changing the distance metrics from the Euclidean distance to the Gower distance, which is a measure of similarity <cite id="xliyv">(Gower, 1971)</cite>, *k*-Means can be adjusted to cluster categorical variables. More recently, new methods have been developed, such as the *k*-Modes <cite id="wx7f9">(Huang, 1998)</cite>. These alternative methods rose in popularity because the "quadratic computational costs" of similarity-based algorithms are not suited for the larger and larger datasets we have been dealing with, especially in the past years.
+Some workarounds have long been studied in the literature: as an example, by changing the distance metrics from the Euclidean distance to the Gower distance, which is a measure of similarity <cite id="1bw6w">(Gower, 1971)</cite>, *k*-Means can be adjusted to cluster categorical variables. As an alternative, new methods have been developed, such as the *k*-Modes <cite id="d9fnm">(Huang, 1998)</cite>. These alternative methods rose in popularity because the "quadratic computational costs" of similarity-based algorithms are not suited for the larger and larger datasets we have been dealing with, especially in the past years.
 
 Our context does not warrant new, sophisticated clustering algorithms. The sample size of the spatial distribution of stalls would even be small enough to justify an attempt with similarity scores. Yet, to the best of our knowledge, this procedure has not been tried yet in the literature, and there are plenty of good reasons for doing so.
 
@@ -104,7 +102,7 @@ selected_stalls_lonlat: pd.DataFrame = bikemi_selected_stalls.pipe(filter_coords
 
 ## *k*-Means Clustering Evaluation Metrics
 
-+++ {"pycharm": {"name": "#%% md\n"}}
++++ {"citation-manager": {"citations": {"4ixnl": [{"id": "7765261/QKQH3PKJ", "source": "zotero"}], "pdryw": [{"id": "7765261/QKQH3PKJ", "source": "zotero"}]}}, "pycharm": {"name": "#%% md\n"}, "tags": []}
 
 The main, if not only, hyperparameter to tune in *k*-means is, indeed, the number of clusters.
 As most machine learning methods, *k*-means is a quite old algorithm and has thus been widely studied.
@@ -114,11 +112,11 @@ $$
 \sum_{i=0}^{n}\underset{\mu_{j}\in{C}}{min}(||x_{i} - \mu_{j}||^2)
 $$
 
-Other norms can be used; however, some other performance metrics can only be calculated with the Euclidean distance. While clustering is usually presented as an unsupervised machine-learning technique, a first set of metrics is actually computed comparing the clustering with the ground truths. This is necessary because the evaluation metrics should not take into account the absolute number of clusters, yet if this clustering defines "separations of the data similar to some ground truth set of classes" **SKLEARN**.
+Other norms can be used; however, some other performance metrics can only be calculated with the Euclidean distance. While clustering is usually presented as an unsupervised machine-learning technique, a first set of metrics is actually computed comparing the clustering with the ground truths. This is necessary because the evaluation metrics should not take into account the absolute number of clusters, yet if this clustering defines "separations of the data similar to some ground truth set of classes" <cite id="pdryw">(<i>Clustering</i>, n.d.)</cite>.
 
 Among these metrics there are the *Rand index*, mutual information-based scores, measures of completeness and homogeneity (or both, such as the *V-measure*) and Fowlkes-Mallows scores. There is, however, another category of metrics that does not require a comparison with the ground-truth: the *silhouette coefficients*, the *Calinski-Harabasz index*, computed as  and  the *Davies-Bouldin index*. The dowside of these evaluation metrics is that they are not robust against "unconventional" shapes and tend to display "better" values when the clusters are convex.
 
-These measures are computed for each set of data points and the labels assigned with the *k*-means. The silhouette score is computed as $s = \frac{b - a}{max(a, b)}$, where $a$ is the mean distance between a sample and all points in the same class and $b$ is the average distance between the sample and the points in the *next nearest* cluster. The silhouette coefficients for all samples are averaged and a higher silhouette coefficient relates to a model with better defined clusters **SKLEARN**. For this reason, the silhouette score is defined within $[-1;1]$, and scores closer to $-1$ denote incorrect clustering and values near $0$ indicate overlapping data points.
+These measures are computed for each set of data points and the labels assigned with the *k*-means. The silhouette score is computed as $s = \frac{b - a}{max(a, b)}$, where $a$ is the mean distance between a sample and all points in the same class and $b$ is the average distance between the sample and the points in the *next nearest* cluster. The silhouette coefficients for all samples are averaged and a higher silhouette coefficient relates to a model with better defined clusters <cite id="4ixnl">(<i>Clustering</i>, n.d.)</cite>. For this reason, the silhouette score is defined within $[-1;1]$, and scores closer to $-1$ denote incorrect clustering and values near $0$ indicate overlapping data points.
 
 The Calinski-Harabasz Index is defined as:
 
@@ -191,10 +189,12 @@ plot_all_metrics(selected_stalls_metrics)
 
 The $WSS$ or inertia is not really indicative of a significant value of $K$. The silhouette coefficient is greatest for a quite small number of clusters (smaller than 5) and in general not greater than 20. This appears to be the case for the Calinski-Harabasz index too and, while the same cannot be said of the Davies-Bouldin index, beyond said threshold the index is bound to improve. Our final choice should fall on 18, as we believe that clustering the whole set of stations into three great clusters bears no practical utility for the purpose of the policymaker - forecasting the bikes demand in Milan.
 
-However, as mentioned above, the total number of neighbourhoods inside our area of analysis is 25: at this point, the policymaker might just be better off aggregating the data by neighbourhood, without going through the hassle of computing the *k*-means. Indeed, the purpose of fitting a *k*-means should be to isolate a small amount of clusters inside of each neighbourhood, to aggregate together stations that are quite close to each other and that cannot all be used at once as independent variables for the forecasting models without injecting error in the estimates via multicollinearity.
+However, as mentioned above, the total number of neighbourhoods inside our area of analysis is 25: at this point, the policymaker might just be better off aggregating the data by neighbourhood, without going through the hassle of computing the *k*-means. Indeed, in this context the purpose of fitting a *k*-means should be to isolate a small amount of clusters inside of each neighbourhood, in order to be able to aggregate together stations that are quite close to each other and that cannot all be used at once as independent variables for the forecasting models without injecting error in the estimates via multicollinearity. In this way, it would also be possible to include neighbourhood fixed effects - which would otherwise be impossible to add to the regression if data was aggregated ad that level.
 
 ```{code-cell} ipython3
 ---
+jupyter:
+  outputs_hidden: false
 pycharm:
   name: '#%%
 
@@ -246,6 +246,8 @@ def plot_clusters(
 
 ```{code-cell} ipython3
 ---
+jupyter:
+  outputs_hidden: false
 pycharm:
   name: '#%%
 
@@ -272,10 +274,13 @@ If we sort the metrics matrix by the values of `sihlouette_coefficient`, the fir
 
 ```{code-cell} ipython3
 ---
+jupyter:
+  outputs_hidden: false
 pycharm:
   name: '#%%
 
     '
+tags: []
 ---
 def get_k_greater_than_25(metrics_data: pd.DataFrame, metric: str = "silhouette_coefficient") -> pd.DataFrame:
     return metrics_data.sort_values(metric, ascending=False).assign(ranking=range(metrics_data.shape[0])).query(
@@ -287,6 +292,8 @@ get_k_greater_than_25(selected_stalls_metrics)
 
 ```{code-cell} ipython3
 ---
+jupyter:
+  outputs_hidden: false
 pycharm:
   name: '#%%
 
@@ -315,6 +322,8 @@ After choosing the value for $K$, stall data is aggregated to compute the coordi
 
 ```{code-cell} ipython3
 ---
+jupyter:
+  outputs_hidden: false
 pycharm:
   name: '#%%
 
@@ -352,10 +361,13 @@ plot_virtual_clusters(virtual_stalls, layer=selected_nills_46k)
 
 ```{code-cell} ipython3
 ---
+jupyter:
+  outputs_hidden: false
 pycharm:
   name: '#%%
 
     '
+tags: [hide-cell]
 ---
 clustered_selected_stalls: pd.DataFrame = (
     bikemi_selected_stalls.filter(["nome_stazione"])

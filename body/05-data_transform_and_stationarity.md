@@ -7,9 +7,9 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.11.5
 kernelspec:
-  display_name: Bike Sharing Forecasting
+  display_name: PyCharm (tesi)
   language: python
-  name: bikemi
+  name: pycharm-dd017f2c
 ---
 
 +++ {"incorrectly_encoded_metadata": "jp-MarkdownHeadingCollapsed=true", "tags": []}

@@ -98,36 +98,41 @@ count_users_by_year(conn)
 
 # ## Data Analysis
 
-# ### Remove Outliers and Select the Time Span
+# In addition to selecting only trips from June 2015 to June 2018, we also disregard all rentals whose duration is smaller than one minute (around 4000) - as previously done in the literature <cite id="oz3v4">(Toro et al., 2020)</cite>. This leaves us with more than 11,7 million observations. We will temporarily store these in a [materialised view](https://www.postgresql.org/docs/current/sql-creatematerializedview.html), that we will drop at the end of the data analysis.
 
-# In addition to selecting only trips from June 2015 to June 2018, we also disregard all rentals whose duration is smaller than one minute - as previously done in the literature. This leaves us with more than 11,7 million observations. We store these in a [materialised view](https://www.postgresql.org/docs/current/sql-creatematerializedview.html):
+# ```python
+# def create_materialised_view(connection) -> None:
+# 
+#     query_rentals_before_2019: str = """
+#         CREATE MATERIALIZED VIEW IF NOT EXISTS bikemi_rentals.bikemi_rentals_before_2019 AS
+#         (
+#         SELECT b.bici,
+#                b.tipo_bici,
+#                b.cliente_anonimizzato,
+#                DATE_TRUNC('second', b.data_prelievo)     AS data_prelievo,
+#                b.numero_stazione_prelievo,
+#                b.nome_stazione_prelievo,
+#                DATE_TRUNC('second', b.data_restituzione) AS data_restituzione,
+#                b.numero_stazione_restituzione,
+#                b.nome_stazione_restituzione,
+#                b.durata_noleggio
+#         FROM bikemi_rentals.bikemi_source_data b
+#         WHERE EXTRACT(
+#                       'year'
+#                       FROM b.data_restituzione
+#                   ) < 2019
+#           AND durata_noleggio > interval '1 minute'
+#             );
+#     """
+# 
+#     with connection:
+#         with connection.cursor() as cursor:
+#             cursor.execute(query_rentals_before_2019)
+# ```
+
+# The service has almost two-hundred thousands unique subscribers in the time period. For the years 2016 and 2017, the only ones for which we have complete data, the number of subscribers is almost a hundred thousand. By lookind at the unique subscribers for the other two years, it might seem that the number of subscribers in the second half of the year is higher.
 
 # In[4]:
-
-
-materialized_view_query = """
-    CREATE MATERIALIZED VIEW IF NOT EXISTS bikemi_rentals_before_2019 AS (
-        SELECT
-            b.tipo_bici,
-            b.cliente_anonimizzato,
-            DATE_TRUNC("second", b.data_prelievo) AS data_prelievo,
-            b.numero_stazione_prelievo,
-            b.nome_stazione_prelievo,
-            DATE_TRUNC("second", b.data_restituzione) AS data_restituzione,
-            b.numero_stazione_restituzione,
-            b.nome_stazione_restituzione,
-            b.durata_noleggio
-        FROM bikemi_source_data b
-        WHERE
-            EXTRACT("year" FROM b.data_restituzione) < 2019 AND
-            durata_noleggio > interval "1 minute"
-    );
-"""
-
-
-# ### Top Users and Commuting Habits
-
-# In[5]:
 
 
 def count_distinct_users(connection) -> pd.DataFrame:
@@ -143,9 +148,7 @@ def count_distinct_users(connection) -> pd.DataFrame:
 count_distinct_users(conn)
 
 
-# The service has almost 200 thousands unique subscribers in the time period. Then breakdown by year is the following:
-
-# In[6]:
+# In[5]:
 
 
 def count_users_by_year(connection) -> pd.DataFrame:
@@ -162,34 +165,9 @@ def count_users_by_year(connection) -> pd.DataFrame:
 count_users_by_year(conn)
 
 
-# The number of subscriptions is declining in 2015 and 2018, as there are observations for six months only. In particular, for the year 2018 the count is even lower because the autumn/winter months are missing.
-# 
-# It is also interesting to look at the top users:
+# It is also of interest to look at the number of rentals of each user, broken down by year. As expected, there are more observations from the years 2016 and 2017 as these are complete years. The great number of usage translates to an average of almost 4 trips per day - i.e., to reach the first train station and then the workplace.
 
-# In[7]:
-
-
-def get_top_users(connection) -> pd.DataFrame:
-    query = """
-        SELECT
-            cliente_anonimizzato,
-            COUNT(*) AS noleggi_totali
-        FROM bikemi_rentals_before_2019 b
-        GROUP BY
-            cliente_anonimizzato
-        ORDER BY noleggi_totali DESC
-        LIMIT 10;
-    """
-
-    return pd.read_sql(query, connection).set_index("cliente_anonimizzato")
-
-
-get_top_users(conn)
-
-
-# But it might be of greater interest to look at the distribution by year:
-
-# In[8]:
+# In[6]:
 
 
 def get_top_users_by_year(connection) -> pd.DataFrame:
@@ -212,13 +190,11 @@ def get_top_users_by_year(connection) -> pd.DataFrame:
 get_top_users_by_year(conn)
 
 
-# As expected, there are more observations from the years 2016 and 2017 as these are complete years. The great number of usage translates to an average of almost 4 trips per day - i.e., to reach the first train station and then the workplace.
-
 # ### Usage Patterns and Origin-Destination Matrix
 
 # As a starter, it is useful to look at the origin-destination (OD) matrix, to see which are the most popular starting and departure points. On the aggregate level, the most popular points on the OD matrix are the train stations and sightseeing places such as Duomo.
 
-# In[9]:
+# In[7]:
 
 
 def get_top_stations(cols: list[str], connection, commuting_hours: bool = False) -> pd.DataFrame:
@@ -226,7 +202,7 @@ def get_top_stations(cols: list[str], connection, commuting_hours: bool = False)
         if commuting:
             query = f"""
             SELECT
-                {colname},
+                {colname} AS {colname.replace("nome_", "")},
                 COUNT(*) AS numero_noleggi
             FROM bikemi_rentals_before_2019
             WHERE
@@ -241,7 +217,7 @@ def get_top_stations(cols: list[str], connection, commuting_hours: bool = False)
 
         query = f"""
             SELECT
-                {colname},
+                {colname} AS {colname.replace("nome_", "")},
                 COUNT(*) AS numero_noleggi
             FROM bikemi_rentals_before_2019
             GROUP BY
@@ -259,7 +235,7 @@ get_top_stations(["nome_stazione_prelievo", "nome_stazione_restituzione"], conn)
 
 # The ranking is basically unchanged if we look only at data from Monday to Friday and within "core" commuting hours (say, from 7 to 10 and from 17 to 20). However, trips towards stations become more frequent and destinations such as Moscova are slightly less popular. Indeed, employees might straight bike to Moscova after work to take a sip from their Negroni.
 
-# In[10]:
+# In[8]:
 
 
 get_top_stations(["nome_stazione_prelievo", "nome_stazione_restituzione"], conn, commuting_hours=True)
@@ -267,15 +243,15 @@ get_top_stations(["nome_stazione_prelievo", "nome_stazione_restituzione"], conn,
 
 # The behaviour changes if we look ad the individual trips, i.e. if we `GROUP BY` both departure and destination stations (`nome_stazione_prelievo` and `nome_stazione_restituzione`). To be exact, `Coni Zugna Solari` is close to both the station in Porta Genova as well as the Navigli and Darsena, which partly explains its popularity.
 
-# In[11]:
+# In[9]:
 
 
 def get_top_od(connection, commuting_hours: bool = False) -> pd.DataFrame:
     if commuting_hours:
         query = """
                 SELECT
-                    nome_stazione_prelievo,
-                    nome_stazione_restituzione,
+                    nome_stazione_prelievo AS stazione_prelievo,
+                    nome_stazione_restituzione AS stazione_destinazione,
                     COUNT(*) AS numero_noleggi
                 FROM bikemi_rentals_before_2019
                 WHERE
@@ -291,8 +267,8 @@ def get_top_od(connection, commuting_hours: bool = False) -> pd.DataFrame:
 
     query = """
         SELECT
-            nome_stazione_prelievo,
-            nome_stazione_restituzione,
+            nome_stazione_prelievo AS stazione_prelievo,
+            nome_stazione_restituzione AS stazione_destinazione,
             COUNT(*) AS numero_noleggi
         FROM bikemi_rentals_before_2019
         GROUP BY
@@ -310,7 +286,7 @@ get_top_od(conn)
 
 # The same considerations apply when looking at the top trips only within the "core" commuting hours. This reinforces the conclusion that BikeMi is consistently used for commuting purposes.
 
-# In[12]:
+# In[10]:
 
 
 get_top_od(conn, commuting_hours=True)
@@ -320,7 +296,7 @@ get_top_od(conn, commuting_hours=True)
 
 # On its open data portal, the Comune di Milano publishes all sorts of open data - like the daily entrances in the so-called Area C, where access to private cars is limited. On this treasure trove of data, we can also find things like the location of column fountains and newsstands, but also the geo-referenced data of bike tracks and the location of [BikeMi Stations](https://dati.comune.milano.it/it/dataset/ds65_infogeo_aree_sosta_bike_sharing_localizzazione_). As noted previously, the service has some 320 stations, spread unevenly across the town, as it was outlined by previous studies <cite id="tfga6">(Saibene &#38; Manzi, 2015)</cite>. As a starter, we filter out all stations that have been introduced after 2019. This leaves us with 281 official stations, versus 279 in the historic data.
 
-# In[13]:
+# In[11]:
 
 
 bikemi_stalls = (
@@ -342,7 +318,7 @@ bikemi_stalls.head()
 
 # The data is represented with the (geographic) coordinate reference system (CRS) `EPSG:4326`, but in order to use the `contextily` library we need to cast it to the (projected) reference system `EPSG:3587`. As the map shows, the stalls stretch to the North, towards Bicocca and Sesto San Giovanni. We can already see that the stalls distribution outside the city centre follows bike lanes (in blue).
 
-# In[14]:
+# In[12]:
 
 
 bike_lanes = geopandas.read_file(Path(milan_data / "transports-bike_lanes.geo.json"))
@@ -371,48 +347,99 @@ plot_stalls_and_bikelanes()
 # 
 # We start by creating another two `materialised views` with the daily and hourly rentals, by station. Since the service is only active between 7 and 24, we just keep hourly observations within that time span. If we simply were to `GROUP BY` station names and time units, we would obtain series with gaps in the time index. We first create a table with all possible combinations of stations and dates using a `CROSS JOIN` and a common table expression (or `CTE`), then left join on this table the values obtained via the `GROUP BY` on the reference table. A similar query is used to obtain the hourly rentals, with hourly time intervals instead of daily ones.
 
-# In[15]:
+# ```python
+# def create_rentals_materialized_views(connection) -> None:
+#     
+#     query_daily_rentals: str = """
+#         CREATE MATERIALIZED VIEW IF NOT EXISTS bikemi_rentals.daily_rentals_before_2019 AS
+#         (
+#         WITH cross_table AS (
+#             SELECT d.date AS data_partenza,
+#                    s.nome AS stazione_partenza,
+#                    s.numero_stazione
+#             FROM (
+#                      SELECT *
+#                      FROM bikemi_rentals.bikemi_stations
+#                      WHERE anno < 2019
+#                  ) s
+#                      CROSS JOIN (
+#                 SELECT generate_series(
+#                                timestamp '2015-06-01',
+#                                timestamp '2018-06-01',
+#                                interval '1 day'
+#                            )::date
+#             ) d(date)
+#             ORDER BY nome,
+#                      date
+#         )
+#         SELECT c.data_partenza,
+#                c.stazione_partenza,
+#                c.numero_stazione,
+#                COUNT(b.*)::smallint AS noleggi_giornalieri
+#         FROM cross_table c
+#                  LEFT JOIN bikemi_rentals.bikemi_rentals_before_2019 b ON b.numero_stazione_prelievo = c.numero_stazione
+#             AND DATE_TRUNC('day', b.data_prelievo)::date = c.data_partenza
+#         GROUP BY c.data_partenza,
+#                  c.stazione_partenza,
+#                  c.numero_stazione
+#         ORDER BY stazione_partenza,
+#                  data_partenza
+#             );
+#     """
+#     
+#     query_hourly_rentals: str = """
+#     CREATE MATERIALIZED VIEW IF NOT EXISTS bikemi_rentals.hourly_rentals_before_2019 AS
+#     (
+#     WITH cross_table AS (
+#         SELECT d.date_time AS data_partenza,
+#                s.nome      AS stazione_partenza,
+#                s.numero_stazione
+#         FROM (
+#                  SELECT *
+#                  FROM bikemi_rentals.bikemi_stations
+#                  WHERE anno < 2019
+#              ) s
+#                  CROSS JOIN (
+#             SELECT generate_series(
+#                            timestamp '2015-06-01',
+#                            timestamp '2018-06-01',
+#                            interval '1 hour'
+#                        )::timestamp
+#         ) d(date_time)
+#         WHERE EXTRACT(
+#                       'hour'
+#                       FROM d.date_time
+#                   ) BETWEEN 7 and 24
+#         ORDER BY nome,
+#                  date_time
+#     )
+#     SELECT c.data_partenza,
+#            c.stazione_partenza,
+#            c.numero_stazione,
+#            COUNT(b.*)::smallint AS noleggi_per_ora
+#     FROM cross_table c
+#              LEFT JOIN bikemi_rentals.bikemi_rentals_before_2019 b ON b.numero_stazione_prelievo = c.numero_stazione
+#         AND DATE_TRUNC('hour', b.data_prelievo)::timestamp = c.data_partenza
+#     GROUP BY c.data_partenza,
+#              c.stazione_partenza,
+#              c.numero_stazione
+#     ORDER BY stazione_partenza,
+#              data_partenza
+#         );
+#     """
+#     
+#     with connection:
+#         with connection.cursor() as cursor:
+#             cursor.execute(query_daily_rentals)
+#             cursor.execute(query_hourly_rentals)
+# ```
 
+# In[13]:
 
-# query with cross join used to create the second materialised view
-# another similar one is used to create the view for hourly observations
-materialised_view_daily_rentals = """
-    DROP TABLE IF EXISTS daily_rentals_all;
-    
-    CREATE MATERIALIZED VIEW IF NOT EXISTS daily_rentals_before_2019 AS (
-    
-        WITH cross_table AS (SELECT
-            d.date AS data_partenza,
-            s.nome AS stazione_partenza,
-            s.numero_stazione
-        FROM bikemi_stalls s
-        CROSS JOIN (
-           SELECT generate_series (timestamp "2015-06-01"
-                                 , timestamp "2018-06-01"
-                                 , interval  "1 day")::date
-           ) d(date)
-        ORDER BY nome, date ASC)
-
-        SELECT
-            c.data_partenza,
-            c.stazione_partenza,
-            c.numero_stazione,
-            COUNT(b.*) AS noleggi_giornalieri
-        FROM cross_table c
-        LEFT JOIN bikemi_rentals_before_2019 b
-            ON b.numero_stazione_prelievo = c.numero_stazione
-            AND DATE_TRUNC("day", b.data_prelievo)::date = c.data_partenza
-        GROUP BY
-            c.data_partenza,
-            c.stazione_partenza,
-            c.numero_stazione
-        ORDER BY stazione_partenza, data_partenza ASC
-    );
-"""
 
 def retrieve_daily_rentals(connection) -> pd.DataFrame:
     query = """
-        SELECT * FROM daily_rentals_all;
+        SELECT * FROM daily_rentals_before_2019;
     """
     return pd.read_sql(query, connection).set_index("data_partenza")
 
@@ -421,7 +448,7 @@ daily_rentals = retrieve_daily_rentals(conn)
 
 # Then, we compute the number of null values in the data (`null_obs`), pivot the table to wider format and compute the percentage of missing values in each station (`null_obs`). Using Pandas"`cut()` method, we can convert this numerical column into a categorical variable (`null_obs_ranking`) and choose the number of levels - five, in our case - to split the column into even intervals with.
 
-# In[16]:
+# In[14]:
 
 
 obs_number = daily_rentals.index.unique().shape[0]
@@ -450,7 +477,7 @@ stations_missing_obs["null_obs_ranking"] = pd.cut(
 
 # In this way, we can see that the number of stations with an "unacceptable" number of missing values is smaller than thirty.
 
-# In[17]:
+# In[15]:
 
 
 sns.histplot(stations_missing_obs, x="null_obs_ranking")
@@ -466,7 +493,7 @@ plt.show()
 
 # More than 80 percent of the stations display a count of null observations inferior to 20 percent.
 
-# In[18]:
+# In[16]:
 
 
 sns.ecdfplot(stations_missing_obs, x="pct_null")
@@ -482,7 +509,7 @@ plt.show()
 
 # We can also join this data with the station spatial data to plot them. While this does not expose patterns that could be used to reduce the dimensionality of the data, it shows that there are some stations that need to be dropped off even from the most crowded areas in the city. This could not be spotted before as, to the best of our knowledge, no one in the BikeMi literature has ever found a way to take into account of how public work on roads and infrastructure had effects on the bike sharing service.
 
-# In[19]:
+# In[17]:
 
 
 bikemi_stalls_nulls = (
@@ -520,7 +547,7 @@ plot_stalls_missing_values()
 
 # Besides dropping the "emptiest" stations, we should also come up with a way to narrow down the geographic area inside which we perform the analysis. Previously, authors have chosen to analyse just the area inside the Bastioni, or "Area C" <cite id="sopwq">(Saibene &#38; Manzi, 2015)</cite> or the whole set of stations <cite id="srqoj">(Toro et al., 2020)</cite>. This was mainly due to the different purpose of their analysis and the data availability (Saibene and Manzi analyse data from 2008 to 2012). For our goal, as well as the policymaker perspective, this choice seems restricting, as it leaves out most of the train stations. It is worth noting that analysing the bike sharing traffic inside of Area C can be appropriate: for example, since, the municipality publishes the number of daily accesses to the area, which could be used to evaluate the effect of sharing services on traffic.
 
-# In[20]:
+# In[18]:
 
 
 area_c = (
@@ -550,7 +577,7 @@ plot_area_c()
 # 
 # This approach might just reinforce the bias towards the centre of the city, but given the technical constraints seems to be the more viable option. However, as a comparison, the Area C would only contain one train station, whereas this area contains all of the top rentals stalls from the origin-destination (OD) matrix.
 
-# In[21]:
+# In[19]:
 
 
 metro_stations = geopandas.read_file(Path(milan_data / "transports-metro_stops.geo.json"))
@@ -587,7 +614,7 @@ nil = (
 milan = municipi.dissolve().rename({"municipio": "milano"}, axis=1)
 
 
-# In[22]:
+# In[20]:
 
 
 milan_train_stations = train_stations.to_crs(4326).sjoin(milan)
@@ -597,6 +624,7 @@ area_circonvallazione = geopandas.read_file(Path(milan_data / "custom-area_circo
 
 trains_dict = {"color": "tab:blue", "marker": "X"}
 metro_dict = {"color": "rebeccapurple", "marker": "^"}
+
 
 def plot_stations() -> None:
 
@@ -613,12 +641,13 @@ def plot_stations() -> None:
 
     plt.show()
 
+
 plot_stations()
 
 
 # This leaves us with the following stations, which we store as a `.csv` file and then upload into our local PostgreSQL database with a Bash script.
 
-# In[23]:
+# In[21]:
 
 
 all_stalls: geopandas.GeoDataFrame = (
@@ -637,10 +666,6 @@ selected_stalls: geopandas.GeoDataFrame = (
         .drop("index_right", axis=1)
 )
 
-
-# In[24]:
-
-
 train_stations_circ: geopandas.GeoDataFrame = (
     train_stations
         .to_crs(4326)
@@ -653,7 +678,6 @@ metro_stations_circ: geopandas.GeoDataFrame = (
         .sjoin(area_circonvallazione)
         .drop("index_right", axis=1)
 )
-
 
 
 def plot_final_data() -> None:
@@ -670,10 +694,11 @@ def plot_final_data() -> None:
 
     plt.show()
 
+
 plot_final_data()
 
 
-# In[25]:
+# In[22]:
 
 
 def unpack_geometry(data: geopandas.GeoDataFrame) -> pd.DataFrame:
@@ -684,6 +709,9 @@ def unpack_geometry(data: geopandas.GeoDataFrame) -> pd.DataFrame:
 
     return df[[col for col in df.columns if col not in "stalls_geometry"]]
 
-all_stalls.pipe(unpack_geometry).to_csv(milan_data / "bikemi-stalls-with_nils.csv")
+
+# all_stalls.pipe(unpack_geometry).to_csv(milan_data / "bikemi-stalls-with_nils.csv")
 selected_stalls.pipe(unpack_geometry).to_csv(milan_data / "bikemi-selected_stalls-with_nils.csv")
+
+conn.close()
 
