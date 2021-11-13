@@ -474,7 +474,7 @@ def create_rentals_materialized_views(connection) -> None:
 ```
 
 ```{code-cell} ipython3
-:tags: []
+:tags: [hide-input]
 
 def retrieve_daily_rentals(connection) -> pd.DataFrame:
     query = """
