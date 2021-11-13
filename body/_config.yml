@@ -22,9 +22,7 @@ latex:
   latex_documents:
     targetname: thesis-bike_sharing_forecasting.tex
 
-# Add a bibtex file so that we can create citations
-bibtex_bibfiles:
-  - tesi.bib
+# No bibtex file is specified as we are using jupyterlab-citation-manager
 
 # # Information about where the book exists on the web
 # repository:

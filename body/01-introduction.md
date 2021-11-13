@@ -58,7 +58,7 @@ Restructuring the public transport will require extensive coordination between n
 
 ## The Case for Promoting Bike Sharing
 
-+++ {"citation-manager": {"citations": {"039o5": [{"id": "7765261/RNCXQEAG", "source": "zotero"}], "0mmhf": [{"id": "7765261/LUCYT8NP", "source": "zotero"}], "4kg8r": [{"id": "7765261/FTM4CYUT", "source": "zotero"}], "601x8": [{"id": "7765261/EIMDTC6Q", "source": "zotero"}], "abpus": [{"id": "7765261/VMWQTQ76", "source": "zotero"}], "e1ls8": [{"id": "7765261/NF5NTFPJ", "source": "zotero"}], "enrov": [{"id": "7765261/NF5NTFPJ", "source": "zotero"}], "eq14m": [{"id": "7765261/FGMR4BME", "source": "zotero"}], "i5qrt": [{"id": "7765261/RNCXQEAG", "source": "zotero"}], "izohe": [{"id": "7765261/FGMR4BME", "source": "zotero"}], "l8499": [{"id": "7765261/NF5NTFPJ", "source": "zotero"}], "ua2i7": [{"id": "7765261/N37UTVGB", "source": "zotero"}], "v4gkr": [{"id": "7765261/FGMR4BME", "source": "zotero"}], "wgl8a": [{"id": "7765261/VMWQTQ76", "source": "zotero"}], "yeski": [{"id": "7765261/4US9Q7KQ", "source": "zotero"}]}}, "tags": []}
++++ {"citation-manager": {"citations": {"039o5": [{"id": "7765261/RNCXQEAG", "source": "zotero"}], "0mmhf": [{"id": "7765261/LUCYT8NP", "source": "zotero"}], "4kg8r": [{"id": "7765261/FTM4CYUT", "source": "zotero"}], "601x8": [{"id": "7765261/EIMDTC6Q", "source": "zotero"}], "abpus": [{"id": "7765261/VMWQTQ76", "source": "zotero"}], "e1ls8": [{"id": "7765261/NF5NTFPJ", "source": "zotero"}], "enrov": [{"id": "7765261/NF5NTFPJ", "source": "zotero"}], "eq14m": [{"id": "7765261/FGMR4BME", "source": "zotero"}], "i5qrt": [{"id": "7765261/RNCXQEAG", "source": "zotero"}], "izohe": [{"id": "7765261/FGMR4BME", "source": "zotero"}], "l8499": [{"id": "7765261/NF5NTFPJ", "source": "zotero"}], "ua2i7": [{"id": "7765261/N37UTVGB", "source": "zotero"}], "v4gkr": [{"id": "7765261/FGMR4BME", "source": "zotero"}], "wgl8a": [{"id": "7765261/VMWQTQ76", "source": "zotero"}], "yeski": [{"id": "7765261/4US9Q7KQ", "source": "zotero"}], "megeu": [{"id": "7765261/XAXEHQ4L", "source": "zotero"}]}}, "tags": []}
 
 Reforming the public transport will be crucial to reach carbon neutrality and possibly promote economic growth. After all, transport accounts for as much as 27 percent of emissions in the EU <cite id="wgl8a">(Bergantino et al., 2021)</cite> and while the overall greenhouse gases (GHG) emissions has been declining since the 1990s, the emissions from road transportation has nonetheless been increasing ever since <cite id="yeski">(<i>Annual European Union Greenhouse Gas Inventory 1990–2018 and Inventory Report 2020 — European Environment Agency</i>, 2020)</cite>. Besides, it is well-known that Italy chose to privilege rubber over railways to transport goods: Eurostat estimated that from 2000 to 2016 less than 10 percent of goods travelled by train, while the EU average was almost 18 percent <cite id="601x8">(<i>Milano ha un’occasione storica</i>, 2017)</cite>, so there seems to be much room to increase productivity. And, besides, despite the fact that emissions have been decreasing since the 1990s, Italy is not on the side of the achievers: since 1990, emissions in the country were reduced by 17,2 percent, compared to the EU28's 25,2 percent. 
 
@@ -66,7 +66,7 @@ The Next Generation EU provides Italy with the perfect chance to narrow the divi
 
 This dissertation stems from the idea that bike sharing systems can be promoted with cheap measures. This is not a new approach to the literature: as an example, Cantelmo and his coauthors attempt to implement a low-dimensional model for bike-dharing demand forecasting that does not "focus on the methodological aspect of finding the most advanced algorithm to learn these correlations" <cite id="l8499">(Cantelmo et al., 2020)</cite>, as these more sophisticated models are prone to overfitting and new issues arise when more data is added to these models, i.e. when new contexts appear in the model space.
 
-In particular, this project falls in the trunk of literature aimed at improving customer satisfaction through demand forecasting. This task can be split in two categories: demand rebalancing and demand forecasting techniques. The first category, demand rebalancing or repositioning, simply means "design efficient bike repositioning solutions" <cite id="ua2i7">(Ghosh et al., 2019)</cite>. Rebalancing can either be user-based, when the users are offered an incentive to park the bike themselves, or operator-based. In this latter case, we can also distinguish between static rebalancing (when repositioning occurs when the service is off, like at night) and dynamic rebalancing otherwise <cite id="enrov">(Cantelmo et al., 2020)</cite>. The second problem, demand forecasting, is the one we will be focusing on. Simply put, demand forecasting attempt to estimate the number of bikes that will be requested at a certain moment in time. This task can be accomplished at the aggregate city level, or by identifying clusters of stations (the so-called Traffic-Analysis Zones or *TAZ*) or even at the individual station <cite id="e1ls8">(Cantelmo et al., 2020)</cite>. 
+In particular, this project falls in the trunk of literature aimed at improving customer satisfaction through demand forecasting, a task of "tremendous commercial value" <cite id="megeu">(Hamad et al., 2021)</cite>. This task can be split in two categories: demand rebalancing and demand forecasting techniques. The first category, demand rebalancing or repositioning, simply means "design efficient bike repositioning solutions" <cite id="ua2i7">(Ghosh et al., 2019)</cite>. Rebalancing can either be user-based, when the users are offered an incentive to park the bike themselves, or operator-based. In this latter case, we can also distinguish between static rebalancing (when repositioning occurs when the service is off, like at night) and dynamic rebalancing otherwise <cite id="enrov">(Cantelmo et al., 2020)</cite>. The second problem, demand forecasting, is the one we will be focusing on. Simply put, demand forecasting attempt to estimate the number of bikes that will be requested at a certain moment in time. This task can be accomplished at the aggregate city level, or by identifying clusters of stations (the so-called Traffic-Analysis Zones or *TAZ*) or even at the individual station <cite id="e1ls8">(Cantelmo et al., 2020)</cite>. 
 
 These problems became ever more important since the introduction of free-float bike-sharing systems (FFBBS), as the bikes can be dropped anywhere and end up in sub-optimal places for the next customers. On the positive side, FFBBS do not require the upfront investments for building docking stations - which is necessary for station-based BSS (also known as SBSS). Furthermore, FFBSS "prevents bike theft", "by tracking bikes in real-time with built-in GPS", and "offers significant opportunities for smart management"<cite id="v4gkr">(Pal &#38; Zhang, 2017)</cite>. This implies a greater satisfaction level for customers, "because obtaining and returning the bikes becomes much more convenient" <cite id="izohe">(Pal &#38; Zhang, 2017)</cite>. However, all of this comes at the increased costs for bike rebalancing, because of how inefficient the redistribution becomes and the higher operating costs in terms of human and financial resources <cite id="eq14m">(Pal &#38; Zhang, 2017)</cite>. This has been recognised as "one of the main reasons why many FFBS enterprises lose money or even withdrawn from market."<cite id="4kg8r">(Tian et al., 2021)</cite>.
 
@@ -101,3 +101,88 @@ When Romer tried to work with Mathematica notebooks and share their results, it 
 > The tie-breaker [between Wolfram and Jupyter, as well as proprietary and open source] is social, not technical. The more I learn about the open source community, the more I trust its members. The more I learn about proprietary software, the more I worry that objective truth might perish from the earth.
 
 Jupyter Notebooks are being developed since 2001 and they are ever more popular. Perhaps they might even replace the scientific paper <cite id="f4aji">(Somers, 2018)</cite>; what's sure is that they are ever more present. Indeed, Romer is not the only Nobel prize using open source software: Thomas Sargent, currently 78, uses Julia for his scientific research and launched a website, [QuantEcon](https://quantecon.org/) built with Jupyter Books, to teach computational economics in Python and Julia.
+
++++
+
+## References
+
++++
+
+<!-- BIBLIOGRAPHY START -->
+<div class="csl-bib-body">
+  <div class="csl-entry"><i>Ambiente urbano</i>. (2021, June 17). https://www.istat.it/it/archivio/258691</div>
+
+  <div class="csl-entry"><i>Annual European Union greenhouse gas inventory 1990–2018 and inventory report 2020 — European Environment Agency</i>. (2020, May 28). [Publication]. https://www.eea.europa.eu//publications/european-union-greenhouse-gas-inventory-2020</div>
+
+  <div class="csl-entry">Anthony Jnr, B., &#38; Abbas Petersen, S. (2021). Examining the digitalisation of virtual enterprises amidst the COVID-19 pandemic: a systematic and meta-analysis. <i>Enterprise Information Systems</i>, <i>15</i>(5), 617–650. https://doi.org/10.1080/17517575.2020.1829075</div>
+
+  <div class="csl-entry">Bahmanyar, A., Estebsari, A., &#38; Ernst, D. (2020). The impact of different COVID-19 containment measures on electricity consumption in Europe. <i>Energy Research &#38; Social Science</i>, <i>68</i>, 101683. https://doi.org/10.1016/j.erss.2020.101683</div>
+
+  <div class="csl-entry">Bergantino, A. S., Intini, M., &#38; Tangari, L. (2021). Influencing factors for potential bike-sharing users: an empirical analysis during the COVID-19 pandemic. <i>Research in Transportation Economics</i>, <i>86</i>, 101028. https://doi.org/10.1016/j.retrec.2020.101028</div>
+
+  <div class="csl-entry">Bordagaray, M., dell’Olio, L., Fonzone, A., &#38; Ibeas, Á. (2016). Capturing the conditions that introduce systematic variation in bike-sharing travel behavior using data mining techniques. <i>Transportation Research Part C: Emerging Technologies</i>, <i>71</i>, 231–248. https://doi.org/10.1016/j.trc.2016.07.009</div>
+
+  <div class="csl-entry">Cantelmo, G., Kucharski, R., &#38; Antoniou, C. (2020). Low-Dimensional Model for Bike-Sharing Demand Forecasting that Explicitly Accounts for Weather Data. <i>Transportation Research Record</i>, <i>2674</i>(8), 132–144. https://doi.org/10.1177/0361198120932160</div>
+
+  <div class="csl-entry">Che aria respiriamo. (2021, September 28). <i>Il Post</i>. https://www.ilpost.it/2021/09/28/qualita-aria-inquinanti-oms/</div>
+
+  <div class="csl-entry"><i>Dall’andamento degli obiettivi di sviluppo sostenibile alla mobilità</i>. (2021, September 8). https://www.istat.it/it/archivio/260839</div>
+
+  <div class="csl-entry">Eren, E., &#38; Uz, V. E. (2020). A review on bike-sharing: The factors affecting bike-sharing demand. <i>Sustainable Cities and Society</i>, <i>54</i>, 101882. https://doi.org/10.1016/j.scs.2019.101882</div>
+
+  <div class="csl-entry"><i>European city air quality viewer — European Environment Agency</i>. (2021, June 17). [Dashboard (Tableau)]. https://www.eea.europa.eu/themes/air/urban-air-quality/european-city-air-quality-viewer</div>
+
+  <div class="csl-entry">Executable Books Community. (2020). <i>Jupyter Book</i> (v0.10) [Computer software]. Zenodo. https://doi.org/10.5281/ZENODO.2561065</div>
+
+  <div class="csl-entry">Fricker, C., &#38; Gast, N. (2016). Incentives and redistribution in homogeneous bike-sharing systems with stations of finite capacity. <i>EURO Journal on Transportation and Logistics</i>, <i>5</i>(3), 261–291. https://doi.org/10.1007/s13676-014-0053-5</div>
+
+  <div class="csl-entry">Ghosh, S., Koh, J. Y., &#38; Jaillet, P. (2019). Improving Customer Satisfaction in Bike Sharing Systems through Dynamic Repositioning. <i>MIT Web Domain</i>. https://dspace.mit.edu/handle/1721.1/128925</div>
+
+  <div class="csl-entry"><i>Gli spostamenti per motivi di studio o lavoro nel 2019 secondo il Censimento permanente della popolazione</i>. (2021, May 13). https://www.istat.it/it/archivio/257621</div>
+
+  <div class="csl-entry">Gualtieri, G., Brilli, L., Carotenuto, F., Vagnoli, C., Zaldei, A., &#38; Gioli, B. (2020). Quantifying road traffic impact on air quality in urban areas: A Covid19-induced lockdown analysis in Italy. <i>Environmental Pollution</i>, <i>267</i>, 115682. https://doi.org/10.1016/j.envpol.2020.115682</div>
+
+  <div class="csl-entry">Hamad, S. Y. Y., Ma, T., &#38; Antoniou, C. (2021). Analysis and Prediction of Bikesharing Traffic Flow – Citi Bike, New York. <i>2021 7th International Conference on Models and Technologies for Intelligent Transportation Systems (MT-ITS)</i>, 1–8. https://doi.org/10.1109/MT-ITS49943.2021.9529290</div>
+
+  <div class="csl-entry">Härmand, K. (2021). Digitalisation before and after the Covid-19 crisis. <i>ERA Forum</i>, <i>22</i>(1), 39–50. https://doi.org/10.1007/s12027-021-00656-8</div>
+
+  <div class="csl-entry"><i>Italy - Air pollution country fact sheet — European Environment Agency</i>. (2020, November 23). [Dashboard (Tableau)]. https://www.eea.europa.eu/themes/air/country-fact-sheets/2020-country-fact-sheets/italy</div>
+
+  <div class="csl-entry">Jephcote, C., Hansell, A. L., Adams, K., &#38; Gulliver, J. (2021). Changes in air quality during COVID-19 ‘lockdown’ in the United Kingdom. <i>Environmental Pollution</i>, <i>272</i>, 116011. https://doi.org/10.1016/j.envpol.2020.116011</div>
+
+  <div class="csl-entry">Ke, J., Zheng, H., Yang, H., &#38; Chen, X. (Michael). (2017). Short-term forecasting of passenger demand under on-demand ride services: A spatio-temporal deep learning approach. <i>Transportation Research Part C: Emerging Technologies</i>, <i>85</i>, 591–608. https://doi.org/10.1016/j.trc.2017.10.016</div>
+
+  <div class="csl-entry">Lian, X., Huang, J., Huang, R., Liu, C., Wang, L., &#38; Zhang, T. (2020). Impact of city lockdown on the air quality of COVID-19-hit of Wuhan city. <i>Science of The Total Environment</i>, <i>742</i>, 140556. https://doi.org/10.1016/j.scitotenv.2020.140556</div>
+
+  <div class="csl-entry"><i>Milano ha un’occasione storica</i>. (2017, April 9). Il Post. http://www.ilpost.it/2017/04/09/scali-ferroviari-milano/</div>
+
+  <div class="csl-entry">Pal, A., &#38; Zhang, Y. (2017). Free-floating bike sharing: Solving real-life large-scale static rebalancing problems. <i>Transportation Research Part C: Emerging Technologies</i>, <i>80</i>, 92–116. https://doi.org/10.1016/j.trc.2017.03.016</div>
+
+  <div class="csl-entry"><i>Pandoc - About pandoc</i>. (n.d.). Retrieved October 23, 2021, from https://pandoc.org/</div>
+
+  <div class="csl-entry">Perkel, J. M. (2018). Why Jupyter is data scientists’ computational notebook of choice. <i>Nature</i>, <i>563</i>(7729), 145–146. https://doi.org/10.1038/d41586-018-07196-1</div>
+
+  <div class="csl-entry">Romer, P. (2018, April 13). <i>Jupyter, Mathematica, and the Future of the Research Paper</i>. Paul Romer. https://paulromer.net/jupyter-mathematica-and-the-future-of-the-research-paper/index.html</div>
+
+  <div class="csl-entry">Singh, R. P., &#38; Chauhan, A. (2020). Impact of lockdown on air quality in India during COVID-19 pandemic. <i>Air Quality, Atmosphere &#38; Health</i>, <i>13</i>(8), 921–928. https://doi.org/10.1007/s11869-020-00863-1</div>
+
+  <div class="csl-entry">Somers, J. (2018, April 5). <i>The Scientific Paper Is Obsolete</i>. The Atlantic. https://www.theatlantic.com/science/archive/2018/04/the-scientific-paper-is-obsolete/556676/</div>
+
+  <div class="csl-entry"><i>Spostamenti quotidiani e nuove forme di mobilità</i>. (2019, February 4). https://www.istat.it/it/archivio/224469</div>
+
+  <div class="csl-entry"><i>Standards - Air Quality - Environment - European Commission</i>. (n.d.). Retrieved October 10, 2021, from https://ec.europa.eu/environment/air/quality/standards.htm</div>
+
+  <div class="csl-entry"><i>The 17 Goals</i>. (n.d.). Retrieved October 10, 2021, from https://sdgs.un.org/goals</div>
+
+  <div class="csl-entry">Tian, Y., Zhang, X., Yang, B., Wang, J., &#38; An, S. (2021). An individual-based spatio-temporal travel demand mining method and its application in improving rebalancing for free-floating bike-sharing system. <i>Advanced Engineering Informatics</i>, <i>50</i>, 101365. https://doi.org/10.1016/j.aei.2021.101365</div>
+
+  <div class="csl-entry">Truant, E., Broccardo, L., &#38; Dana, L.-P. (2021). Digitalisation boosts company performance: an overview of Italian listed companies. <i>Technological Forecasting and Social Change</i>, <i>173</i>, 121173. https://doi.org/10.1016/j.techfore.2021.121173</div>
+
+  <div class="csl-entry"><i>Un po’ di cose notevoli dentro il PNRR</i>. (2021, April 27). Il Post. http://www.ilpost.it/2021/04/27/pnrr-cosa-ce-dentro/</div>
+
+  <div class="csl-entry">Xu, C., Ji, J., &#38; Liu, P. (2018). The station-free sharing bike demand forecasting with a deep learning approach and large-scale datasets. <i>Transportation Research Part C: Emerging Technologies</i>, <i>95</i>, 47–60. https://doi.org/10.1016/j.trc.2018.07.013</div>
+
+  <div class="csl-entry"><i>Zotero | Your personal research assistant</i>. (n.d.). Retrieved October 24, 2021, from https://www.zotero.org/start</div>
+
+</div>
+<!-- BIBLIOGRAPHY END -->
