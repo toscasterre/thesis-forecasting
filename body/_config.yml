@@ -23,8 +23,8 @@ latex:
     targetname: thesis-bike_sharing_forecasting.tex
 
 # Add a bibtex file so that we can create citations
-# bibtex_bibfiles:
-#  - references.bib
+bibtex_bibfiles:
+  - tesi.bib
 
 # # Information about where the book exists on the web
 # repository:

@@ -19,5 +19,7 @@
 \BOOKMARK [2][-]{subsection.3.3.2}{Area\040of\040Analysis}{section.3.3}% 19
 \BOOKMARK [0][-]{chapter.4}{BikeMi\040Stalls\040k-Means\040Clustering}{}% 20
 \BOOKMARK [1][-]{section.4.1}{k-Means\040Clustering\040Review}{chapter.4}% 21
-\BOOKMARK [1][-]{section.4.2}{k-Means\040Clustering\040Evaluation\040Metrics}{chapter.4}% 22
-\BOOKMARK [1][-]{section.4.3}{Fitting\040k-Means\040on\040BikeMi\040Stalls\040Geographic\040Data}{chapter.4}% 23
+\BOOKMARK [2][-]{subsection.4.1.1}{k-Means\040Clusttering\040and\040its\040Shortcomings}{section.4.1}% 22
+\BOOKMARK [2][-]{subsection.4.1.2}{Alternative\040Approaches\040to\040k-Means\040Clustering}{section.4.1}% 23
+\BOOKMARK [1][-]{section.4.2}{k-Means\040Clustering\040Evaluation\040Metrics}{chapter.4}% 24
+\BOOKMARK [1][-]{section.4.3}{Fitting\040k-Means\040on\040BikeMi\040Stalls\040Geographic\040Data}{chapter.4}% 25

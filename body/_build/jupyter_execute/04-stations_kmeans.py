@@ -55,7 +55,9 @@ nils: geopandas.GeoDataFrame = (
 # we are still left with more than 200 stations, spread across 25 neighbourhoods out of 88 - identified by the acronym NIL, i.e. *nuclei d'identità locale*. This figure might still be too high, especially as far as multivariate models are concerned: indeed, shrinkage will be necessary in order to avoid highly correlated features (*multicollinearity*).
 # However, it is still in our interests to reduce the number of series to model even for the univariate forecasting: fitting twenty or two-hundred series is a different task. Even inspecting the correlation across series becomes a daunting task with such a great number of features.
 # 
-# To do so, we will use *k*-means clustering - a popular method widely used in the sharing-services literature, especially to identify "virtual stations" in free-float services <cite id="sfr96">(Ma et al., 2018)</cite> or to "visualize the spatial distribution of DBS [Dockless Bike Sharing] and taxis around metro stations" <cite id="bh87a">(Li et al., 2019)</cite>.
+# To do so, we will use *k*-means clustering - a popular method widely used in the sharing-services literature, especially to identify "virtual stations" in free-float services <cite id="sfr96">(Ma et al., 2018)</cite> or to "visualize the spatial distribution of DBS [Dockless Bike Sharing] and taxis around metro stations" <cite id="bh87a">(Li et al., 2019)</cite>. This strategy, howerver, is also used for docked-bike sharig services <cite id="6ozrx">(Cantelmo et al., 2020)</cite>.
+# 
+# ### *k*-Means Clusttering and its Shortcomings
 # 
 # In a few words, with *k*-means clustering  we "want to partition the observations into $K$ clusters such that the total within-cluster variation [also known as  *inertia*], summed over all $K$ clusters, is as small as possible" <cite id="5wuoa">(Sohil et al., 2021)</cite>. The objective function to optimise is usually the squared Euclidean distance. Simply put, *k*-means "aims to partition n observations into $K$ clusters, represented by their centres or means. The centre of each cluster is calculated as the mean of all the instances belonging to that cluster" <cite id="oc9xp">(Li et al., 2019)</cite> and "is extremely efficient and concise for the classification of equivalent multidimensional data" such as sharing services data <cite id="4rpc6">(Li et al., 2019)</cite>.
 # 
@@ -63,29 +65,17 @@ nils: geopandas.GeoDataFrame = (
 # 
 # *k*-Means clustering scales well with the number of samples $n$, but assumes convex shapes (i.e., has worse performances where the "true" clusters have elongated or irregular shapes) <cite id="xpmoo">(<i>Clustering</i>, n.d.)</cite>. Besides, since the initial position of the cluster is random, it might take some attempt for the algorithm to converge. More importantly, however, *k*-Means is sensitive to the scales of the variables in the data, so normalising the feature matrix is a crucial step. Finally, *k*-Means assumes continuous data and is not designed to handle categorical features: "[T]he *k*-means algorithm only works on numerical data, i.e. variables that are measured on a ratio scale [...], because it minimises a cost function by changing the means of clusters. This prohibits it from being used in applications where categorical data are involved" <cite id="acr6r">(Huang, 1998)</cite>.
 # 
+# ### Alternative Approaches to *k*-Means Clustering
+# 
 # Some workarounds have long been studied in the literature: as an example, by changing the distance metrics from the Euclidean distance to the Gower distance, which is a measure of similarity <cite id="1bw6w">(Gower, 1971)</cite>, *k*-Means can be adjusted to cluster categorical variables. As an alternative, new methods have been developed, such as the *k*-Modes <cite id="d9fnm">(Huang, 1998)</cite>. These alternative methods rose in popularity because the "quadratic computational costs" of similarity-based algorithms are not suited for the larger and larger datasets we have been dealing with, especially in the past years.
 # 
-# Our context does not warrant new, sophisticated clustering algorithms. The sample size of the spatial distribution of stalls would even be small enough to justify an attempt with similarity scores. Yet, to the best of our knowledge, this procedure has not been tried yet in the literature, and there are plenty of good reasons for doing so.
+# Given the data availability, this analysis should not benefit from more sophisticated clustering algorithms. While the chosen sample of stalls would even be small enough to justify an attempt with similarity scores, other meaninfgul regressor are absent from the data - especially weather data. The features that we could extract from the data, like the neighbourhood, are in fact highly correlated with the geographic coordinates themselves. Another avenue of research might be to exploit spatial attributes, such as the nature and number of building in an area, to provide quantitative measurements of the charatcterisation of one geographic area. For example, the number of train and metro stations (and, to a lesser extent, of bus stops), perhaps within a certain radius from the invididual station, could be used. The share of residential buildings and firms, or the extension of green areas such as parks, might be another one. Some, if not most, of this data could be retrieved using open sources like Open Street Maps, but is out of the scope for this analysis.
 # 
-# As a starter, the categorical variables we have - like the neighbourhood - are just another measure of geographic distribution. It would be much more meaningful to run the *k*-means algorithm with other, quantitative features, such as the number of stations or bike lanes in the proximity of the station. The nature and number of buildings, like the extension of parks or traffic measurements, could be used, too. This procedure of data collection should take a lot of time and diversified skills and would primarily accomplish the goal to provide a better segmentation of the individual stations: as an example, it could represent an improvement over choosing neighbourhood fixed effects. While the level of accuracy of such an approach could be much greater, this is nothing that would not be similarly accomplished by "arbitrarily" selecting stations close to each other (say, within a radius of a couple of hundred metres, or that varies according to the population density of the area). Given the nature of our task - forecasting - we shall stick to the usage of *k*-means that is prevalent in the literature: identify virtual stations to reduce dimensionality and perhaps offer new insights as far as data analysis is concerned.
-
-# In[2]:
-
-
-from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
-from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
-from sklearn.pipeline import make_pipeline
-
-
-def filter_coords(data: pd.DataFrame, cols=None) -> pd.DataFrame:
-    if cols is None:
-        cols = ["longitudine", "latitudine"]
-    return data.filter(cols)
-
-
-selected_stalls_lonlat: pd.DataFrame = bikemi_selected_stalls.pipe(filter_coords)
-
+# The situation changes when we move from a static clustering approach to a dynamic one. Time series clustering <cite id="gxpvj">(Ali et al., 2019)</cite> seems a promising path of research, as it would allow to implement a novel procedure for feature selection, which could be layered on top of a geographic (or spatial) clustering. Time-series clustering could be paired with spatial cross-validation folds, whose importance has been underlined since at least the past ten years <cite id="v3vci">(Brenning, 2012)</cite> <cite id="5ch77">(Roberts et al., 2017)</cite>.
+# 
+# We know of only one peculiar approach, implemented by Chen and his coauthors <cite id="d003u">(Chen et al., 2016)</cite>, who implemented a weighted correlation network to account for "contextual factors". Indeed, according to the authors, "bike usage patterns are highly context dependent: time of the day, day of the week, weather condition, social events, and traffic conditions can all lead to different bike usage patterns". The authors identify two types of context-dependencies: "the *common contextual factors* that occur frequently and affect all the stations, such as time and weather" and "the *opportunistic contextual factors* that happen irregularly and only affect a subset of stations, such as social and traffic events" <cite id="vqgjn">(Chen et al., 2016)</cite>. The idea behind this is to "build a [set of] statistical clustering template using historical records (e.g., a cluster template for sunny weekday rush hours)", that are automatically switched between according to the values of the other regressors.
+# 
+# To provide a more practical example, let us assume that there are four clusters, the results of a the combination two independent variables: whether it is a weekday or weekends, and whether there is sunny or rainy weather. Each of these templates is used to fit a *k*-means algorithm (actually, Chen and his colleagues build a "correlation network") and the resulting clustering labels are 'switched on and off' as the weather changes from sunny to rainy and the time from weekdays to weekends.
 
 # ## *k*-Means Clustering Evaluation Metrics
 
@@ -117,7 +107,29 @@ selected_stalls_lonlat: pd.DataFrame = bikemi_selected_stalls.pipe(filter_coords
 # DB = \frac{1}{k} \sum_{i=1}^k \max_{i \neq j} R_{ij}
 # $$
 
+# In[2]:
+
+
+from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.pipeline import make_pipeline
+
+
+def filter_coords(data: pd.DataFrame, cols=None) -> pd.DataFrame:
+    if cols is None:
+        cols = ["longitudine", "latitudine"]
+    return data.filter(cols)
+
+
+selected_stalls_lonlat: pd.DataFrame = bikemi_selected_stalls.pipe(filter_coords)
+
+
 # ## Fitting *k*-Means on BikeMi Stalls Geographic Data
+
+# We define two functions, using Python and its `scikit-learn` library to fit an arbitrarily large number of *k*-means iterations and collect the chosen metrics to evaluate their performance. As a graphic aid, the second function plots this data in a grid, to easen graphic analysis. It is worth nothing that `scikit-learn` is widely used in the literature <cite id="rkywj">(Cantelmo et al., 2020)</cite> <cite id="pgl48">(Li et al., 2019)</cite>.
+# 
+# The $WSS$ or inertia is not really indicative of a significant value of $K$. The silhouette coefficient is greatest for a quite small number of clusters (smaller than 5) and in general not greater than 20. This appears to be the case for the Calinski-Harabasz index too and, while the same cannot be said of the Davies-Bouldin index, beyond said threshold the index is bound to improve. Our final choice should fall on 18, as we believe that clustering the whole set of stations into three great clusters bears no practical utility for the purpose of the policymaker - forecasting the bikes demand in Milan.
 
 # In[3]:
 
@@ -170,8 +182,6 @@ selected_stalls_metrics = get_kmeans_metrics(selected_stalls_lonlat, 70, 42)
 plot_all_metrics(selected_stalls_metrics)
 
 
-# The $WSS$ or inertia is not really indicative of a significant value of $K$. The silhouette coefficient is greatest for a quite small number of clusters (smaller than 5) and in general not greater than 20. This appears to be the case for the Calinski-Harabasz index too and, while the same cannot be said of the Davies-Bouldin index, beyond said threshold the index is bound to improve. Our final choice should fall on 18, as we believe that clustering the whole set of stations into three great clusters bears no practical utility for the purpose of the policymaker - forecasting the bikes demand in Milan.
-# 
 # However, as mentioned above, the total number of neighbourhoods inside our area of analysis is 25: at this point, the policymaker might just be better off aggregating the data by neighbourhood, without going through the hassle of computing the *k*-means. Indeed, in this context the purpose of fitting a *k*-means should be to isolate a small amount of clusters inside of each neighbourhood, in order to be able to aggregate together stations that are quite close to each other and that cannot all be used at once as independent variables for the forecasting models without injecting error in the estimates via multicollinearity. In this way, it would also be possible to include neighbourhood fixed effects - which would otherwise be impossible to add to the regression if data was aggregated ad that level.
 
 # In[4]:

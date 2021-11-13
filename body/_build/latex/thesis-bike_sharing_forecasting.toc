@@ -17,8 +17,10 @@
 \contentsline {subsection}{\numberline {3.2.1}Usage Patterns and Origin\sphinxhyphen {}Destination Matrix}{17}{subsection.3.2.1}%
 \contentsline {section}{\numberline {3.3}Spatial Data Analysis}{19}{section.3.3}%
 \contentsline {subsection}{\numberline {3.3.1}Inspecting Stations with Zero Daily Rentals}{20}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}Area of Analysis}{25}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.2}Area of Analysis}{24}{subsection.3.3.2}%
 \contentsline {chapter}{\numberline {4}BikeMi Stalls \sphinxstyleemphasis {k}\sphinxhyphen {}Means Clustering}{29}{chapter.4}%
 \contentsline {section}{\numberline {4.1}\sphinxstyleemphasis {k}\sphinxhyphen {}Means Clustering Review}{29}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}\sphinxstyleemphasis {k}\sphinxhyphen {}Means Clusttering and its Shortcomings}{29}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Alternative Approaches to \sphinxstyleemphasis {k}\sphinxhyphen {}Means Clustering}{30}{subsection.4.1.2}%
 \contentsline {section}{\numberline {4.2}\sphinxstyleemphasis {k}\sphinxhyphen {}Means Clustering Evaluation Metrics}{30}{section.4.2}%
 \contentsline {section}{\numberline {4.3}Fitting \sphinxstyleemphasis {k}\sphinxhyphen {}Means on BikeMi Stalls Geographic Data}{31}{section.4.3}%

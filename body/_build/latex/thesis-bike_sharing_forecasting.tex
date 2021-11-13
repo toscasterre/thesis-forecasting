@@ -84,7 +84,7 @@
         
 
 \title{A Comparison of Forecasting Techniques in Bike Sharing Services}
-\date{Nov 12, 2021}
+\date{Nov 13, 2021}
 \release{}
 \author{Luca Baggi}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -164,14 +164,19 @@ Reforming the public transport will be crucial to reach carbon neutrality and po
 The Next Generation EU provides Italy with the perfect chance to narrow the divide with Western economies, while curbing emissions and finally improving the air quality. To promote more sustainable modes of transport, measures are needed on both the supply side (for example, by improving vehicle and fuel performance) and on the demand side by reducing demand for private transport, or at least increasing the demand for greener modes of transport (Bergantino et al., 2021). Investments in sharing services can and should play a role in this transition. Indeed, capital might be limited: after all, municipalities will receive a smaller share of the NGEU funds and upgrading their bus fleets seems more urgent. Besides, there are also the time constraints that need to be taken into account. However, biking infrastructure projects can be relatively cheaper compared to other TPL investments \sphinxhyphen{} especially if factoring in the presence of private entrepreneurs. Once infrastructure is in place, the costs of the service “only” amount to the human and technical cost to reallocate bikes to be at the right place at the right time.
 
 \sphinxAtStartPar
-This dissertation stems from the idea that bike sharing systems can be promoted with cheap measures. One of the most widely discussed problems in the literature is improving customer satisfaction through repositioning, i.e. forecasting the demand for bikes and “design efficient bike repositioning solutions” (Ghosh et al., 2019). The problem is ever more important since the introduction of free\sphinxhyphen{}float bike\sphinxhyphen{}sharing systems (FFBBS), as the bikes can be dropped anywhere and end up in sub\sphinxhyphen{}optimal places for the next customers.
-On the positive side, FFBBS do not require the upfront investments for building docking stations \sphinxhyphen{} which is necessary for station\sphinxhyphen{}based BSS (also known as SBSS). Furthermore, FFBSS “prevents bike theft”, “by tracking bikes in real\sphinxhyphen{}time with built\sphinxhyphen{}in GPS”, and “offers significant opportunities for smart management”(Pal \& Zhang, 2017). This implies a greater satisfaction level for customers, “because obtaining and returning the bikes becomes much more convenient” (Pal \& Zhang, 2017). However, all of this comes at the increased costs for bike rebalancing, because of how inefficient bike redistribution becomes and the and higher operating costs in terms of human and financial resources (Pal \& Zhang, 2017). This has been recognised as “one of the main reasons why many FFBS enterprises lose money or even withdrawn from market.”(Tian et al., 2021).
+This dissertation stems from the idea that bike sharing systems can be promoted with cheap measures. This is not a new approach to the literature: as an example, Cantelmo and his coauthors attempt to implement a low\sphinxhyphen{}dimensional model for bike\sphinxhyphen{}dharing demand forecasting that does not “focus on the methodological aspect of finding the most advanced algorithm to learn these correlations” (Cantelmo et al., 2020), as these more sophisticated models are prone to overfitting and new issues arise when more data is added to these models, i.e. when new contexts appear in the model space.
 
 \sphinxAtStartPar
-Most of the new approaches involve deep learning (DL) techniques, such as long\sphinxhyphen{}term short\sphinxhyphen{}memory (LSTM) neural networks, which usually outperform other statistical and machine learning approaches (Xu et al., 2018). Some are incredibly sophisticated: Convolutional LSTM are deep learning models “stacked and fused by multiple convolutional long short\sphinxhyphen{}term memory (LSTM) layers, standard LSTM layers, and convolutional layers {[}…{]} to better capture the spatio\sphinxhyphen{}temporal characteristics and correlations of explanatory variables” (Ke et al., 2017). This, combined with external data such as “travel time rate, time\sphinxhyphen{}of\sphinxhyphen{}day, day\sphinxhyphen{}of\sphinxhyphen{}week, and weather conditions”, results in an improvement of error metrics (RMSE) by almost 50 percent (Ke et al., 2017).
+In particular, this project falls in the trunk of literature aimed at improving customer satisfaction through demand forecasting. This task can be split in two categories: demand rebalancing and demand forecasting techniques. The first category, demand rebalancing or repositioning, simply means “design efficient bike repositioning solutions” (Ghosh et al., 2019). Rebalancing can either be user\sphinxhyphen{}based, when the users are offered an incentive to park the bike themselves, or operator\sphinxhyphen{}based. In this latter case, we can also distinguish between static rebalancing (when repositioning occurs when the service is off, like at night) and dynamic rebalancing otherwise (Cantelmo et al., 2020). The second problem, demand forecasting, is the one we will be focusing on. Simply put, demand forecasting attempt to estimate the number of bikes that will be requested at a certain moment in time. This task can be accomplished at the aggregate city level, or by identifying clusters of stations (the so\sphinxhyphen{}called Traffic\sphinxhyphen{}Analysis Zones or \sphinxstyleemphasis{TAZ}) or even at the individual station (Cantelmo et al., 2020).
 
 \sphinxAtStartPar
-There is no way we could best the performance of such sophisticated models. However, this may not be the ultimate goal for policymakers. Despite their impressive performances, deep learning methods are hard to implement. They require a considerable amount of resources and, unlike simpler models, are much more difficult to visualise and interpret. For one, they require senior data scientists and access to a local server cluster with access to Graphic Processing Units (GPUs) or cloud computing platforms such as Google Cloud, Microsoft Azure or Amazon Web Services. This infrastructure needs time to set up and delays are inevitable, since the data manipulated by public administration deserves a much greater degree of privacy. Besides, such models require a long time to train \sphinxhyphen{} which translates to more expensive models.
+These problems became ever more important since the introduction of free\sphinxhyphen{}float bike\sphinxhyphen{}sharing systems (FFBBS), as the bikes can be dropped anywhere and end up in sub\sphinxhyphen{}optimal places for the next customers. On the positive side, FFBBS do not require the upfront investments for building docking stations \sphinxhyphen{} which is necessary for station\sphinxhyphen{}based BSS (also known as SBSS). Furthermore, FFBSS “prevents bike theft”, “by tracking bikes in real\sphinxhyphen{}time with built\sphinxhyphen{}in GPS”, and “offers significant opportunities for smart management”(Pal \& Zhang, 2017). This implies a greater satisfaction level for customers, “because obtaining and returning the bikes becomes much more convenient” (Pal \& Zhang, 2017). However, all of this comes at the increased costs for bike rebalancing, because of how inefficient the redistribution becomes and the higher operating costs in terms of human and financial resources (Pal \& Zhang, 2017). This has been recognised as “one of the main reasons why many FFBS enterprises lose money or even withdrawn from market.”(Tian et al., 2021).
+
+\sphinxAtStartPar
+Most of the new approaches involve deep learning (DL) techniques, such as long\sphinxhyphen{}term short\sphinxhyphen{}memory (LSTM) neural networks, which usually outperform other statistical and machine learning approaches (Xu et al., 2018). Some are incredibly sophisticated: Convolutional LSTM are deep learning models “stacked and fused by multiple convolutional long short\sphinxhyphen{}term memory (LSTM) layers, standard LSTM layers, and convolutional layers {[}…{]} to better capture the spatio\sphinxhyphen{}temporal characteristics and correlations of explanatory variables” (Ke et al., 2017). In this instance, these models have been combined with external data such as “travel time rate, time\sphinxhyphen{}of\sphinxhyphen{}day, day\sphinxhyphen{}of\sphinxhyphen{}week, and weather conditions”, resulting in an improvement of error metrics (RMSE) by almost 50 percent (Ke et al., 2017).
+
+\sphinxAtStartPar
+There is no way we could best the performance of such sophisticated models. However, this may not be the ultimate goal for policymakers. Despite their impressive performances, deep learning methods are hard to implement. They require a considerable amount of resources and, unlike simpler models, are much more difficult to visualise and interpret. For one, they require senior data scientists and access to a local server cluster with access to Graphic Processing Units (GPUs) or cloud computing platforms such as Google Cloud, Microsoft Azure or Amazon Web Services. This infrastructure needs time to set up and delays are inevitable, since the data manipulated by public administration deserves a much greater degree of privacy. Besides, such models require a longer time to train \sphinxhyphen{} which translates to more expensive models.
 
 \sphinxAtStartPar
 Given the policymaker constraints, DL techniques may well be out of time, and budget. Our goal is to satisfy the constraints of a local planner with tight budget and more pressing issues, or the limited options of a private BSS company who needs to sustain high operational costs. We will develop two classes of models, univariate and multivariate, using both statistical and machine\sphinxhyphen{}learning methods. We will also attempt to evaluate the usefulness of external data \sphinxhyphen{} which might be hard to require and process \sphinxhyphen{} and the performances of libraries such as Facebook’s Prophet, which have been specifically designed for ‘forecasting at scale’, i.e. forecasting multiple time\sphinxhyphen{}series (in the order of the thousands) with little to no pre\sphinxhyphen{}processing, feature engineering and simple models.
@@ -732,17 +737,7 @@ We start by creating another two \sphinxcode{\sphinxupquote{materialised views}}
 \end{sphinxVerbatim}
 
 \begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k}{def} \PYG{n+nf}{retrieve\PYGZus{}daily\PYGZus{}rentals}\PYG{p}{(}\PYG{n}{connection}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{:}
-    \PYG{n}{query} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{        SELECT * FROM daily\PYGZus{}rentals\PYGZus{}before\PYGZus{}2019;}
-\PYG{l+s+s2}{    }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-    \PYG{k}{return} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{read\PYGZus{}sql}\PYG{p}{(}\PYG{n}{query}\PYG{p}{,} \PYG{n}{connection}\PYG{p}{)}\PYG{o}{.}\PYG{n}{set\PYGZus{}index}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{data\PYGZus{}partenza}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-\PYG{n}{daily\PYGZus{}rentals} \PYG{o}{=} \PYG{n}{retrieve\PYGZus{}daily\PYGZus{}rentals}\PYG{p}{(}\PYG{n}{conn}\PYG{p}{)}
-\end{sphinxVerbatim}
-
+\begin{sphinxuseclass}{tag_hide-input}
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 \sphinxAtStartPar
@@ -869,8 +864,11 @@ we are still left with more than 200 stations, spread across 25 neighbourhoods o
 However, it is still in our interests to reduce the number of series to model even for the univariate forecasting: fitting twenty or two\sphinxhyphen{}hundred series is a different task. Even inspecting the correlation across series becomes a daunting task with such a great number of features.
 
 \sphinxAtStartPar
-To do so, we will use \sphinxstyleemphasis{k}\sphinxhyphen{}means clustering \sphinxhyphen{} a popular method widely used in the sharing\sphinxhyphen{}services literature, especially to identify “virtual stations” in free\sphinxhyphen{}float services (Ma et al., 2018) or to “visualize the spatial distribution of DBS {[}Dockless Bike Sharing{]} and taxis around metro stations” (Li et al., 2019).
+To do so, we will use \sphinxstyleemphasis{k}\sphinxhyphen{}means clustering \sphinxhyphen{} a popular method widely used in the sharing\sphinxhyphen{}services literature, especially to identify “virtual stations” in free\sphinxhyphen{}float services (Ma et al., 2018) or to “visualize the spatial distribution of DBS {[}Dockless Bike Sharing{]} and taxis around metro stations” (Li et al., 2019). This strategy, howerver, is also used for docked\sphinxhyphen{}bike sharig services (Cantelmo et al., 2020).
 
+
+\subsection{\sphinxstyleemphasis{k}\sphinxhyphen{}Means Clusttering and its Shortcomings}
+\label{\detokenize{04-stations_kmeans:k-means-clusttering-and-its-shortcomings}}
 \sphinxAtStartPar
 In a few words, with \sphinxstyleemphasis{k}\sphinxhyphen{}means clustering  we “want to partition the observations into \(K\) clusters such that the total within\sphinxhyphen{}cluster variation {[}also known as  \sphinxstyleemphasis{inertia}{]}, summed over all \(K\) clusters, is as small as possible” (Sohil et al., 2021). The objective function to optimise is usually the squared Euclidean distance. Simply put, \sphinxstyleemphasis{k}\sphinxhyphen{}means “aims to partition n observations into \(K\) clusters, represented by their centres or means. The centre of each cluster is calculated as the mean of all the instances belonging to that cluster” (Li et al., 2019) and “is extremely efficient and concise for the classification of equivalent multidimensional data” such as sharing services data (Li et al., 2019).
 
@@ -880,35 +878,24 @@ The algorithm begins with randomly choosing clusters centres and, with each iter
 \sphinxAtStartPar
 \sphinxstyleemphasis{k}\sphinxhyphen{}Means clustering scales well with the number of samples \(n\), but assumes convex shapes (i.e., has worse performances where the “true” clusters have elongated or irregular shapes) (Clustering, n.d.). Besides, since the initial position of the cluster is random, it might take some attempt for the algorithm to converge. More importantly, however, \sphinxstyleemphasis{k}\sphinxhyphen{}Means is sensitive to the scales of the variables in the data, so normalising the feature matrix is a crucial step. Finally, \sphinxstyleemphasis{k}\sphinxhyphen{}Means assumes continuous data and is not designed to handle categorical features: “{[}T{]}he \sphinxstyleemphasis{k}\sphinxhyphen{}means algorithm only works on numerical data, i.e. variables that are measured on a ratio scale {[}…{]}, because it minimises a cost function by changing the means of clusters. This prohibits it from being used in applications where categorical data are involved” (Huang, 1998).
 
+
+\subsection{Alternative Approaches to \sphinxstyleemphasis{k}\sphinxhyphen{}Means Clustering}
+\label{\detokenize{04-stations_kmeans:alternative-approaches-to-k-means-clustering}}
 \sphinxAtStartPar
 Some workarounds have long been studied in the literature: as an example, by changing the distance metrics from the Euclidean distance to the Gower distance, which is a measure of similarity (Gower, 1971), \sphinxstyleemphasis{k}\sphinxhyphen{}Means can be adjusted to cluster categorical variables. As an alternative, new methods have been developed, such as the \sphinxstyleemphasis{k}\sphinxhyphen{}Modes (Huang, 1998). These alternative methods rose in popularity because the “quadratic computational costs” of similarity\sphinxhyphen{}based algorithms are not suited for the larger and larger datasets we have been dealing with, especially in the past years.
 
 \sphinxAtStartPar
-Our context does not warrant new, sophisticated clustering algorithms. The sample size of the spatial distribution of stalls would even be small enough to justify an attempt with similarity scores. Yet, to the best of our knowledge, this procedure has not been tried yet in the literature, and there are plenty of good reasons for doing so.
+Given the data availability, this analysis should not benefit from more sophisticated clustering algorithms. While the chosen sample of stalls would even be small enough to justify an attempt with similarity scores, other meaninfgul regressor are absent from the data \sphinxhyphen{} especially weather data. The features that we could extract from the data, like the neighbourhood, are in fact highly correlated with the geographic coordinates themselves. Another avenue of research might be to exploit spatial attributes, such as the nature and number of building in an area, to provide quantitative measurements of the charatcterisation of one geographic area. For example, the number of train and metro stations (and, to a lesser extent, of bus stops), perhaps within a certain radius from the invididual station, could be used. The share of residential buildings and firms, or the extension of green areas such as parks, might be another one. Some, if not most, of this data could be retrieved using open sources like Open Street Maps, but is out of the scope for this analysis.
 
 \sphinxAtStartPar
-As a starter, the categorical variables we have \sphinxhyphen{} like the neighbourhood \sphinxhyphen{} are just another measure of geographic distribution. It would be much more meaningful to run the \sphinxstyleemphasis{k}\sphinxhyphen{}means algorithm with other, quantitative features, such as the number of stations or bike lanes in the proximity of the station. The nature and number of buildings, like the extension of parks or traffic measurements, could be used, too. This procedure of data collection should take a lot of time and diversified skills and would primarily accomplish the goal to provide a better segmentation of the individual stations: as an example, it could represent an improvement over choosing neighbourhood fixed effects. While the level of accuracy of such an approach could be much greater, this is nothing that would not be similarly accomplished by “arbitrarily” selecting stations close to each other (say, within a radius of a couple of hundred metres, or that varies according to the population density of the area). Given the nature of our task \sphinxhyphen{} forecasting \sphinxhyphen{} we shall stick to the usage of \sphinxstyleemphasis{k}\sphinxhyphen{}means that is prevalent in the literature: identify virtual stations to reduce dimensionality and perhaps offer new insights as far as data analysis is concerned.
+The situation changes when we move from a static clustering approach to a dynamic one. Time series clustering (Ali et al., 2019) seems a promising path of research, as it would allow to implement a novel procedure for feature selection, which could be layered on top of a geographic (or spatial) clustering. Time\sphinxhyphen{}series clustering could be paired with spatial cross\sphinxhyphen{}validation folds, whose importance has been underlined since at least the past ten years (Brenning, 2012) (Roberts et al., 2017).
 
-\begin{sphinxuseclass}{cell}
-\begin{sphinxuseclass}{cell_input}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{sklearn}\PYG{n+nn}{.}\PYG{n+nn}{metrics} \PYG{k+kn}{import} \PYG{n}{silhouette\PYGZus{}score}\PYG{p}{,} \PYG{n}{davies\PYGZus{}bouldin\PYGZus{}score}\PYG{p}{,} \PYG{n}{calinski\PYGZus{}harabasz\PYGZus{}score}
-\PYG{k+kn}{from} \PYG{n+nn}{sklearn}\PYG{n+nn}{.}\PYG{n+nn}{preprocessing} \PYG{k+kn}{import} \PYG{n}{StandardScaler}
-\PYG{k+kn}{from} \PYG{n+nn}{sklearn}\PYG{n+nn}{.}\PYG{n+nn}{cluster} \PYG{k+kn}{import} \PYG{n}{KMeans}
-\PYG{k+kn}{from} \PYG{n+nn}{sklearn}\PYG{n+nn}{.}\PYG{n+nn}{pipeline} \PYG{k+kn}{import} \PYG{n}{make\PYGZus{}pipeline}
+\sphinxAtStartPar
+We know of only one peculiar approach, implemented by Chen and his coauthors (Chen et al., 2016), who implemented a weighted correlation network to account for “contextual factors”. Indeed, according to the authors, “bike usage patterns are highly context dependent: time of the day, day of the week, weather condition, social events, and traffic conditions can all lead to different bike usage patterns”. The authors identify two types of context\sphinxhyphen{}dependencies: “the \sphinxstyleemphasis{common contextual factors} that occur frequently and affect all the stations, such as time and weather” and “the \sphinxstyleemphasis{opportunistic contextual factors} that happen irregularly and only affect a subset of stations, such as social and traffic events” (Chen et al., 2016). The idea behind this is to “build a {[}set of{]} statistical clustering template using historical records (e.g., a cluster template for sunny weekday rush hours)”, that are automatically switched between according to the values of the other regressors.
 
+\sphinxAtStartPar
+To provide a more practical example, let us assume that there are four clusters, the results of a the combination two independent variables: whether it is a weekday or weekends, and whether there is sunny or rainy weather. Each of these templates is used to fit a \sphinxstyleemphasis{k}\sphinxhyphen{}means algorithm (actually, Chen and his colleagues build a “correlation network”) and the resulting clustering labels are ‘switched on and off’ as the weather changes from sunny to rainy and the time from weekdays to weekends.
 
-\PYG{k}{def} \PYG{n+nf}{filter\PYGZus{}coords}\PYG{p}{(}\PYG{n}{data}\PYG{p}{:} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{,} \PYG{n}{cols}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{:}
-    \PYG{k}{if} \PYG{n}{cols} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
-        \PYG{n}{cols} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{longitudine}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{latitudine}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}
-    \PYG{k}{return} \PYG{n}{data}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{cols}\PYG{p}{)}
-
-
-\PYG{n}{selected\PYGZus{}stalls\PYGZus{}lonlat}\PYG{p}{:} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame} \PYG{o}{=} \PYG{n}{bikemi\PYGZus{}selected\PYGZus{}stalls}\PYG{o}{.}\PYG{n}{pipe}\PYG{p}{(}\PYG{n}{filter\PYGZus{}coords}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\end{sphinxuseclass}
-\end{sphinxuseclass}
 
 \section{\sphinxstyleemphasis{k}\sphinxhyphen{}Means Clustering Evaluation Metrics}
 \label{\detokenize{04-stations_kmeans:k-means-clustering-evaluation-metrics}}
@@ -947,9 +934,35 @@ Finally, the Davies\sphinxhyphen{}Bouldin index indicates a better separation be
 DB = \frac{1}{k} \sum_{i=1}^k \max_{i \neq j} R_{ij}
 \end{split}
 \end{equation*}
+\begin{sphinxuseclass}{cell}
+\begin{sphinxuseclass}{cell_input}
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{sklearn}\PYG{n+nn}{.}\PYG{n+nn}{metrics} \PYG{k+kn}{import} \PYG{n}{silhouette\PYGZus{}score}\PYG{p}{,} \PYG{n}{davies\PYGZus{}bouldin\PYGZus{}score}\PYG{p}{,} \PYG{n}{calinski\PYGZus{}harabasz\PYGZus{}score}
+\PYG{k+kn}{from} \PYG{n+nn}{sklearn}\PYG{n+nn}{.}\PYG{n+nn}{preprocessing} \PYG{k+kn}{import} \PYG{n}{StandardScaler}
+\PYG{k+kn}{from} \PYG{n+nn}{sklearn}\PYG{n+nn}{.}\PYG{n+nn}{cluster} \PYG{k+kn}{import} \PYG{n}{KMeans}
+\PYG{k+kn}{from} \PYG{n+nn}{sklearn}\PYG{n+nn}{.}\PYG{n+nn}{pipeline} \PYG{k+kn}{import} \PYG{n}{make\PYGZus{}pipeline}
+
+
+\PYG{k}{def} \PYG{n+nf}{filter\PYGZus{}coords}\PYG{p}{(}\PYG{n}{data}\PYG{p}{:} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{,} \PYG{n}{cols}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{:}
+    \PYG{k}{if} \PYG{n}{cols} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
+        \PYG{n}{cols} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{longitudine}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{latitudine}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}
+    \PYG{k}{return} \PYG{n}{data}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{cols}\PYG{p}{)}
+
+
+\PYG{n}{selected\PYGZus{}stalls\PYGZus{}lonlat}\PYG{p}{:} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame} \PYG{o}{=} \PYG{n}{bikemi\PYGZus{}selected\PYGZus{}stalls}\PYG{o}{.}\PYG{n}{pipe}\PYG{p}{(}\PYG{n}{filter\PYGZus{}coords}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\end{sphinxuseclass}
+\end{sphinxuseclass}
 
 \section{Fitting \sphinxstyleemphasis{k}\sphinxhyphen{}Means on BikeMi Stalls Geographic Data}
 \label{\detokenize{04-stations_kmeans:fitting-k-means-on-bikemi-stalls-geographic-data}}
+\sphinxAtStartPar
+We define two functions, using Python and its \sphinxcode{\sphinxupquote{scikit\sphinxhyphen{}learn}} library to fit an arbitrarily large number of \sphinxstyleemphasis{k}\sphinxhyphen{}means iterations and collect the chosen metrics to evaluate their performance. As a graphic aid, the second function plots this data in a grid, to easen graphic analysis. It is worth nothing that \sphinxcode{\sphinxupquote{scikit\sphinxhyphen{}learn}} is widely used in the literature (Cantelmo et al., 2020) (Li et al., 2019).
+
+\sphinxAtStartPar
+The \(WSS\) or inertia is not really indicative of a significant value of \(K\). The silhouette coefficient is greatest for a quite small number of clusters (smaller than 5) and in general not greater than 20. This appears to be the case for the Calinski\sphinxhyphen{}Harabasz index too and, while the same cannot be said of the Davies\sphinxhyphen{}Bouldin index, beyond said threshold the index is bound to improve. Our final choice should fall on 18, as we believe that clustering the whole set of stations into three great clusters bears no practical utility for the purpose of the policymaker \sphinxhyphen{} forecasting the bikes demand in Milan.
+
 \begin{sphinxuseclass}{cell}
 \begin{sphinxuseclass}{cell_input}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
@@ -1003,13 +1016,10 @@ DB = \frac{1}{k} \sum_{i=1}^k \max_{i \neq j} R_{ij}
 
 \end{sphinxuseclass}
 \begin{sphinxuseclass}{cell_output}
-\noindent\sphinxincludegraphics{{04-stations_kmeans_8_0}.png}
+\noindent\sphinxincludegraphics{{04-stations_kmeans_9_0}.png}
 
 \end{sphinxuseclass}
 \end{sphinxuseclass}
-\sphinxAtStartPar
-The \(WSS\) or inertia is not really indicative of a significant value of \(K\). The silhouette coefficient is greatest for a quite small number of clusters (smaller than 5) and in general not greater than 20. This appears to be the case for the Calinski\sphinxhyphen{}Harabasz index too and, while the same cannot be said of the Davies\sphinxhyphen{}Bouldin index, beyond said threshold the index is bound to improve. Our final choice should fall on 18, as we believe that clustering the whole set of stations into three great clusters bears no practical utility for the purpose of the policymaker \sphinxhyphen{} forecasting the bikes demand in Milan.
-
 \sphinxAtStartPar
 However, as mentioned above, the total number of neighbourhoods inside our area of analysis is 25: at this point, the policymaker might just be better off aggregating the data by neighbourhood, without going through the hassle of computing the \sphinxstyleemphasis{k}\sphinxhyphen{}means. Indeed, in this context the purpose of fitting a \sphinxstyleemphasis{k}\sphinxhyphen{}means should be to isolate a small amount of clusters inside of each neighbourhood, in order to be able to aggregate together stations that are quite close to each other and that cannot all be used at once as independent variables for the forecasting models without injecting error in the estimates via multicollinearity. In this way, it would also be possible to include neighbourhood fixed effects \sphinxhyphen{} which would otherwise be impossible to add to the regression if data was aggregated ad that level.
 
@@ -1082,7 +1092,7 @@ However, as mentioned above, the total number of neighbourhoods inside our area 
 
 \end{sphinxuseclass}
 \begin{sphinxuseclass}{cell_output}
-\noindent\sphinxincludegraphics{{04-stations_kmeans_11_0}.png}
+\noindent\sphinxincludegraphics{{04-stations_kmeans_12_0}.png}
 
 \end{sphinxuseclass}
 \end{sphinxuseclass}
@@ -1136,7 +1146,7 @@ k
 
 \end{sphinxuseclass}
 \begin{sphinxuseclass}{cell_output}
-\noindent\sphinxincludegraphics{{04-stations_kmeans_14_0}.png}
+\noindent\sphinxincludegraphics{{04-stations_kmeans_15_0}.png}
 
 \end{sphinxuseclass}
 \end{sphinxuseclass}
@@ -1178,7 +1188,7 @@ After choosing the value for \(K\), stall data is aggregated to compute the coor
 
 \end{sphinxuseclass}
 \begin{sphinxuseclass}{cell_output}
-\noindent\sphinxincludegraphics{{04-stations_kmeans_16_0}.png}
+\noindent\sphinxincludegraphics{{04-stations_kmeans_17_0}.png}
 
 \end{sphinxuseclass}
 \end{sphinxuseclass}
