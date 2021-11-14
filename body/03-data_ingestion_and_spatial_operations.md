@@ -60,7 +60,7 @@ conn = psycopg2.connect("dbname=bikemi user=luca")
 
 +++
 
-The data was made available thanks to a partnership established by Prof. Giancarlo Manzi of the University of Milan and Clear Channel Italia, the provider of the service. The data is comprised of all the individual trips performed by each client (`cliente_anonimizzato`). This includes the bike type (which can either be a regular bike or an electric bike), the bike identifier, the station of departure and arrival with the time, the duration of the trip `durata_noleggio` plus the total travel distance. We do not know how the total travel distance `distanza_totale` is computed. Here are a selection of fields for the first five rows of the source data (time features are rounded to the daily level to fit into the page):
+The data was made available thanks to a partnership established by Prof. Giancarlo Manzi of the University of Milan and Clear Channel Italia, the provider of the service. The data is comprised of all the individual trips performed by each client (`cliente_anonimizzato`). This includes the bike type (which can either be a regular bike or an electric bike), the bike identifier, the station of departure and arrival with the time, the duration of the trip `durata_noleggio` plus the total travel distance. We do not know how the total travel distance `distanza_totale` is computed. Here is a selection of fields for the first five rows of the source data (time features are rounded to the daily level to fit into the page):
 
 ```{code-cell} ipython3
 :tags: [hide-input]
@@ -87,11 +87,11 @@ show_data_sample(conn)
 
 +++ {"citation-manager": {"citations": {"1xb31": [{"id": "7765261/NQ8DBQNG", "source": "zotero"}], "ge16g": [{"id": "7765261/574YW5KY", "source": "zotero"}], "jf5wt": [{"id": "7765261/NQ8DBQNG", "source": "zotero"}], "tcloo": [{"id": "7765261/2TTUU9QV", "source": "zotero"}]}}, "tags": []}
 
-The data available ranges from the first of June, 2015, to the first of October, 2020, totalling to 15.842.891 observations. Data was made available in Excel spreadsheets, following the [Office Open XML SpreadsheetML File Format](https://docs.microsoft.com/en-us/openspecs/office_standards/ms-xlsx/f780b2d6-8252-4074-9fe3-5d7bc4830968) (the `.xlsx` file format). Python"s Pandas library has methods to read `.xlsx` files; however, given how big these files are, data manipulation would have proven unfeasible.
+The data available ranges from the first of June, 2015, to the first of October, 2020, totalling 15.842.891 observations. Data was made available in Excel spreadsheets, following the [Office Open XML SpreadsheetML File Format](https://docs.microsoft.com/en-us/openspecs/office_standards/ms-xlsx/f780b2d6-8252-4074-9fe3-5d7bc4830968) (the `.xlsx` file format). Python"s Pandas library has methods to read `.xlsx` files; however, given how big these files are, data manipulation would have proven unfeasible.
 
-For this reason, we resorted to some useful and popular open source tools, which we used to build `bash` scripts and functions to automate conversion from `.xlsx` to `.csv` files, perform some elementary data cleaning and load the data into a local PostgreSQL database. Format conversion to Comma-Separated Values (`.csv`) was performed using [`csvkit`](https://github.com/wireservice/csvkit), a Python package to perform basic operations on `.csv` files from the command line. Being written in Python, `csvkit` can be slow. However, as part of a major trend for several command-line applications, `csvkit` was rewritten in Rust, a fast and secure programming language whose popularity has been rising in the last couple of years <cite id="jf5wt">(Perkel, 2020)</cite>. Much alike Julia <cite id="ge16g">(Perkel, 2019)</cite>, Rust is becoming a tool for data science, as well as scientific computing (for example in bio-statistics) as it is "a language that offer[s] the "expressiveness" of Python but the speed of languages such as C and C++" <cite id="1xb31">(Perkel, 2020)</cite>.
+For this reason, we resorted to some useful and popular open source tools, which we used to build `bash` scripts and functions to automate the conversion from `.xlsx` to `.csv` files, perform some elementary data cleaning and load the data into a local PostgreSQL database. Format conversion to Comma-Separated Values (`.csv`) was performed using [`csvkit`](https://github.com/wireservice/csvkit), a Python package to perform basic operations on `.csv` files from the command line. Being written in Python, `csvkit` can be slow. However, as part of a major trend for several command-line applications, `csvkit` was rewritten in Rust, a fast and secure programming language whose popularity has been rising in the last couple of years <cite id="jf5wt">(Perkel, 2020)</cite>. Much alike Julia <cite id="ge16g">(Perkel, 2019)</cite>, Rust is becoming a tool for data science, as well as scientific computing (for example in bio-statistics) as it is "a language that offer[s] the "expressiveness" of Python but the speed of languages such as C and C++" <cite id="1xb31">(Perkel, 2020)</cite>.
 
-The Rust port of `csvkit` is called [`xsv`](https://github.com/BurntSushi/xsv), and is blazing fast. Much alike `awk` <cite id="tcloo">(<i>Gawk - GNU Project - Free Software Foundation (FSF)</i>, n.d.)</cite>, `xsv` can perform filtering operations, but also joins and partitions, as well as computing summary statistics. `xsv` does not offer format conversion (yet), but was used to filter out a negligible number of invalid observations from each original `.xslx` files (after the conversion to `.csv`), and select only the columns that would enter the final dataset.
+The Rust port of `csvkit` is called [`xsv`](https://github.com/BurntSushi/xsv), and is blazing fast. Much like `awk` <cite id="tcloo">(<i>Gawk - GNU Project - Free Software Foundation (FSF)</i>, n.d.)</cite>, `xsv` can perform filtering operations, but also joins and partitions, as well as computing summary statistics. `xsv` does not offer format conversion (yet), but was used to filter out a negligible number of invalid observations from each original `.xslx` files (after the conversion to `.csv`), and select only the columns that would enter the final dataset.
 
 Finally, `psql` (PostgreSQL"s command line utility) was used to upload the "clean" data into a local database instance. PostgreSQL was also used to perform basic survey statistics, like computing the number of rows, and data aggregation (such as counting the number of observations by year). Looking at the frequency tables by year, there appears to be an oddly small number of observations from 2018. This is because there is indeed missing data from June 2018 until the end of the year. For this reason, we chose to work only with data from June 2015 to the end of May 2018.
 
@@ -119,7 +119,7 @@ count_users_by_year(conn)
 
 +++ {"citation-manager": {"citations": {"oz3v4": [{"id": "7765261/VTA4UCWW", "source": "zotero"}]}}, "tags": []}
 
-In addition to selecting only trips from June 2015 to June 2018, we also disregard all rentals whose duration is smaller than one minute (around 4000) - as previously done in the literature <cite id="oz3v4">(Toro et al., 2020)</cite>. This leaves us with more than 11,7 million observations. We will temporarily store these in a [materialised view](https://www.postgresql.org/docs/current/sql-creatematerializedview.html), that we will drop at the end of the data analysis.
+In addition to selecting only trips from June 2015 to June 2018, we also disregard all rentals whose duration is smaller than one minute (around 4000) - as previously done in the literature <cite id="oz3v4">(Toro et al., 2020)</cite>. This leaves us with more than 11,7 million observations. We will temporarily store these in a [materialised view](https://www.postgresql.org/docs/current/sql-creatematerializedview.html), which we will drop at the end of the data analysis.
 
 +++ {"tags": ["hide-cell"]}
 
@@ -155,7 +155,7 @@ def create_materialised_view(connection) -> None:
 
 +++ {"pycharm": {"name": "#%% md\n"}}
 
-The service has almost two-hundred thousands unique subscribers in the time period. For the years 2016 and 2017, the only ones for which we have complete data, the number of subscribers is almost a hundred thousand. By lookind at the unique subscribers for the other two years, it might seem that the number of subscribers in the second half of the year is higher.
+The service has almost two hundred thousand unique subscribers in the time period. For the years 2016 and 2017, the only ones for which we have complete data, the number of subscribers is almost a hundred thousand. By looking at the unique subscribers for the other two years, it might seem that the number of subscribers in the second half of the year is higher.
 
 ```{code-cell} ipython3
 :tags: [hide-input]
@@ -380,9 +380,9 @@ plot_stalls_and_bikelanes()
 
 +++ {"tags": []}
 
-The stalls in the outer stations are not as used as the ones in the city centre, which come up as an abundance of zeros in the data aggregated at daily and hourly level. Some of these stations are practically unused. Besides, the great count of stations would represent a problem in the context of multivariate regressions (the so-called $p > n$ problem). Hence, we can drop the unused stations from our data to help us reduce the dimensionality.
+The stalls in the outer stations are not as used as the ones in the city centre, which come up as an abundance of zeros in the data aggregated at the daily and hourly level. Some of these stations are practically unused. Besides, the great count of stations would represent a problem in the context of multivariate regressions (the so-called $p > n$ problem). Hence, we can drop the unused stations from our data to help us reduce the dimensionality.
 
-We start by creating another two `materialised views` with the daily and hourly rentals, by station. Since the service is only active between 7 and 24, we just keep hourly observations within that time span. If we simply were to `GROUP BY` station names and time units, we would obtain series with gaps in the time index. We first create a table with all possible combinations of stations and dates using a `CROSS JOIN` and a common table expression (or `CTE`), then left join on this table the values obtained via the `GROUP BY` on the reference table. A similar query is used to obtain the hourly rentals, with hourly time intervals instead of daily ones.
+We start by creating another two `materialised views` with the daily and hourly rentals, by the station. Since the service is only active between 7 and 24, we just keep hourly observations within that time span. If we simply were to `GROUP BY` station names and time units, we would obtain a series with gaps in the time index. We first create a table with all possible combinations of stations and dates using a `CROSS JOIN` and a common table expression (or `CTE`), then left join on this table the values obtained via the `GROUP BY` on the reference table. A similar query is used to obtain the hourly rentals, with hourly time intervals instead of daily ones.
 
 +++
 
@@ -485,7 +485,7 @@ def retrieve_daily_rentals(connection) -> pd.DataFrame:
 daily_rentals = retrieve_daily_rentals(conn)
 ```
 
-Then, we compute the number of null values in the data (`null_obs`), pivot the table to wider format and compute the percentage of missing values in each station (`null_obs`). Using Pandas"`cut()` method, we can convert this numerical column into a categorical variable (`null_obs_ranking`) and choose the number of levels - five, in our case - to split the column into even intervals with.
+Then, we compute the number of null values in the data (`null_obs`), pivot the table to wider format, and compute the percentage of missing values in each station (`null_obs`). Using Pandas"`cut()` method, we can convert this numerical column into a categorical variable (`null_obs_ranking`) and choose the number of levels - five, in our case - to split the column into even intervals with.
 
 ```{code-cell} ipython3
 obs_number = daily_rentals.index.unique().shape[0]
@@ -544,7 +544,7 @@ sns.despine()
 plt.show()
 ```
 
-We can also join this data with the station spatial data to plot them. While this does not expose patterns that could be used to reduce the dimensionality of the data, it shows that there are some stations that need to be dropped off even from the most crowded areas in the city. This could not be spotted before as, to the best of our knowledge, no one in the BikeMi literature has ever found a way to take into account of how public work on roads and infrastructure had effects on the bike sharing service.
+We can also join this data with the station spatial data to plot them. While this does not expose patterns that could be used to reduce the dimensionality of the data, it shows that some stations need to be omitted even from the most crowded areas in the city. This could not be spotted before as, to the best of our knowledge, no one in the BikeMi literature has ever found a way to take into account how public work on roads and infrastructure had effects on the bike sharing service.
 
 ```{code-cell} ipython3
 :tags: [hide-input]
@@ -586,7 +586,7 @@ plot_stalls_missing_values()
 
 +++ {"citation-manager": {"citations": {"sopwq": [{"id": "7765261/RZW74C9X", "source": "zotero"}], "srqoj": [{"id": "7765261/VTA4UCWW", "source": "zotero"}]}}, "tags": []}
 
-Besides dropping the "emptiest" stations, we should also come up with a way to narrow down the geographic area inside which we perform the analysis. Previously, authors have chosen to analyse just the area inside the Bastioni, or "Area C" <cite id="sopwq">(Saibene &#38; Manzi, 2015)</cite> or the whole set of stations <cite id="srqoj">(Toro et al., 2020)</cite>. This was mainly due to the different purpose of their analysis and the data availability (Saibene and Manzi analyse data from 2008 to 2012). For our goal, as well as the policymaker perspective, this choice seems restricting, as it leaves out most of the train stations. It is worth noting that analysing the bike sharing traffic inside of Area C can be appropriate: for example, since, the municipality publishes the number of daily accesses to the area, which could be used to evaluate the effect of sharing services on traffic.
+Besides dropping the "emptiest" stations, we should also come up with a way to narrow down the geographic area inside which we perform the analysis. Previously, authors have chosen to analyse just the area inside the Bastioni, or "Area C" <cite id="sopwq">(Saibene &#38; Manzi, 2015)</cite> or the whole set of stations <cite id="srqoj">(Toro et al., 2020)</cite>. This was mainly due to the different purposes of their analysis and the data availability (Saibene and Manzi analyse data from 2008 to 2012). For our goal, as well as the policymaker perspective, this choice seems restricting, as it leaves out most of the train stations. It is worth noting that analysing the bike sharing traffic inside of Area C can be appropriate: for example, since, the municipality publishes the number of daily accesses to the area, which could be used to evaluate the effect of sharing services on traffic.
 
 ```{code-cell} ipython3
 :tags: [hide-input]
@@ -616,9 +616,9 @@ plot_area_c()
 
 +++ {"tags": []}
 
-The area we propose is the road ring across Milan, informally referred to as Circonvallazione. This area encapsulates the city centre, as well as most of the train stations, and is represented by the green shade in the map below. This is arguably limiting, as the area does not take in Lambrate and Villapizzone/Bovisa train stations. However, one might argue that it is unlikely for to choose to go to Lambrate and then rent a bike to get to the city centre, as they can just get to Centrale; the same goes for the other stations. In other words, this area contains the sufficient amount of stations to provide a useful forecast for the policymaker, albeit neglecting the outer stalls.
+The area we propose is the road ring across Milan, informally referred to as Circonvallazione. This area encapsulates the city centre, as well as most of the train stations, and is represented by the green shade in the map below. This is arguably limiting, as the area does not take in Lambrate and Villapizzone/Bovisa train stations. However, one might argue that it is unlikely for individuals to choose to go to Lambrate and then rent a bike to get to the city centre, as they can just get to Centrale; the same goes for the other stations. In other words, this area contains a sufficient amount of stations to provide a useful forecast for the policymaker, albeit neglecting the outer stalls.
 
-This approach might just reinforce the bias towards the centre of the city, but given the technical constraints seems to be the more viable option. However, as a comparison, the Area C would only contain one train station, whereas this area contains all of the top rentals stalls from the origin-destination (OD) matrix.
+This approach might just reinforce the bias towards the centre of the city, but given the technical constraints seems to be the more viable option. However, as a comparison, Area C would only contain one train station, whereas this area contains all of the top rental stalls from the origin-destination (OD) matrix.
 
 ```{code-cell} ipython3
 :tags: [hide-input]
