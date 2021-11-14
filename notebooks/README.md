@@ -2,22 +2,21 @@
 
 A brief explanation of the content of this subdirectory of the repo.
 
-```
+```bash
 .
-├── custom_functions/
-├── 00_retrieve_mila_data.ipynb
-├── 01_retrieve_data.ipynb
-├── 02_spatial_joins.ipynb
-├── 03_univariate_tsa.ipynb
-├── 04_arima_modelling.ipynb
-└── README.md
+├── 01-introduction.ipynb
+├── 02-bikesharing_and_bikemi.ipynb
+├── 03-data_ingestion_and_spatial_operations.ipynb
+├── 04-stations_kmeans.ipynb
+├── 05-time_series_analysis.ipynb
+├── README.md
+└── conclusions.ipynb
 ```
 
-* `custom_functions/` contains the custom functions written to improve readability and reduce boilerplate code,
-* `00_retrieve_milan_data.ipynb`: retrieval of external data, such as the localised data of each station. There is also a script for that in `scripts/`.
-* `01_retrieve_data.ipynb`: get the data for the analysis from the PostgreSQL server.
-* `02_spatial_joins.ipynb`: combining the data obtained in notebooks `00` and `01` to aggregate the time series data at local neighbourhood level (NIL).
-* `03_unvariate_tsa.ipynb`: visualisation of the unvariate time series at the city aggregation level.
-* `04_arima_modelling.ipynb`: fitting of univariate time series models.
-* `README.md`: this file.
+* [`01-introduction.ipynb`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks/01-introduction.ipynb) explains the goal of the project and the motivations.
+* [`02-bikesharing_and_bikemi.ipynb`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks/02-bikesharing_and_bikemi.ipynb) is a review of the bike-sharing literature in general and the previous work done on BikeMi.
+* [`03-data_ingestion_and_spatial_operations.ipynb`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks/03-data_ingestion_and_spatial_operations.ipynb) goes through data management and spatial operations with GeoPandas to reduce the number of stalls from 280 to 200.
+* [`04-stations_kmeans.ipynb`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks/04-stations_kmeans.ipynb) the *k*-Means algorithm is applied to spatially cluster the over 200 stations.
+* [`05-time_series_analysis.ipynb`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks/05-time_series_analysis.ipynb) final aggregations are performed, then decomposition (classic and STL), autocorrelation plots and order of differencing are analysed.
+* [`README.md`](https://github.com/baggiponte/thesis-forecasting/tree/main/notebooks/README.md) is this file.
 

@@ -116,7 +116,6 @@ Through spatial analysis, the researchers confirm that traffic flows from the pe
 
 +++
 
-<!-- BIBLIOGRAPHY START -->
 <div class="csl-bib-body">
   <div class="csl-entry">Airbnb urges housing reform in Berlin after court overturns permit rejection. (2017, September 8). <i>Tech Crunch</i>. https://techcrunch.com/2017/09/08/airbnb-urges-housing-reform-in-berlin-after-court-overturns-permit-rejection/</div>
 
@@ -199,4 +198,3 @@ Through spatial analysis, the researchers confirm that traffic flows from the pe
   <div class="csl-entry">Zhu, R., Zhang, X., Kondor, D., Santi, P., &#38; Ratti, C. (2020). Understanding spatio-temporal heterogeneity of bike-sharing and scooter-sharing mobility. <i>Computers, Environment and Urban Systems</i>, <i>81</i>, 101483. https://doi.org/10.1016/j.compenvurbsys.2020.101483</div>
 
 </div>
-<!-- BIBLIOGRAPHY END -->

@@ -108,7 +108,6 @@ Jupyter Notebooks are being developed since 2001 and they are ever more popular.
 
 +++
 
-<!-- BIBLIOGRAPHY START -->
 <div class="csl-bib-body">
   <div class="csl-entry"><i>Ambiente urbano</i>. (2021, June 17). https://www.istat.it/it/archivio/258691</div>
 
@@ -185,4 +184,3 @@ Jupyter Notebooks are being developed since 2001 and they are ever more popular.
   <div class="csl-entry"><i>Zotero | Your personal research assistant</i>. (n.d.). Retrieved October 24, 2021, from https://www.zotero.org/start</div>
 
 </div>
-<!-- BIBLIOGRAPHY END -->

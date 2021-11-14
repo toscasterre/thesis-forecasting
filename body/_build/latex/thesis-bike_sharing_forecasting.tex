@@ -167,7 +167,7 @@ The Next Generation EU provides Italy with the perfect chance to narrow the divi
 This dissertation stems from the idea that bike sharing systems can be promoted with cheap measures. This is not a new approach to the literature: as an example, Cantelmo and his coauthors attempt to implement a low\sphinxhyphen{}dimensional model for bike\sphinxhyphen{}dharing demand forecasting that does not “focus on the methodological aspect of finding the most advanced algorithm to learn these correlations” (Cantelmo et al., 2020), as these more sophisticated models are prone to overfitting and new issues arise when more data is added to these models, i.e. when new contexts appear in the model space.
 
 \sphinxAtStartPar
-In particular, this project falls in the trunk of literature aimed at improving customer satisfaction through demand forecasting. This task can be split in two categories: demand rebalancing and demand forecasting techniques. The first category, demand rebalancing or repositioning, simply means “design efficient bike repositioning solutions” (Ghosh et al., 2019). Rebalancing can either be user\sphinxhyphen{}based, when the users are offered an incentive to park the bike themselves, or operator\sphinxhyphen{}based. In this latter case, we can also distinguish between static rebalancing (when repositioning occurs when the service is off, like at night) and dynamic rebalancing otherwise (Cantelmo et al., 2020). The second problem, demand forecasting, is the one we will be focusing on. Simply put, demand forecasting attempt to estimate the number of bikes that will be requested at a certain moment in time. This task can be accomplished at the aggregate city level, or by identifying clusters of stations (the so\sphinxhyphen{}called Traffic\sphinxhyphen{}Analysis Zones or \sphinxstyleemphasis{TAZ}) or even at the individual station (Cantelmo et al., 2020).
+In particular, this project falls in the trunk of literature aimed at improving customer satisfaction through demand forecasting, a task of “tremendous commercial value” (Hamad et al., 2021). This task can be split in two categories: demand rebalancing and demand forecasting techniques. The first category, demand rebalancing or repositioning, simply means “design efficient bike repositioning solutions” (Ghosh et al., 2019). Rebalancing can either be user\sphinxhyphen{}based, when the users are offered an incentive to park the bike themselves, or operator\sphinxhyphen{}based. In this latter case, we can also distinguish between static rebalancing (when repositioning occurs when the service is off, like at night) and dynamic rebalancing otherwise (Cantelmo et al., 2020). The second problem, demand forecasting, is the one we will be focusing on. Simply put, demand forecasting attempt to estimate the number of bikes that will be requested at a certain moment in time. This task can be accomplished at the aggregate city level, or by identifying clusters of stations (the so\sphinxhyphen{}called Traffic\sphinxhyphen{}Analysis Zones or \sphinxstyleemphasis{TAZ}) or even at the individual station (Cantelmo et al., 2020).
 
 \sphinxAtStartPar
 These problems became ever more important since the introduction of free\sphinxhyphen{}float bike\sphinxhyphen{}sharing systems (FFBBS), as the bikes can be dropped anywhere and end up in sub\sphinxhyphen{}optimal places for the next customers. On the positive side, FFBBS do not require the upfront investments for building docking stations \sphinxhyphen{} which is necessary for station\sphinxhyphen{}based BSS (also known as SBSS). Furthermore, FFBSS “prevents bike theft”, “by tracking bikes in real\sphinxhyphen{}time with built\sphinxhyphen{}in GPS”, and “offers significant opportunities for smart management”(Pal \& Zhang, 2017). This implies a greater satisfaction level for customers, “because obtaining and returning the bikes becomes much more convenient” (Pal \& Zhang, 2017). However, all of this comes at the increased costs for bike rebalancing, because of how inefficient the redistribution becomes and the higher operating costs in terms of human and financial resources (Pal \& Zhang, 2017). This has been recognised as “one of the main reasons why many FFBS enterprises lose money or even withdrawn from market.”(Tian et al., 2021).
@@ -219,6 +219,85 @@ The tie\sphinxhyphen{}breaker {[}between Wolfram and Jupyter, as well as proprie
 
 \sphinxAtStartPar
 Jupyter Notebooks are being developed since 2001 and they are ever more popular. Perhaps they might even replace the scientific paper (Somers, 2018); what’s sure is that they are ever more present. Indeed, Romer is not the only Nobel prize using open source software: Thomas Sargent, currently 78, uses Julia for his scientific research and launched a website, \sphinxhref{https://quantecon.org/}{QuantEcon} built with Jupyter Books, to teach computational economics in Python and Julia.
+
+
+\section{References}
+\label{\detokenize{01-introduction:references}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 \chapter{Bike Sharing and BikeMi: A Literature Review}
@@ -330,6 +409,91 @@ The authors remove all records before the service working hours, as they might i
 
 \sphinxAtStartPar
 Through spatial analysis, the researchers confirm that traffic flows from the periphery to the city centre in the mornings and back in the evenings, with greater use in the proximity of train stations. These patterns are also captured by cluster analysis. Looking at the weather, the usage starts to decline “dramatically” only around the 20mm threshold. Also Croci and Rossi (Croci \& Rossi, 2014) find that their results are robust to “confounding factors such as weather conditions”. Their research establishes that “the presence of metro and train stations, universities, museums, cinema and restricted traffic areas in correspondence of bike sharing stations significantly increase use. On the other hand the presence of tram and bus stops and theatres does not and has an opposite influence” (Croci \& Rossi, 2014). Lastly, Cappozzo and their coauthors work on scrapped BikeMi data to classify stations to determine “the future \sphinxstyleemphasis{full}, \sphinxstyleemphasis{empty} or \sphinxstyleemphasis{not problematic}” state of each station (Cappozzo et al., n.d.).
+
+
+\section{References}
+\label{\detokenize{02-bikesharing_and_bikemi:references}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 \chapter{BikeMi Data}
@@ -853,6 +1017,23 @@ This leaves us with the following stations, which we store as a \sphinxcode{\sph
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 
+\section{References}
+\label{\detokenize{03-data_ingestion_and_spatial_operations:references}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 \chapter{BikeMi Stalls \sphinxstyleemphasis{k}\sphinxhyphen{}Means Clustering}
 \label{\detokenize{04-stations_kmeans:bikemi-stalls-k-means-clustering}}\label{\detokenize{04-stations_kmeans::doc}}
 
@@ -864,44 +1045,44 @@ we are still left with more than 200 stations, spread across 25 neighbourhoods o
 However, it is still in our interests to reduce the number of series to model even for the univariate forecasting: fitting twenty or two\sphinxhyphen{}hundred series is a different task. Even inspecting the correlation across series becomes a daunting task with such a great number of features.
 
 \sphinxAtStartPar
-To do so, we will use \sphinxstyleemphasis{k}\sphinxhyphen{}means clustering \sphinxhyphen{} a popular method widely used in the sharing\sphinxhyphen{}services literature, especially to identify “virtual stations” in free\sphinxhyphen{}float services (Ma et al., 2018) or to “visualize the spatial distribution of DBS {[}Dockless Bike Sharing{]} and taxis around metro stations” (Li et al., 2019). This strategy, howerver, is also used for docked\sphinxhyphen{}bike sharig services (Cantelmo et al., 2020).
+To do so, we will use \sphinxstyleemphasis{k}\sphinxhyphen{}Means clustering \sphinxhyphen{} a popular method widely used in the sharing\sphinxhyphen{}services literature, especially to identify “virtual stations” in free\sphinxhyphen{}float services (Ma et al., 2018) or to “visualize the spatial distribution of DBS {[}Dockless Bike Sharing{]} and taxis around metro stations” (Li et al., 2019). These “virtual stations” are also called \sphinxstyleemphasis{TAZ}, i.e. Traffic Analysis Zones, and are also used for docked\sphinxhyphen{}bike sharing services (Cantelmo et al., 2020).
 
 
 \subsection{\sphinxstyleemphasis{k}\sphinxhyphen{}Means Clusttering and its Shortcomings}
 \label{\detokenize{04-stations_kmeans:k-means-clusttering-and-its-shortcomings}}
 \sphinxAtStartPar
-In a few words, with \sphinxstyleemphasis{k}\sphinxhyphen{}means clustering  we “want to partition the observations into \(K\) clusters such that the total within\sphinxhyphen{}cluster variation {[}also known as  \sphinxstyleemphasis{inertia}{]}, summed over all \(K\) clusters, is as small as possible” (Sohil et al., 2021). The objective function to optimise is usually the squared Euclidean distance. Simply put, \sphinxstyleemphasis{k}\sphinxhyphen{}means “aims to partition n observations into \(K\) clusters, represented by their centres or means. The centre of each cluster is calculated as the mean of all the instances belonging to that cluster” (Li et al., 2019) and “is extremely efficient and concise for the classification of equivalent multidimensional data” such as sharing services data (Li et al., 2019).
+In a few words, with \sphinxstyleemphasis{k}\sphinxhyphen{}Means clustering  we “want to partition the observations into \(K\) clusters such that the total within\sphinxhyphen{}cluster variation {[}also known as  \sphinxstyleemphasis{inertia}{]}, summed over all \(K\) clusters, is as small as possible” (Sohil et al., 2021). The objective function to optimise is usually the squared Euclidean distance. Simply put, \sphinxstyleemphasis{k}\sphinxhyphen{}Means “aims to partition n observations into \(K\) clusters, represented by their centres or means. The centre of each cluster is calculated as the mean of all the instances belonging to that cluster” (Li et al., 2019) and “is extremely efficient and concise for the classification of equivalent multidimensional data” such as sharing services data (Li et al., 2019).
 
 \sphinxAtStartPar
 The algorithm begins with randomly choosing clusters centres and, with each iteration, the centres are re\sphinxhyphen{}calculated to reduce the partitioning error \sphinxhyphen{} which decreases monotonically, as \(K\) increases. Basically, in this second step the algorithm “creates new centroids by taking the mean value of all of the samples assigned to each previous centroid {[}…{]} until the centroids do not move significantly” (Clustering, n.d.). However, despite similarity always increasing, values of \(K\) that are too great defy the purpose of this classification algorithm. For this reasons, practitioners and researchers have come up with more or less sophisticated ways to assess the optimal number of clusters, the most common of which is the so\sphinxhyphen{}called “Elbow method”. In a few words, a chosen performance metric is computed for each number of clusters and the optimum is represented by the point at which the performance improvements start to marginally decline.
 
 \sphinxAtStartPar
-\sphinxstyleemphasis{k}\sphinxhyphen{}Means clustering scales well with the number of samples \(n\), but assumes convex shapes (i.e., has worse performances where the “true” clusters have elongated or irregular shapes) (Clustering, n.d.). Besides, since the initial position of the cluster is random, it might take some attempt for the algorithm to converge. More importantly, however, \sphinxstyleemphasis{k}\sphinxhyphen{}Means is sensitive to the scales of the variables in the data, so normalising the feature matrix is a crucial step. Finally, \sphinxstyleemphasis{k}\sphinxhyphen{}Means assumes continuous data and is not designed to handle categorical features: “{[}T{]}he \sphinxstyleemphasis{k}\sphinxhyphen{}means algorithm only works on numerical data, i.e. variables that are measured on a ratio scale {[}…{]}, because it minimises a cost function by changing the means of clusters. This prohibits it from being used in applications where categorical data are involved” (Huang, 1998).
+\sphinxstyleemphasis{k}\sphinxhyphen{}Means clustering scales well with the number of samples \(n\), but assumes convex shapes (i.e., has worse performances where the “true” clusters have elongated or irregular shapes) (Clustering, n.d.). Besides, since the initial position of the cluster is random, it might take some attempt for the algorithm to converge. More importantly, however, \sphinxstyleemphasis{k}\sphinxhyphen{}Means is sensitive to the scales of the variables in the data, so normalising the feature matrix is a crucial step. Finally, \sphinxstyleemphasis{k}\sphinxhyphen{}Means assumes continuous data and is not designed to handle categorical features: “{[}T{]}he \sphinxstyleemphasis{k}\sphinxhyphen{}Means algorithm only works on numerical data, i.e. variables that are measured on a ratio scale {[}…{]}, because it minimises a cost function by changing the means of clusters. This prohibits it from being used in applications where categorical data are involved” (Huang, 1998).
 
 
 \subsection{Alternative Approaches to \sphinxstyleemphasis{k}\sphinxhyphen{}Means Clustering}
 \label{\detokenize{04-stations_kmeans:alternative-approaches-to-k-means-clustering}}
 \sphinxAtStartPar
-Some workarounds have long been studied in the literature: as an example, by changing the distance metrics from the Euclidean distance to the Gower distance, which is a measure of similarity (Gower, 1971), \sphinxstyleemphasis{k}\sphinxhyphen{}Means can be adjusted to cluster categorical variables. As an alternative, new methods have been developed, such as the \sphinxstyleemphasis{k}\sphinxhyphen{}Modes (Huang, 1998). These alternative methods rose in popularity because the “quadratic computational costs” of similarity\sphinxhyphen{}based algorithms are not suited for the larger and larger datasets we have been dealing with, especially in the past years.
+Some workarounds have long been known in the literature: as an example, by changing the distance metrics from the Euclidean distance to the Gower distance, which is a measure of similarity (Gower, 1971), \sphinxstyleemphasis{k}\sphinxhyphen{}Means can be adjusted to cluster categorical variables. However, similarity\sphinxhyphen{}based algorithms often display “quadratic computational costs”, and their usage “hinders” the reputation of \sphinxstyleemphasis{k}\sphinxhyphen{}Means, which is know to be a pretty fast algorithm. As an alternative, new methods have been developed, such as the \sphinxstyleemphasis{k}\sphinxhyphen{}Modes (Huang, 1998), which scale well with the larger and larger datasets we have been getting accustomed to in the past ten years.
 
 \sphinxAtStartPar
-Given the data availability, this analysis should not benefit from more sophisticated clustering algorithms. While the chosen sample of stalls would even be small enough to justify an attempt with similarity scores, other meaninfgul regressor are absent from the data \sphinxhyphen{} especially weather data. The features that we could extract from the data, like the neighbourhood, are in fact highly correlated with the geographic coordinates themselves. Another avenue of research might be to exploit spatial attributes, such as the nature and number of building in an area, to provide quantitative measurements of the charatcterisation of one geographic area. For example, the number of train and metro stations (and, to a lesser extent, of bus stops), perhaps within a certain radius from the invididual station, could be used. The share of residential buildings and firms, or the extension of green areas such as parks, might be another one. Some, if not most, of this data could be retrieved using open sources like Open Street Maps, but is out of the scope for this analysis.
+Given the data availability, this analysis should not benefit from more sophisticated clustering algorithms. While the chosen sample of stalls would even be small enough to justify an attempt with similarity scores, other meaningful regressor are absent from the data \sphinxhyphen{} especially weather data. The features that we could extract from the data, like the neighbourhood, are in fact highly correlated with the geographic coordinates themselves. Another avenue of research might be to exploit \sphinxstylestrong{spatial attributes}, such as the nature and number of building in an area, to provide quantitative measurements of the characterisation of one geographic area. For example, the number of train and metro stations (and, to a lesser extent, of bus stops), perhaps within a certain radius from the individual station, could be used. The share of residential buildings and firms, or the extension of green areas such as parks, might be another one. Some, if not most, of this data could be retrieved using open sources like Open Street Maps, but is out of the scope for this analysis.
 
 \sphinxAtStartPar
 The situation changes when we move from a static clustering approach to a dynamic one. Time series clustering (Ali et al., 2019) seems a promising path of research, as it would allow to implement a novel procedure for feature selection, which could be layered on top of a geographic (or spatial) clustering. Time\sphinxhyphen{}series clustering could be paired with spatial cross\sphinxhyphen{}validation folds, whose importance has been underlined since at least the past ten years (Brenning, 2012) (Roberts et al., 2017).
 
 \sphinxAtStartPar
-We know of only one peculiar approach, implemented by Chen and his coauthors (Chen et al., 2016), who implemented a weighted correlation network to account for “contextual factors”. Indeed, according to the authors, “bike usage patterns are highly context dependent: time of the day, day of the week, weather condition, social events, and traffic conditions can all lead to different bike usage patterns”. The authors identify two types of context\sphinxhyphen{}dependencies: “the \sphinxstyleemphasis{common contextual factors} that occur frequently and affect all the stations, such as time and weather” and “the \sphinxstyleemphasis{opportunistic contextual factors} that happen irregularly and only affect a subset of stations, such as social and traffic events” (Chen et al., 2016). The idea behind this is to “build a {[}set of{]} statistical clustering template using historical records (e.g., a cluster template for sunny weekday rush hours)”, that are automatically switched between according to the values of the other regressors.
+We know of only one peculiar approach, implemented by Chen and his coauthors (Chen et al., 2016), who implemented a weighted correlation network to account for “contextual factors”. Indeed, according to the authors, “bike usage patterns are highly context dependent: time of the day, day of the week, weather condition, social events, and traffic conditions can all lead to different bike usage patterns”. The authors identify two types of context\sphinxhyphen{}dependencies: “the \sphinxstyleemphasis{common contextual factors} that occur frequently and affect all the stations, such as time and weather” and “the \sphinxstyleemphasis{opportunistic contextual factors} that happen irregularly and only affect a subset of stations, such as social and traffic events” (Chen et al., 2016). The idea behind this is to “build a {[}set of{]} statistical clustering template{[}s{]} using historical records (e.g., a cluster template for sunny weekday rush hours)”, that are automatically switched between according to the values of the other regressors.
 
 \sphinxAtStartPar
-To provide a more practical example, let us assume that there are four clusters, the results of a the combination two independent variables: whether it is a weekday or weekends, and whether there is sunny or rainy weather. Each of these templates is used to fit a \sphinxstyleemphasis{k}\sphinxhyphen{}means algorithm (actually, Chen and his colleagues build a “correlation network”) and the resulting clustering labels are ‘switched on and off’ as the weather changes from sunny to rainy and the time from weekdays to weekends.
+To provide a more practical example, let us assume that there are four clusters, the results of the combination two independent variables: whether it is a weekday or weekends, and whether there is sunny or rainy weather. Each of these templates is used to fit a \sphinxstyleemphasis{k}\sphinxhyphen{}Means algorithm (actually, Chen and his colleagues build a “correlation network”) and the resulting clustering labels are ‘switched on and off’ as the weather changes from sunny to rainy and the time from weekdays to weekends.
 
 
 \section{\sphinxstyleemphasis{k}\sphinxhyphen{}Means Clustering Evaluation Metrics}
 \label{\detokenize{04-stations_kmeans:k-means-clustering-evaluation-metrics}}
 \sphinxAtStartPar
-The main, if not only, hyperparameter to tune in \sphinxstyleemphasis{k}\sphinxhyphen{}means is, indeed, the number of clusters.
-As most machine learning methods, \sphinxstyleemphasis{k}\sphinxhyphen{}means is a quite old algorithm and has thus been widely studied.
+The main, if not only, hyperparameter to tune in \sphinxstyleemphasis{k}\sphinxhyphen{}Means is, indeed, the number of clusters.
+As most machine learning methods, \sphinxstyleemphasis{k}\sphinxhyphen{}Means is a quite old algorithm and has thus been widely studied.
 The first metric to look at is indeed the inertia, or \sphinxstyleemphasis{within\sphinxhyphen{}cluster sum\sphinxhyphen{}of\sphinxhyphen{}squares} (\(WSS\)), which is usually computed using the Euclidean norm:
 \begin{equation*}
 \begin{split}
@@ -912,10 +1093,10 @@ The first metric to look at is indeed the inertia, or \sphinxstyleemphasis{withi
 Other norms can be used; however, some other performance metrics can only be calculated with the Euclidean distance. While clustering is usually presented as an unsupervised machine\sphinxhyphen{}learning technique, a first set of metrics is actually computed comparing the clustering with the ground truths. This is necessary because the evaluation metrics should not take into account the absolute number of clusters, yet if this clustering defines “separations of the data similar to some ground truth set of classes” (Clustering, n.d.).
 
 \sphinxAtStartPar
-Among these metrics there are the \sphinxstyleemphasis{Rand index}, mutual information\sphinxhyphen{}based scores, measures of completeness and homogeneity (or both, such as the \sphinxstyleemphasis{V\sphinxhyphen{}measure}) and Fowlkes\sphinxhyphen{}Mallows scores. There is, however, another category of metrics that does not require a comparison with the ground\sphinxhyphen{}truth: the \sphinxstyleemphasis{silhouette coefficients}, the \sphinxstyleemphasis{Calinski\sphinxhyphen{}Harabasz index}, computed as  and  the \sphinxstyleemphasis{Davies\sphinxhyphen{}Bouldin index}. The dowside of these evaluation metrics is that they are not robust against “unconventional” shapes and tend to display “better” values when the clusters are convex.
+Among these metrics there are the \sphinxstyleemphasis{Rand index}, mutual information\sphinxhyphen{}based scores, measures of completeness and homogeneity (or both, such as the \sphinxstyleemphasis{V\sphinxhyphen{}measure}) and Fowlkes\sphinxhyphen{}Mallows scores. There is, however, another category of metrics that does not require a comparison with the ground\sphinxhyphen{}truth: the \sphinxstyleemphasis{silhouette coefficients}, the \sphinxstyleemphasis{Calinski\sphinxhyphen{}Harabasz index}, computed as  and  the \sphinxstyleemphasis{Davies\sphinxhyphen{}Bouldin index}. The downside of these evaluation metrics is that they are not robust against “unconventional” shapes and tend to display “better” values when the clusters are convex.
 
 \sphinxAtStartPar
-These measures are computed for each set of data points and the labels assigned with the \sphinxstyleemphasis{k}\sphinxhyphen{}means. The silhouette score is computed as \(s = \frac{b - a}{max(a, b)}\), where \(a\) is the mean distance between a sample and all points in the same class and \(b\) is the average distance between the sample and the points in the \sphinxstyleemphasis{next nearest} cluster. The silhouette coefficients for all samples are averaged and a higher silhouette coefficient relates to a model with better defined clusters (Clustering, n.d.). For this reason, the silhouette score is defined within \([-1;1]\), and scores closer to \(-1\) denote incorrect clustering and values near \(0\) indicate overlapping data points.
+These measures are computed for each set of data points and the labels assigned with the \sphinxstyleemphasis{k}\sphinxhyphen{}Means. The silhouette score is computed as \(s = \frac{b - a}{max(a, b)}\), where \(a\) is the mean distance between a sample and all points in the same class and \(b\) is the average distance between the sample and the points in the \sphinxstyleemphasis{next nearest} cluster. The silhouette coefficients for all samples are averaged and a higher silhouette coefficient relates to a model with better defined clusters (Clustering, n.d.). For this reason, the silhouette score is defined within \([-1;1]\), and scores closer to \(-1\) denote incorrect clustering and values near \(0\) indicate overlapping data points.
 
 \sphinxAtStartPar
 The Calinski\sphinxhyphen{}Harabasz Index is defined as:
@@ -958,10 +1139,10 @@ DB = \frac{1}{k} \sum_{i=1}^k \max_{i \neq j} R_{ij}
 \section{Fitting \sphinxstyleemphasis{k}\sphinxhyphen{}Means on BikeMi Stalls Geographic Data}
 \label{\detokenize{04-stations_kmeans:fitting-k-means-on-bikemi-stalls-geographic-data}}
 \sphinxAtStartPar
-We define two functions, using Python and its \sphinxcode{\sphinxupquote{scikit\sphinxhyphen{}learn}} library to fit an arbitrarily large number of \sphinxstyleemphasis{k}\sphinxhyphen{}means iterations and collect the chosen metrics to evaluate their performance. As a graphic aid, the second function plots this data in a grid, to easen graphic analysis. It is worth nothing that \sphinxcode{\sphinxupquote{scikit\sphinxhyphen{}learn}} is widely used in the literature (Cantelmo et al., 2020) (Li et al., 2019).
+We define two functions, using Python and its \sphinxcode{\sphinxupquote{scikit\sphinxhyphen{}learn}} library. The first one fits one instance of \sphinxstyleemphasis{k}\sphinxhyphen{}Means up to an arbitrarily large number of clusters, and collects the chosen metrics to evaluate their performance. As a graphic aid, the second function plots this data in a grid, to ease graphic analysis. It is worth nothing that \sphinxcode{\sphinxupquote{scikit\sphinxhyphen{}learn}} is widely used in the literature (Cantelmo et al., 2020) (Li et al., 2019).
 
 \sphinxAtStartPar
-The \(WSS\) or inertia is not really indicative of a significant value of \(K\). The silhouette coefficient is greatest for a quite small number of clusters (smaller than 5) and in general not greater than 20. This appears to be the case for the Calinski\sphinxhyphen{}Harabasz index too and, while the same cannot be said of the Davies\sphinxhyphen{}Bouldin index, beyond said threshold the index is bound to improve. Our final choice should fall on 18, as we believe that clustering the whole set of stations into three great clusters bears no practical utility for the purpose of the policymaker \sphinxhyphen{} forecasting the bikes demand in Milan.
+The \(WSS\) or inertia is not really indicative of a significant value of \(K\). The silhouette coefficient is greatest for a quite small number of clusters (smaller than 5) and in general not greater than 20. This appears to be the case for the Calinski\sphinxhyphen{}Harabasz index too and, while the same cannot be said of the Davies\sphinxhyphen{}Bouldin index, beyond said threshold the index is bound to improve. Our final choice should fall on 18, as we believe that clustering the whole set of stations into three great TAZ bears no practical utility for the purpose of the policymaker \sphinxhyphen{} i.e., forecasting bikes demand in Milan.
 
 \begin{sphinxuseclass}{cell}
 \begin{sphinxuseclass}{cell_input}
@@ -973,10 +1154,8 @@ The \(WSS\) or inertia is not really indicative of a significant value of \(K\).
     \PYG{n}{Metrics} \PYG{o}{=} \PYG{n+nb}{tuple}\PYG{p}{[}\PYG{n+nb}{float}\PYG{p}{,} \PYG{n+nb}{float}\PYG{p}{,} \PYG{n+nb}{float}\PYG{p}{,} \PYG{n+nb}{float}\PYG{p}{]}
 
     \PYG{k}{def} \PYG{n+nf}{compute\PYGZus{}scores}\PYG{p}{(}\PYG{n}{source\PYGZus{}data}\PYG{p}{,} \PYG{n}{num\PYGZus{}clusters}\PYG{p}{,} \PYG{n}{rand}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{Metrics}\PYG{p}{:}
-        \PYG{c+c1}{\PYGZsh{} fit kmeans}
         \PYG{n}{kmeans} \PYG{o}{=} \PYG{n}{KMeans}\PYG{p}{(}\PYG{n}{num\PYGZus{}clusters}\PYG{p}{,} \PYG{n}{random\PYGZus{}state}\PYG{o}{=}\PYG{n}{rand}\PYG{p}{)}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{(}\PYG{n}{source\PYGZus{}data}\PYG{p}{)}
 
-        \PYG{c+c1}{\PYGZsh{} scores}
         \PYG{n}{inertia} \PYG{o}{=} \PYG{n}{kmeans}\PYG{o}{.}\PYG{n}{inertia\PYGZus{}}
         \PYG{n}{silhouette\PYGZus{}coefficient} \PYG{o}{=} \PYG{n}{silhouette\PYGZus{}score}\PYG{p}{(}\PYG{n}{source\PYGZus{}data}\PYG{p}{,} \PYG{n}{kmeans}\PYG{o}{.}\PYG{n}{labels\PYGZus{}}\PYG{p}{,} \PYG{n}{metric}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{euclidean}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
         \PYG{n}{calinski\PYGZus{}harabasz} \PYG{o}{=} \PYG{n}{calinski\PYGZus{}harabasz\PYGZus{}score}\PYG{p}{(}\PYG{n}{source\PYGZus{}data}\PYG{p}{,} \PYG{n}{kmeans}\PYG{o}{.}\PYG{n}{labels\PYGZus{}}\PYG{p}{)}
@@ -1021,7 +1200,7 @@ The \(WSS\) or inertia is not really indicative of a significant value of \(K\).
 \end{sphinxuseclass}
 \end{sphinxuseclass}
 \sphinxAtStartPar
-However, as mentioned above, the total number of neighbourhoods inside our area of analysis is 25: at this point, the policymaker might just be better off aggregating the data by neighbourhood, without going through the hassle of computing the \sphinxstyleemphasis{k}\sphinxhyphen{}means. Indeed, in this context the purpose of fitting a \sphinxstyleemphasis{k}\sphinxhyphen{}means should be to isolate a small amount of clusters inside of each neighbourhood, in order to be able to aggregate together stations that are quite close to each other and that cannot all be used at once as independent variables for the forecasting models without injecting error in the estimates via multicollinearity. In this way, it would also be possible to include neighbourhood fixed effects \sphinxhyphen{} which would otherwise be impossible to add to the regression if data was aggregated ad that level.
+However, as mentioned above, the total number of neighbourhoods inside our area of analysis is 25: at this point, the policymaker might just be better off aggregating the data by neighbourhood, without going through the hassle of computing the \sphinxstyleemphasis{k}\sphinxhyphen{}Means. Indeed, in this context the purpose of fitting a \sphinxstyleemphasis{k}\sphinxhyphen{}Means should be to isolate a small amount of Traffic Analysis Zones inside each neighbourhood, in order to be able to aggregate together stations that are quite close to each other and that cannot all be used at once as independent variables for the forecasting models without injecting error in the estimates via multicollinearity. In this way, it would also be possible to include neighbourhood fixed effects \sphinxhyphen{} which would otherwise be impossible to add to the regression if data was aggregated ad that level.
 
 \begin{sphinxuseclass}{cell}
 \begin{sphinxuseclass}{cell_input}

@@ -7,6 +7,7 @@ This is the repository for my graduate thesis on time series forecasting, compar
 ## Structure of the repo
 
 ```bash.
+.
 ├── README.md
 ├── body
 ├── data
@@ -29,7 +30,8 @@ This is the repository for my graduate thesis on time series forecasting, compar
 
 * [`README.md`](https://github.com/baggiponte/thesis-forecasting/tree/main/README.md) is this file.
 * [`body`](https://github.com/baggiponte/thesis-forecasting/tree/main/body) contains the MyST (Markedly Structured Text) notebooks used to convert the Jupyter Notebooks into the PDF book.
-* [`data`](https://github.com/baggiponte/thesis-forecasting/tree/main/data) containst the data that could be disclosed. The private data is stored on a private database.
+    * The compiled `.pdf` is [here](https://github.com/baggiponte/thesis-forecasting/blob/main/body/_build/latex/thesis-bike_sharing_forecasting.pdf)
+* [`data`](https://github.com/baggiponte/thesis-forecasting/tree/main/data) contains the data that could be disclosed. The private data is stored on a private database.
   * [`milan`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/milan) contains the open data about Milan that I collected and manipulated
   * [`queries`](https://github.com/baggiponte/thesis-forecasting/tree/main/data/queries) contains the SQL queries to retrieve the data from the server and create materialised views.
 * [`environment.yml`](https://github.com/baggiponte/thesis-forecasting/tree/main/environment.yml) is the specification files to reproduce this project.
