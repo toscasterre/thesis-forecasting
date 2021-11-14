@@ -58,7 +58,7 @@ daily_outflow.info()
 
 +++
 
-We first use the Python library `statsmodels` to attempt a first time series decomposition and see some patterns.
+We first use the Python library `statsmodels` to attempt an initial time series decomposition and see some patterns.
 
 ```{code-cell} ipython3
 from statsmodels.tsa.seasonal import seasonal_decompose
@@ -92,7 +92,7 @@ plt.suptitle("Daily Rentals Additive Seasonal Decomposition")
 plt.show()
 ```
 
-Just by looking at the residuals we realise that the seasonal component is not filtered out in the most optimal way - the residual variance changes across time. One strategy might be to take logs and see if the residuals become less volatile. Let's see what changes with a multiplicative decomposition:
+Just by looking at the residuals, we realise that the seasonal component is not filtered out in the most optimal way - the residual variance changes across time. One strategy might be to take logs and see if the residuals become less volatile. Let's see what changes with a multiplicative decomposition:
 
 ```{code-cell} ipython3
 weekly_seasonal_decomposition = seasonal_decompose(
@@ -125,7 +125,7 @@ plt.suptitle("Daily Rentals Multiplicative Seasonal Decomposition")
 plt.show()
 ```
 
-While the first part of the series is slightly better handled, the declining trend in the last part of the year translates into much greater variance towards of the residuals at the end of the year.
+While the first part of the series is slightly better handled, the declining trend in the last part of the year translates into a much greater variance towards of the residuals at the end of the year.
 
 +++ {"tags": []}
 
@@ -151,7 +151,7 @@ daily_outflow.plot(
 ).update_layout(**plotly_styles).update_traces(hovertemplate=None)
 ```
 
-Clearly, taking first differences does not remove the seasonal component - but removes the trend and seemingly returns stationary data. However, as recommended in Hyndman (quote), we need to apply first the seasonal differcing.
+Clearly, taking first differences does not remove the seasonal component - but removes the trend and seemingly returns stationary data. However, as recommended in Hyndman (quote), we need to apply first the seasonal differencing.
 
 First differencing remarks the time-varying nature of the seasonal component of the series, pointing ever more convincingly to an STL decomposition.
 
@@ -167,7 +167,7 @@ daily_outflow.plot(
 ).update_layout(**plotly_styles).update_traces(hovertemplate=None)
 ```
 
-There is a great variance in the seris: around the end of April, there are consecutive days where there is a difference of ten thousand rentals. At first glance, it seems that seasonal differences do not make the series unequivocally stationary. Let's verify it with a statistical test:
+There is a great variance in the series: around the end of April, there are consecutive days where there is a difference of ten thousand rentals. At first glance, it seems that seasonal differences do not make the series unequivocally stationary. Let's verify it with a statistical test:
 
 ```{code-cell} ipython3
 from statsmodels.tsa.stattools import adfuller, kpss
@@ -196,13 +196,13 @@ KPSS p-value is {kpss_results[1]:.2%}: {"the series is stationary (there is no u
 
 `statsmodels` guide summarises the ADFuller test in this way:
 
-> The null hypothesis of the Augmented Dickey-Fuller is that there is a unit root, with the alternative that there is no unit root. If the pvalue is above a critical size, then we cannot reject that there is a unit root.
+> The null hypothesis of the Augmented Dickey-Fuller is that there is a unit root, with the alternative that there is no unit root. If the p-value is above a critical size, then we cannot reject that there is a unit root.
 
 The presence of a unit root signifies a non-stationary time series. The p-value is much smaller than 5%, so we can safely reject the null hypothesis: there is no unit root, i.e. the series is stationary.
 
 THe Kwiatkowski-Phillips-Schmidt-Shin (KPSS) tests for the null hypothesis that a time series $x$ is level or trend stationary. In other words, we want the p-value to be greater than 5%: in this way, we fail to reject the null hypothesis and we can assume it is trend stationary.
 
-`statsmodels` warns us that the test statistics is actually outside of the range of p-values available in the statistical table - this means that the p-value is greater than ten percent. This means we fail to reject the null and that our series is stationary.
+`statsmodels` warns us that the test statistics are actually outside of the range of p-values available in the statistical table - this means that the p-value is greater than ten percent. This means we fail to reject the null and that our series is stationary.
 
 However, we might not be satisfied with this - let's have a look at the double differences.
 
@@ -239,9 +239,9 @@ The series is more convincingly stationary, but still displays a large variance.
 )
 ```
 
-This transformation removes stationarity and seasonality, but does not really deal with the variance in the data. We can use our human knowledge to explain some of this variation: holidays, first of all. Then we would expect the temperature to play a role, in conjunction with precipitation (i.e. the winter), which could explain the greater variance around the last months of the year.
+This transformation removes stationarity and seasonality but does not really deal with the variance in the data. We can use our human knowledge to explain some of this variation: holidays, first of all. Then we would expect the temperature to play a role, in conjunction with precipitation (i.e. the winter), which could explain the greater variance around the last months of the year.
 
-This suggests that even a SARIMA model might not compete with something like Prophet, which can exploit holiday patterns and models piecewise trends. However, without the aid of external data, neither of the two models can take into account rainy days or colder weather - even via categorical variables such as dummies for each month. A ETS model could also exploit these patterns.
+This suggests that even a SARIMA model might not compete with something like Prophet, which can exploit holiday patterns and model piecewise trends. However, without the aid of external data, neither of the two models can take into account rainy days or colder weather - even via categorical variables such as dummies for each month. An ETS model could also exploit these patterns.
 
 +++ {"tags": []}
 
@@ -273,7 +273,7 @@ plot_pacf(
 plt.plot()
 ```
 
-The autocorrelation plot shows a sinusoidal dependence with past lags; the first (and second) lags are significant, and so do the multiples of 7, even beyond the 30th lag. This fact should not be too surprising: we could already spot it from the 30 day window moving average, but is still remarkable. This will likely entail a greater MA component for our (S)ARIMA models; in particular, the ACF suggests a moving average component with 1-2 lags and possibly even more seasonal lags. The partial autocorrelation function indicates an autoregressive component of 1 and a seasonal AR component of perhaps 1 lag.
+The autocorrelation plot shows a sinusoidal dependence with past lags; the first (and second) lags are significant, and so do the multiples of 7, even beyond the 30th lag. This fact should not be too surprising: we could already spot it from the 30-day window moving average but is still remarkable. This will likely entail a greater MA component for our (S)ARIMA models; in particular, the ACF suggests a moving average component with 1-2 lags and possibly even more seasonal lags. The partial autocorrelation function indicates an autoregressive component of 1 and a seasonal AR component of perhaps 1 lag.
 
 +++ {"tags": []}
 
@@ -281,7 +281,7 @@ The autocorrelation plot shows a sinusoidal dependence with past lags; the first
 
 +++ {"citation-manager": {"citations": {"hmqko": [{"id": "7765261/JEKFIWNG", "source": "zotero"}]}}, "tags": []}
 
-STL decomposition exploits LOESS, i.e. locally estimated scatterplot smoothing, can handle time-varying seasonality. However, as pointed out by Hyndman and ..., STL «does not handle trading day or calendar variation automatically, and it only provides facilities for additive decompositions». This method was developed by <cite id="hmqko">(Cleveland et al., 1990)</cite>.
+STL decomposition exploits LOESS, i.e. locally estimated scatterplot smoothing, which can handle time-varying seasonality. However, as pointed out by Hyndman and ..., STL «does not handle a trading day or calendar variation automatically, and it only provides facilities for additive decompositions». This method was developed by <cite id="hmqko">(Cleveland et al., 1990)</cite>.
 
 In `statsmodels`, the function to perform the STL decomposition is `STL`. It has the following categories of parameters:
 
@@ -301,13 +301,13 @@ Degrees parameters, i.e. whether to use a constant or a constant and trend:
 
 Interpolation step parameters:
 
-* `seasonal_jumpint` is a positive integer determining the linear interpolation step. If larger than 1, the LOESS is used every `seasonal_jump` points and linear interpolation is between fitted points. Higher values reduce estimation time.
-* `trend_jumpint` is a positive integer determining the linear interpolation step. If larger than 1, the LOESS is used every `trend_jump points` and values between the two are linearly interpolated. Higher values reduce estimation time.
-* `low_pass_jumpint` is the last positive integer determining the linear interpolation step. If larger than 1, the LOESS is used every `low_pass_jump` points and values between the two are linearly interpolated. Higher values reduce estimation time.
+* `seasonal_jumpint` is a positive integer determining the linear interpolation step. If larger than 1, the LOESS is used for every `seasonal_jump` point and linear interpolation is between fitted points. Higher values reduce estimation time.
+* `trend_jumpint` is a positive integer determining the linear interpolation step. If larger than 1, the LOESS is used for every `trend_jump` point, and values between the two are linearly interpolated. Higher values reduce estimation time.
+* `low_pass_jumpint` is the last positive integer determining the linear interpolation step. If larger than 1, the LOESS is used for every `low_pass_jump` point, and values between the two are linearly interpolated. Higher values reduce estimation time.
 
 The function also has a `robustbool` flag, indicating whether to use a weighted version that is robust to some forms of outliers.
 
-These defaults ensure us that we can pretty much cast the function without tweaking the parameters
+These defaults ensure that we can pretty much cast the function without tweaking the parameters
 
 ```{code-cell} ipython3
 from statsmodels.tsa.seasonal import STL
@@ -332,7 +332,7 @@ plt.suptitle("STL Decomposition")
 plt.show()
 ```
 
-The results are remarkable: the seasonal component captures a great deal of variance - yet not all of it. The solution might be to employ a multiplicative decomposition - which cannot directly be attained by the STL decompositiona and will require us to go through taking logs of the data.
+The results are remarkable: the seasonal component captures a great deal of variance - yet not all of it. The solution might be to employ a multiplicative decomposition - which cannot directly be attained by the STL decompositions and will require us to go through taking logs of the data.
 
 ```{code-cell} ipython3
 stl_log_decomposition = STL(daily_outflow.apply(np.log), period=7).fit()
